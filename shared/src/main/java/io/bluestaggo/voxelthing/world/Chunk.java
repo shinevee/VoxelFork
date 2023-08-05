@@ -5,6 +5,7 @@ import io.bluestaggo.voxelthing.world.block.Block;
 public class Chunk {
 	public static final int SIZE_POW2 = 5;
 	public static final int LENGTH = 1 << SIZE_POW2;
+	public static final int LENGTH_MASK = (1 << SIZE_POW2) - 1;
 	public static final int AREA = 1 << SIZE_POW2 * 2;
 	public static final int VOLUME = 1 << SIZE_POW2 * 3;
 
@@ -25,16 +26,32 @@ public class Chunk {
 		return (x << SIZE_POW2 | z) << SIZE_POW2 | y;
 	}
 
-	public int getBlockId(int x, int y, int z) {
-		return blocks[arrayCoords(x, y, z)] & 0xFFFF;
+	public int toGlobalX(int x) {
+		return x + (this.x << Chunk.SIZE_POW2);
+	}
+
+	public int toGlobalY(int y) {
+		return y + (this.y << Chunk.SIZE_POW2);
+	}
+
+	public int toGlobalZ(int z) {
+		return z + (this.z << Chunk.SIZE_POW2);
+	}
+
+	public short getBlockId(int x, int y, int z) {
+		if (!containsLocal(x, y, z)) {
+			return this.world.getBlockId(toGlobalX(x), toGlobalY(y), toGlobalZ(z));
+		}
+
+		return blocks[arrayCoords(x, y, z)];
 	}
 
 	public Block getBlock(int x, int y, int z) {
 		return Block.fromId(getBlockId(x, y, z));
 	}
 
-	public void setBlockId(int x, int y, int z, int id) {
-		blocks[arrayCoords(x, y, z)] = (short) id;
+	public void setBlockId(int x, int y, int z, short id) {
+		blocks[arrayCoords(x, y, z)] = id;
 		if (id > 0) {
 			empty = false;
 		}
@@ -46,5 +63,18 @@ public class Chunk {
 
 	public boolean isEmpty() {
 		return empty;
+	}
+
+	public boolean contains(int x, int y, int z) {
+		x -= this.x * Chunk.LENGTH;
+		y -= this.y * Chunk.LENGTH;
+		z -= this.z * Chunk.LENGTH;
+		return containsLocal(x, y, z);
+	}
+
+	public boolean containsLocal(int x, int y, int z) {
+		return x >= 0 && x < Chunk.LENGTH
+				&& y >= 0 && y < Chunk.LENGTH
+				&& z >= 0 && z < Chunk.LENGTH;
 	}
 }

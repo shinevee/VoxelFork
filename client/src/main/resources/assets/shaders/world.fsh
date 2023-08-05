@@ -15,9 +15,10 @@ uniform float camFar;
 uniform float width;
 uniform float height;
 uniform int fogAlgorithm = 3;
+uniform float fade;
 
 float doFog(float fog) {
-    return fog * 2.0 - 1.0;
+    return mix(fog * 2.0 - 1.0, 1.0, fade);
 }
 
 void main() {

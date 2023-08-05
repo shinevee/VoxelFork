@@ -4,8 +4,10 @@ import io.bluestaggo.voxelthing.renderer.Bindings;
 import io.bluestaggo.voxelthing.renderer.GLState;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.util.WorldPrimitives;
+import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.World;
+import org.joml.FrustumIntersection;
 import org.joml.Vector3f;
 
 import java.util.Arrays;
@@ -22,7 +24,7 @@ public class WorldRenderer {
 	private int maxX, maxY, maxZ;
 	private int renderRange;
 
-	public int renderDistance = 12;
+	public int renderDistance = 16;
 
 	public WorldRenderer(MainRenderer renderer) {
 		this.renderer = renderer;
@@ -66,9 +68,14 @@ public class WorldRenderer {
 				.toList();
 
 		int updates = 0;
-		int maxUpdates = 3;
+		int maxUpdates = 5;
+
+		FrustumIntersection frustum = this.renderer.camera.getFrustum();
+		double currentTime = Window.getTimeElapsed();
 
 		for (ChunkRenderer chunkRenderer : sortedChunkRenderers) {
+			if (!chunkRenderer.inFrustum(frustum)) continue;
+
 			if (updates < maxUpdates) {
 				int cx = chunkRenderer.getX();
 				int cy = chunkRenderer.getY();
@@ -84,6 +91,8 @@ public class WorldRenderer {
 					updates++;
 				}
 			}
+
+			renderer.worldShader.fade.set((float)chunkRenderer.getFadeAmount(currentTime));
 			chunkRenderer.draw();
 		}
 	}

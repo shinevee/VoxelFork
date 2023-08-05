@@ -1,6 +1,7 @@
 package io.bluestaggo.voxelthing.renderer;
 
 import io.bluestaggo.voxelthing.window.Window;
+import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -9,10 +10,11 @@ public class Camera {
 	private CameraController controller;
 
 	private final Vector3f position = new Vector3f();
-	private Vector3f front;
-	private Vector3f up = new Vector3f();
-	private Vector3f right = new Vector3f();
-	private Vector3f target = new Vector3f();
+	private final FrustumIntersection frustum = new FrustumIntersection();
+	private final Vector3f front;
+	private final Vector3f up = new Vector3f();
+	private final Vector3f right = new Vector3f();
+	private final Vector3f target = new Vector3f();
 
 	private float yaw = -90.0f;
 	private float pitch = 0.0f;
@@ -73,6 +75,7 @@ public class Camera {
 		front.cross(0.0f, 1.0f, 0.0f, right);
 		right.cross(front, up);
 		position.add(front, target);
+		frustum.set(getProj().mul(getView()));
 	}
 
 	public Vector3f getPosition() {
@@ -101,5 +104,9 @@ public class Camera {
 
 	public Matrix4f getProj() {
 		return proj.identity().perspective(fov, (float) window.getWidth() / (float) window.getHeight(), near, far);
+	}
+
+	public FrustumIntersection getFrustum() {
+		return frustum;
 	}
 }

@@ -16,6 +16,7 @@ public class WorldShader extends Shader {
 	public final ShaderUniform<Float> width;
 	public final ShaderUniform<Float> height;
 	public final ShaderUniform<Integer> fogAlgorithm;
+	public final ShaderUniform<Float> fade;
 
 	public WorldShader() throws IOException {
 		super("/assets/shaders/world");
@@ -30,6 +31,7 @@ public class WorldShader extends Shader {
 		width = getUniform1f("width");
 		height = getUniform1f("height");
 		fogAlgorithm = getUniform1i("fogAlgorithm");
+		fade = getUniform1f("fade");
 
 		stop();
 	}

@@ -24,6 +24,7 @@ public class ChunkStorage {
 		if (chunk == null || chunk.x != x || chunk.y != y || chunk.z != z) {
 			return null;
 		}
+
 		return chunk;
 	}
 

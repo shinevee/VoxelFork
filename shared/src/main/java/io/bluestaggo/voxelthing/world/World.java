@@ -53,6 +53,10 @@ public class World {
 		return chunkStorage.getChunkAt(x, y, z);
 	}
 
+	public boolean chunkExists(int x, int y, int z) {
+		return getChunkAt(x, y, z) != null;
+	}
+
 	public Chunk getChunkAtBlock(int x, int y, int z) {
 		return getChunkAt(
 				Math.floorDiv(x, Chunk.LENGTH),
@@ -61,12 +65,28 @@ public class World {
 		);
 	}
 
+	public boolean chunkExistsAtBlock(int x, int y, int z) {
+		return getChunkAtBlock(x, y, z) != null;
+	}
+
 	public Block getBlock(int x, int y, int z) {
 		Chunk chunk = getChunkAtBlock(x, y, z);
 		if (chunk == null) {
 			return null;
 		}
 		return chunk.getBlock(
+				Math.floorMod(x, Chunk.LENGTH),
+				Math.floorMod(y, Chunk.LENGTH),
+				Math.floorMod(z, Chunk.LENGTH)
+		);
+	}
+
+	public short getBlockId(int x, int y, int z) {
+		Chunk chunk = getChunkAtBlock(x, y, z);
+		if (chunk == null) {
+			return 0;
+		}
+		return chunk.getBlockId(
 				Math.floorMod(x, Chunk.LENGTH),
 				Math.floorMod(y, Chunk.LENGTH),
 				Math.floorMod(z, Chunk.LENGTH)

@@ -4,13 +4,17 @@ import io.bluestaggo.voxelthing.util.MathUtil;
 import io.bluestaggo.voxelthing.util.OpenSimplex2Octaves;
 import io.bluestaggo.voxelthing.world.Chunk;
 
+import java.util.Arrays;
+
 public class GenerationInfo {
 	public final int chunkX, chunkZ;
 	private long randSeed;
 
 	private final long caveSeed;
 
-	private final float[] height;
+	private final float[] height = new float[Chunk.AREA];
+	private final float[] caveInfo = new float[729];
+	private int lastQueryLayer = Integer.MAX_VALUE;
 
 	public GenerationInfo(long salt, int cx, int cz) {
 		randSeed = salt;
@@ -32,7 +36,6 @@ public class GenerationInfo {
 		final float hillThresholdMin = -0.5f;
 		final float hillThresholdMax = 1.0f;
 
-		height = new float[Chunk.AREA];
 		for (int x = 0; x < Chunk.LENGTH; x++) {
 			for (int z = 0; z < Chunk.LENGTH; z++) {
 				int xx = (cx * Chunk.LENGTH + x);
@@ -51,6 +54,10 @@ public class GenerationInfo {
 		}
 	}
 
+	private static int index3D(int x, int y, int z, int length) {
+		return ((x * length) + y) * length + z;
+	}
+
 	private long splitMix() {
 		long z = (randSeed += 0x9e3779b97f4a7c15L);
 	    z = (z ^ (z >>> 30)) * 0xbf58476d1ce4e5b9L;
@@ -62,20 +69,56 @@ public class GenerationInfo {
 		return height[x + z * Chunk.LENGTH];
 	}
 
-	public boolean getCave(int x, int yy, int z) {
-		int xx = chunkX * Chunk.LENGTH + x;
-		int zz = chunkZ * Chunk.LENGTH + z;
+	public boolean getCave(int x, int y, int z) {
+		if (lastQueryLayer != y >> Chunk.SIZE_POW2) {
+			generateCaves(y >> Chunk.SIZE_POW2);
+		}
 
-		final int cheeseOctaves = 3;
-		final double cheeseScaleXZ = 100.0;
-		final double cheeseScaleY = 50.0;
 		final float cheeseMinDensity = -1.0f;
 		final float cheeseMaxDensity = -0.3f;
 		final float cheeseDensitySpread = 100.0f;
 		final float cheeseDensitySurface = -0.5f;
 
-		float cheese = OpenSimplex2Octaves.noise3_ImproveXZ(caveSeed, cheeseOctaves, xx / cheeseScaleXZ, yy / cheeseScaleY, zz / cheeseScaleXZ);
-		float cheeseThreshold = MathUtil.clamp(-yy / cheeseDensitySpread + cheeseDensitySurface, cheeseMinDensity, cheeseMaxDensity);
-		return cheese < cheeseThreshold;
+		int shiftPow2 = Chunk.SIZE_POW2 - 3;
+		int shiftMask = Chunk.LENGTH_MASK >> 3;
+		int shiftDiv = Chunk.LENGTH >> 3;
+		int xx = x >> shiftPow2;
+		int yy = (y & Chunk.LENGTH_MASK) >> shiftPow2;
+		int zz = z >> shiftPow2;
+
+		float c000 = caveInfo[index3D(xx, yy, zz, 9)];
+		float c001 = caveInfo[index3D(xx, yy, zz + 1, 9)];
+		float c010 = caveInfo[index3D(xx, yy + 1, zz, 9)];
+		float c011 = caveInfo[index3D(xx, yy + 1, zz + 1, 9)];
+		float c100 = caveInfo[index3D(xx + 1, yy, zz, 9)];
+		float c101 = caveInfo[index3D(xx + 1, yy, zz + 1, 9)];
+		float c110 = caveInfo[index3D(xx + 1, yy + 1, zz, 9)];
+		float c111 = caveInfo[index3D(xx + 1, yy + 1, zz + 1, 9)];
+		float caveInfo = MathUtil.trilinear(c000, c001, c010, c011, c100, c101, c110, c111,
+					(x & shiftMask) / (float) shiftDiv, (y & shiftMask) / (float) shiftDiv, (z & shiftMask) / (float) shiftDiv);
+		float cheeseThreshold = MathUtil.clamp(-y / cheeseDensitySpread + cheeseDensitySurface, cheeseMinDensity, cheeseMaxDensity);
+		return caveInfo < cheeseThreshold;
+	}
+
+	private void generateCaves(int layer) {
+		lastQueryLayer = layer;
+		Arrays.fill(caveInfo, 0);
+
+		final int cheeseOctaves = 4;
+		final double cheeseScaleXZ = 100.0;
+		final double cheeseScaleY = 50.0;
+
+		for (int x = 0; x < 9; x++) {
+			for (int y = 0; y < 9; y++) {
+				for (int z = 0; z < 9; z++) {
+					int xx = (x << (Chunk.SIZE_POW2 - 3)) + (chunkX << Chunk.SIZE_POW2);
+					int yy = (y << (Chunk.SIZE_POW2 - 3)) + (layer << Chunk.SIZE_POW2);
+					int zz = (z << (Chunk.SIZE_POW2 - 3)) + (chunkZ << Chunk.SIZE_POW2);
+
+					float cheese = OpenSimplex2Octaves.noise3_ImproveXZ(caveSeed, cheeseOctaves, xx / cheeseScaleXZ, yy / cheeseScaleY, zz / cheeseScaleXZ);
+					caveInfo[index3D(x, y, z, 9)] = cheese;
+				}
+			}
+		}
 	}
 }

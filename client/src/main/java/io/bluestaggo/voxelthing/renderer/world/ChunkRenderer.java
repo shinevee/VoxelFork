@@ -2,8 +2,11 @@ package io.bluestaggo.voxelthing.renderer.world;
 
 import io.bluestaggo.voxelthing.renderer.Bindings;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
+import io.bluestaggo.voxelthing.util.MathUtil;
+import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.World;
+import org.joml.FrustumIntersection;
 
 public class ChunkRenderer {
 	private final MainRenderer renderer;
@@ -11,17 +14,14 @@ public class ChunkRenderer {
 	private int x, y, z;
 	private boolean needsUpdate;
 	private boolean empty;
+	private double firstAppearance;
 
-	private Bindings<WorldVertex> bindings = new Bindings<>(WorldVertex.LAYOUT);
+	private final Bindings<WorldVertex> bindings = new Bindings<>(WorldVertex.LAYOUT);
 
 	public ChunkRenderer(MainRenderer renderer, World world, int x, int y, int z) {
 		this.renderer = renderer;
 		this.world = world;
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		needsUpdate = true;
-		empty = true;
+		this.setPosition(x, y, z);
 	}
 
 	public void setPosition(int x, int y, int z) {
@@ -49,6 +49,8 @@ public class ChunkRenderer {
 	}
 
 	public void render() {
+		boolean wasEmpty = empty;
+
 		if (needsUpdate) {
 			empty = true;
 			Chunk chunk = world.getChunkAt(x, y, z);
@@ -61,16 +63,17 @@ public class ChunkRenderer {
 			for (int x = 0; x < Chunk.LENGTH; x++) {
 				for (int y = 0; y < Chunk.LENGTH; y++) {
 					for (int z = 0; z < Chunk.LENGTH; z++) {
-						 empty &= !renderer.blockRenderer.render(bindings, world,
-								 x + Chunk.LENGTH * chunk.x,
-								 y + Chunk.LENGTH * chunk.y,
-								 z + Chunk.LENGTH * chunk.z);
+						 empty &= !renderer.blockRenderer.render(bindings, chunk, x, y, z);
 					}
 				}
 			}
 
 			if (!empty) {
 				bindings.upload(true);
+
+				if (wasEmpty) {
+					firstAppearance = Window.getTimeElapsed();
+				}
 			}
 			needsUpdate = false;
 		}
@@ -88,5 +91,14 @@ public class ChunkRenderer {
 
 	public boolean needsUpdate() {
 		return needsUpdate;
+	}
+
+	public boolean inFrustum(FrustumIntersection frustum) {
+		return frustum.testAab(getX() * Chunk.LENGTH, getY() * Chunk.LENGTH, getZ() * Chunk.LENGTH,
+				(getX() + 1) * Chunk.LENGTH, (getY() + 1) * Chunk.LENGTH, (getZ() + 1) * Chunk.LENGTH);
+	}
+
+	public double getFadeAmount(double time) {
+		return MathUtil.clamp(1.0 - (time - firstAppearance));
 	}
 }

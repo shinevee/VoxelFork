@@ -1,7 +1,7 @@
 package io.bluestaggo.voxelthing.world.block;
 
+import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.Direction;
-import io.bluestaggo.voxelthing.world.World;
 
 import java.util.Arrays;
 
@@ -10,7 +10,7 @@ public class Block {
 	public static final int TEXTURE_ROWS = TEXTURE_RES / 16;
 	public static final float TEXTURE_WIDTH = 1.0f / TEXTURE_ROWS;
 
-	private static int nextId = 0;
+	private static short nextId = 0;
 	private static Block[] blocks = new Block[256];
 
 	public static final Block STONE = new Block().withTex(1, 0);
@@ -18,22 +18,22 @@ public class Block {
 	public static final Block DIRT = new Block().withTex(0, 2);
 	public static final Block BRICK = new Block().withTex(1, 2);
 
-	public final int id;
+	public final short id;
 	private int texX, texY;
 
 	public Block() {
 		id = ++nextId;
+		if (id == 0) {
+			throw new IllegalStateException("Block ID limit of 65535 exceeded!");
+		}
 		if (id >= blocks.length) {
-			if (blocks.length * 2 > (1 << Short.SIZE)) {
-				throw new IllegalStateException("Block ID limit of 65536 exceeded!");
-			}
-			blocks = Arrays.copyOf(blocks, blocks.length * 2);
+			blocks = Arrays.copyOf(blocks, blocks.length + 256);
 		}
 		blocks[id] = this;
 	}
 
-	public boolean isFaceDrawn(World world, int x, int y, int z, Direction face) {
-		return world.getBlock(x, y, z) == null;
+	public boolean isFaceDrawn(Chunk chunk, int x, int y, int z, Direction face) {
+		return chunk.getBlockId(x, y, z) == 0;
 	}
 
 	public Block withTex(int x, int y) {
@@ -50,10 +50,10 @@ public class Block {
 		return texY;
 	}
 
-	public static Block fromId(int id) {
+	public static Block fromId(short id) {
 		if (id < 0 || id >= blocks.length) {
 			return null;
 		}
-		return blocks[id];
+		return blocks[id & 0xFFFF];
 	}
 }

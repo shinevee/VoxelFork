@@ -1,8 +1,8 @@
 package io.bluestaggo.voxelthing.renderer.world;
 
 import io.bluestaggo.voxelthing.renderer.Bindings;
+import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.Direction;
-import io.bluestaggo.voxelthing.world.World;
 import io.bluestaggo.voxelthing.world.block.Block;
 
 public class BlockRenderer {
@@ -25,15 +25,18 @@ public class BlockRenderer {
 		return 1.0f - SHADE_FACTOR * amount;
 	}
 
-	public boolean render(Bindings<WorldVertex> bindings, World world, int x, int y, int z) {
-		Block block = world.getBlock(x, y, z);
+	public boolean render(Bindings<WorldVertex> bindings, Chunk chunk, int x, int y, int z) {
+		Block block = chunk.getBlock(x, y, z);
 		if (block == null) {
 			return false;
 		}
 
+		int xx = x + Chunk.LENGTH * chunk.x;
+		int yy = y + Chunk.LENGTH * chunk.y;
+		int zz = z + Chunk.LENGTH * chunk.z;
 		for (Direction dir : Direction.values()) {
-			if (block.isFaceDrawn(world, x + dir.X, y + dir.Y, z + dir.Z, dir)) {
-				SIDE_RENDERERS[dir.ordinal()].render(bindings, block, x, y, z);
+			if (block.isFaceDrawn(chunk, x + dir.X, y + dir.Y, z + dir.Z, dir)) {
+				SIDE_RENDERERS[dir.ordinal()].render(bindings, block, xx, yy, zz);
 			}
 		}
 
