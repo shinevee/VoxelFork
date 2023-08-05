@@ -1,22 +1,32 @@
 package io.bluestaggo.voxelthing;
 
-import io.bluestaggo.voxelthing.renderer.GLFWCameraController;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.shader.Shader;
+import io.bluestaggo.voxelthing.window.ClientPlayerController;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.ClientWorld;
 import io.bluestaggo.voxelthing.world.World;
+import io.bluestaggo.voxelthing.world.entity.Player;
+import io.bluestaggo.voxelthing.world.entity.IPlayerController;
 
 import static org.lwjgl.opengl.GL33C.*;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class Game {
+	public static final float TICK_RATE = 1.0f / 20;
+
 	private static Game instance;
 
 	public final Window window;
 	public final MainRenderer renderer;
 
 	public World world;
+	public Player player;
+	public IPlayerController playerController;
+
+	public float mouseSensitivity = 0.25f;
+
+	private double tickTime;
 
 	public Game() {
 		instance = this;
@@ -24,10 +34,12 @@ public class Game {
 		window = new Window();
 		window.grabCursor();
 
+		playerController = new ClientPlayerController(this);
+
 		renderer = new MainRenderer(this);
-		renderer.camera.setController(new GLFWCameraController(window));
 
 		world = new ClientWorld(this);
+		player = new Player(world, playerController);
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	}
@@ -38,7 +50,7 @@ public class Game {
 
 	public void run() {
 		while (!window.shouldClose()) {
-			update();
+			update(window.getDeltaTime());
 			draw();
 			window.update();
 		}
@@ -53,8 +65,18 @@ public class Game {
 
 	private int fogAlgorithm = 1;
 
-	private void update() {
-		renderer.camera.update();
+	private void update(double delta) {
+		tickTime += delta;
+		player.onGameUpdate();
+
+		if (tickTime >= TICK_RATE) {
+			tickTime %= TICK_RATE;
+			player.tick();
+		}
+
+		world.partialTick = (tickTime % TICK_RATE) / TICK_RATE;
+		renderer.camera.setPosition((float) player.getRenderX(), (float) (player.getRenderY() + player.height - 0.3), (float) player.getRenderZ());
+		renderer.camera.setRotation((float) player.rotYaw, (float) player.rotPitch);
 
 		if (window.isMouseJustPressed(GLFW_MOUSE_BUTTON_MIDDLE)) {
 			window.toggleGrabCursor();
@@ -73,6 +95,15 @@ public class Game {
 		if (window.isKeyJustPressed(GLFW_KEY_F)) {
 			renderer.worldRenderer.renderDistance += window.isKeyDown(GLFW_KEY_LEFT_SHIFT) ? 1 : -1;
 			renderer.worldRenderer.loadRenderers();
+		}
+
+		if (window.isKeyJustPressed(GLFW_KEY_R)) {
+			player.posX = world.random.nextDouble(-100.0, 100.0);
+			player.posY = 64.0;
+			player.posZ = world.random.nextDouble(-100.0, 100.0);
+			player.velX = 0.0;
+			player.velY = 0.0;
+			player.velZ = 0.0;
 		}
 	}
 

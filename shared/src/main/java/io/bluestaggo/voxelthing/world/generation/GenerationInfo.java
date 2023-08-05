@@ -1,7 +1,7 @@
 package io.bluestaggo.voxelthing.world.generation;
 
-import io.bluestaggo.voxelthing.util.MathUtil;
-import io.bluestaggo.voxelthing.util.OpenSimplex2Octaves;
+import io.bluestaggo.voxelthing.math.MathUtil;
+import io.bluestaggo.voxelthing.math.OpenSimplex2Octaves;
 import io.bluestaggo.voxelthing.world.Chunk;
 
 import java.util.Arrays;

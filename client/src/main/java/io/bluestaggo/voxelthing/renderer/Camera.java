@@ -1,5 +1,6 @@
 package io.bluestaggo.voxelthing.renderer;
 
+import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.window.Window;
 import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
@@ -7,7 +8,6 @@ import org.joml.Vector3f;
 
 public class Camera {
 	private final Window window;
-	private CameraController controller;
 
 	private final Vector3f position = new Vector3f();
 	private final FrustumIntersection frustum = new FrustumIntersection();
@@ -48,20 +48,10 @@ public class Camera {
 		this.position.z = z;
 	}
 
-	public void setController(CameraController controller) {
-		this.controller = controller;
-	}
-
-	public void update() {
-		if (controller.moveForward()) position.add(front.mul(controller.getSpeed(), new Vector3f()));
-		if (controller.moveBackward()) position.add(front.mul(-controller.getSpeed(), new Vector3f()));
-		if (controller.moveLeft()) position.add(right.mul(-controller.getSpeed(), new Vector3f()));
-		if (controller.moveRight()) position.add(right.mul(controller.getSpeed(), new Vector3f()));
-
-		yaw += controller.moveYaw() * controller.getSensitivity();
-		pitch += controller.movePitch() * controller.getSensitivity();
-		if (pitch > 89.0f) pitch = 89.0f;
-		if (pitch < -89.0f) pitch = -89.0f;
+	public void setRotation(float yaw, float pitch) {
+		this.yaw = yaw;
+		this.pitch = pitch;
+		pitch = MathUtil.clamp(pitch, -89.0f, 89.0f);
 
 		updateVectors();
 	}

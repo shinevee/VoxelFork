@@ -1,5 +1,6 @@
 package io.bluestaggo.voxelthing.world.block;
 
+import io.bluestaggo.voxelthing.math.AABB;
 import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.Direction;
 
@@ -32,8 +33,11 @@ public class Block {
 		blocks[id] = this;
 	}
 
-	public boolean isFaceDrawn(Chunk chunk, int x, int y, int z, Direction face) {
-		return chunk.getBlockId(x, y, z) == 0;
+	public static Block fromId(short id) {
+		if (id < 0 || id >= blocks.length) {
+			return null;
+		}
+		return blocks[id & 0xFFFF];
 	}
 
 	public Block withTex(int x, int y) {
@@ -50,10 +54,11 @@ public class Block {
 		return texY;
 	}
 
-	public static Block fromId(short id) {
-		if (id < 0 || id >= blocks.length) {
-			return null;
-		}
-		return blocks[id & 0xFFFF];
+	public boolean isFaceDrawn(Chunk chunk, int x, int y, int z, Direction face) {
+		return chunk.getBlockId(x, y, z) == 0;
+	}
+
+	public AABB getCollisionBox(int x, int y, int z) {
+		return new AABB(x, y, z, x + 1, y + 1, z + 1);
 	}
 }

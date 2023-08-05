@@ -1,4 +1,4 @@
-package io.bluestaggo.voxelthing.util;
+package io.bluestaggo.voxelthing.math;
 
 public class OpenSimplex2Octaves {
 	private interface FreqNoiseFunction {

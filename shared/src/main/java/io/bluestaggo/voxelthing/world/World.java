@@ -1,17 +1,22 @@
 package io.bluestaggo.voxelthing.world;
 
+import io.bluestaggo.voxelthing.math.AABB;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.generation.GenCache;
 import io.bluestaggo.voxelthing.world.generation.GenerationInfo;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class World {
 	private final ChunkStorage chunkStorage;
 	private final GenCache genCache;
-	private final Random random = new Random();
 
+	public final Random random = new Random();
 	public final long seed = random.nextLong();
+
+	public double partialTick;
 
 	public World() {
 		chunkStorage = new ChunkStorage(this);
@@ -142,6 +147,30 @@ public class World {
 		}
 
 		onChunkAdded(cx, cy, cz);
+	}
+
+	public List<AABB> getSurroundingCollision(AABB box) {
+		List<AABB> boxes = new ArrayList<>();
+
+		int minX = (int) Math.floor(box.minX);
+		int minY = (int) Math.floor(box.minY);
+		int minZ = (int) Math.floor(box.minZ);
+		int maxX = (int) Math.floor(box.maxX + 1.0);
+		int maxY = (int) Math.floor(box.maxY + 1.0);
+		int maxZ = (int) Math.floor(box.maxZ + 1.0);
+
+		for (int x = minX; x < maxX; x++) {
+			for (int y = minY; y < maxY; y++) {
+				for (int z = minZ; z < maxZ; z++) {
+					Block block = getBlock(x, y, z);
+					if (block != null) {
+						boxes.add(block.getCollisionBox(x, y, z));
+					}
+				}
+			}
+		}
+
+		return boxes;
 	}
 
 	public void onBlockUpdate(int x, int y, int z) {

@@ -1,4 +1,4 @@
-package io.bluestaggo.voxelthing.util;
+package io.bluestaggo.voxelthing.math;
 
 public final class MathUtil {
 	public static final float PI_F = (float)Math.PI;
@@ -28,6 +28,10 @@ public final class MathUtil {
 	}
 
 	public static float lerp(float a, float b, float t) {
+		return a + (b - a) * t;
+	}
+
+	public static double lerp(double a, double b, double t) {
 		return a + (b - a) * t;
 	}
 

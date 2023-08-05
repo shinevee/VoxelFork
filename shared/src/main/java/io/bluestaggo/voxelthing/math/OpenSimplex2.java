@@ -1,4 +1,4 @@
-package io.bluestaggo.voxelthing.util;
+package io.bluestaggo.voxelthing.math;
 
 /**
  * K.jpg's OpenSimplex 2, faster variant

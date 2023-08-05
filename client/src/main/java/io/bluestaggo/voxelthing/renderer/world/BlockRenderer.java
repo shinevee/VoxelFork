@@ -50,10 +50,10 @@ public class BlockRenderer {
 		float texYp = texY + Block.TEXTURE_WIDTH;
 		float shade = getShade(1);
 
-		bindings.addVertex(new WorldVertex( x,      y + 1,  z - 1,  shade,  shade,  shade,  texXp,  texY    ));
-		bindings.addVertex(new WorldVertex( x,      y,      z - 1,  shade,  shade,  shade,  texXp,  texYp   ));
-		bindings.addVertex(new WorldVertex( x + 1,  y,      z - 1,  shade,  shade,  shade,  texX ,  texYp   ));
-		bindings.addVertex(new WorldVertex( x + 1,  y + 1,  z - 1,  shade,  shade,  shade,  texX ,  texY    ));
+		bindings.addVertex(new WorldVertex( x,      y + 1,  z,  shade,  shade,  shade,  texXp,  texY    ));
+		bindings.addVertex(new WorldVertex( x,      y,      z,  shade,  shade,  shade,  texXp,  texYp   ));
+		bindings.addVertex(new WorldVertex( x + 1,  y,      z,  shade,  shade,  shade,  texX ,  texYp   ));
+		bindings.addVertex(new WorldVertex( x + 1,  y + 1,  z,  shade,  shade,  shade,  texX ,  texY    ));
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
@@ -64,10 +64,10 @@ public class BlockRenderer {
 		float texYp = texY + Block.TEXTURE_WIDTH;
 		float shade = getShade(3);
 
-		bindings.addVertex(new WorldVertex( x + 1,  y + 1,  z,  shade,  shade,  shade,  texXp,  texY    ));
-		bindings.addVertex(new WorldVertex( x + 1,  y,      z,  shade,  shade,  shade,  texXp,  texYp   ));
-		bindings.addVertex(new WorldVertex( x,      y,      z,  shade,  shade,  shade,  texX ,  texYp   ));
-		bindings.addVertex(new WorldVertex( x,      y + 1,  z,  shade,  shade,  shade,  texX ,  texY    ));
+		bindings.addVertex(new WorldVertex( x + 1,  y + 1,  z + 1,  shade,  shade,  shade,  texXp,  texY    ));
+		bindings.addVertex(new WorldVertex( x + 1,  y,      z + 1,  shade,  shade,  shade,  texXp,  texYp   ));
+		bindings.addVertex(new WorldVertex( x,      y,      z + 1,  shade,  shade,  shade,  texX ,  texYp   ));
+		bindings.addVertex(new WorldVertex( x,      y + 1,  z + 1,  shade,  shade,  shade,  texX ,  texY    ));
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
@@ -78,10 +78,10 @@ public class BlockRenderer {
 		float texYp = texY + Block.TEXTURE_WIDTH;
 		float shade = getShade(2);
 
-		bindings.addVertex(new WorldVertex( x,  y + 1,  z,      shade,  shade,  shade,  texXp,  texY    ));
-		bindings.addVertex(new WorldVertex( x,  y,      z,      shade,  shade,  shade,  texXp,  texYp   ));
-		bindings.addVertex(new WorldVertex( x,  y,      z - 1,  shade,  shade,  shade,  texX ,  texYp   ));
-		bindings.addVertex(new WorldVertex( x,  y + 1,  z - 1,  shade,  shade,  shade,  texX ,  texY    ));
+		bindings.addVertex(new WorldVertex( x,  y + 1,  z + 1,  shade,  shade,  shade,  texXp,  texY    ));
+		bindings.addVertex(new WorldVertex( x,  y,      z + 1,  shade,  shade,  shade,  texXp,  texYp   ));
+		bindings.addVertex(new WorldVertex( x,  y,      z,      shade,  shade,  shade,  texX ,  texYp   ));
+		bindings.addVertex(new WorldVertex( x,  y + 1,  z,      shade,  shade,  shade,  texX ,  texY    ));
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
@@ -92,10 +92,10 @@ public class BlockRenderer {
 		float texYp = texY + Block.TEXTURE_WIDTH;
 		float shade = getShade(2);
 
-		bindings.addVertex(new WorldVertex( x + 1,  y + 1,  z - 1,  shade,  shade,  shade,  texXp,  texY    ));
-		bindings.addVertex(new WorldVertex( x + 1,  y,      z - 1,  shade,  shade,  shade,  texXp,  texYp   ));
-		bindings.addVertex(new WorldVertex( x + 1,  y,      z,      shade,  shade,  shade,  texX ,  texYp   ));
-		bindings.addVertex(new WorldVertex( x + 1,  y + 1,  z,      shade,  shade,  shade,  texX ,  texY    ));
+		bindings.addVertex(new WorldVertex( x + 1,  y + 1,  z,      shade,  shade,  shade,  texXp,  texY    ));
+		bindings.addVertex(new WorldVertex( x + 1,  y,      z,      shade,  shade,  shade,  texXp,  texYp   ));
+		bindings.addVertex(new WorldVertex( x + 1,  y,      z + 1,  shade,  shade,  shade,  texX ,  texYp   ));
+		bindings.addVertex(new WorldVertex( x + 1,  y + 1,  z + 1,  shade,  shade,  shade,  texX ,  texY    ));
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
@@ -106,10 +106,10 @@ public class BlockRenderer {
 		float texYp = texY + Block.TEXTURE_WIDTH;
 		float shade = getShade(4);
 
-		bindings.addVertex(new WorldVertex( x,      y,  z - 1,  shade,  shade,  shade,  texXp,  texY    ));
-		bindings.addVertex(new WorldVertex( x,      y,  z,      shade,  shade,  shade,  texXp,  texYp   ));
-		bindings.addVertex(new WorldVertex( x + 1,  y,  z,      shade,  shade,  shade,  texX ,  texYp   ));
-		bindings.addVertex(new WorldVertex( x + 1,  y,  z - 1,  shade,  shade,  shade,  texX ,  texY    ));
+		bindings.addVertex(new WorldVertex( x,      y,  z,      shade,  shade,  shade,  texXp,  texY    ));
+		bindings.addVertex(new WorldVertex( x,      y,  z + 1,  shade,  shade,  shade,  texXp,  texYp   ));
+		bindings.addVertex(new WorldVertex( x + 1,  y,  z + 1,  shade,  shade,  shade,  texX ,  texYp   ));
+		bindings.addVertex(new WorldVertex( x + 1,  y,  z,      shade,  shade,  shade,  texX ,  texY    ));
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
@@ -120,10 +120,10 @@ public class BlockRenderer {
 		float texYp = texY + Block.TEXTURE_WIDTH;
 		float shade = getShade(0);
 
-		bindings.addVertex(new WorldVertex( x,      y + 1,  z,      shade,  shade,  shade,  texXp,  texY    ));
-		bindings.addVertex(new WorldVertex( x,      y + 1,  z - 1,  shade,  shade,  shade,  texXp,  texYp   ));
-		bindings.addVertex(new WorldVertex( x + 1,  y + 1,  z - 1,  shade,  shade,  shade,  texX ,  texYp   ));
-		bindings.addVertex(new WorldVertex( x + 1,  y + 1,  z,      shade,  shade,  shade,  texX ,  texY    ));
+		bindings.addVertex(new WorldVertex( x,      y + 1,  z + 1,  shade,  shade,  shade,  texXp,  texY    ));
+		bindings.addVertex(new WorldVertex( x,      y + 1,  z,      shade,  shade,  shade,  texXp,  texYp   ));
+		bindings.addVertex(new WorldVertex( x + 1,  y + 1,  z,      shade,  shade,  shade,  texX ,  texYp   ));
+		bindings.addVertex(new WorldVertex( x + 1,  y + 1,  z + 1,  shade,  shade,  shade,  texX ,  texY    ));
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 }

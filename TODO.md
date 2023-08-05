@@ -10,5 +10,5 @@ Current goal: create a game akin to Minecraft Classic with building and destruct
 - [ ] Clouds
 
 ## Gameplay
-- [ ] Player entity with physics
+- [ ] Player entity with physics (gotta make it move)
 - [ ] Block building and destruction
