@@ -5,5 +5,7 @@ Nothing much here yet, huh? What will this be? Well, it is heading towards being
 ## Controls
 - WASD: Fly around
 - Move mouse: Look around
+- F: Decrease fog distance
+- Shift + F: Increase fog distance
 - Middle click: Lock / unlock mouse
 - Escape: Quit game

@@ -3,3 +3,4 @@ build
 **/build
 **/out
 !src/**/build
+hs_err_pid*.log
