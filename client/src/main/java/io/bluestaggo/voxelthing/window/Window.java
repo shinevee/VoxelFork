@@ -133,15 +133,6 @@ public class Window {
 		double currentTime = glfwGetTime();
 		deltaTime = currentTime - lastTick;
 		lastTick = currentTime;
-
-		long freeMB = Runtime.getRuntime().freeMemory() / 1000000L;
-		long totalMB = Runtime.getRuntime().totalMemory() / 1000000L;
-		long maxMB = Runtime.getRuntime().maxMemory() / 1000000L;
-
-		glfwSetWindowTitle(handle, "Voxel Thing ("
-				+ (totalMB - freeMB) + " / " + maxMB + "MB, "
-				+ (int)(deltaTime * 1000.0D) + "ms)"
-				);
 	}
 
 	public int getWidth() {
@@ -220,6 +211,10 @@ public class Window {
 				glfwSetWindowIcon(handle, imageBuffer);
 			}
 		}
+	}
+
+	public void setTitle(String title) {
+		glfwSetWindowTitle(handle, title);
 	}
 
 	public boolean isKeyDown(int key) {

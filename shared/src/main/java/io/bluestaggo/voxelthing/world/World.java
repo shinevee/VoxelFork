@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class World {
+public class World implements IBlockAccess {
 	private final ChunkStorage chunkStorage;
 	private final GenCache genCache;
 
@@ -74,6 +74,7 @@ public class World {
 		return getChunkAtBlock(x, y, z) != null;
 	}
 
+	@Override
 	public Block getBlock(int x, int y, int z) {
 		Chunk chunk = getChunkAtBlock(x, y, z);
 		if (chunk == null) {
@@ -86,6 +87,7 @@ public class World {
 		);
 	}
 
+	@Override
 	public short getBlockId(int x, int y, int z) {
 		Chunk chunk = getChunkAtBlock(x, y, z);
 		if (chunk == null) {
@@ -147,6 +149,15 @@ public class World {
 		}
 
 		onChunkAdded(cx, cy, cz);
+	}
+
+	public Chunk getOrLoadChunkAt(int x, int y, int z) {
+		Chunk chunk = getChunkAt(x, y, z);
+		if (chunk == null) {
+			loadChunkAt(x, y, z);
+			chunk = getChunkAt(x, y, z);
+		}
+		return chunk;
 	}
 
 	public List<AABB> getSurroundingCollision(AABB box) {

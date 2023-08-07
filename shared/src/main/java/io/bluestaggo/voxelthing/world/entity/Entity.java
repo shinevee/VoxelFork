@@ -69,7 +69,7 @@ public class Entity {
 			velZ = box.calcZOffset(collisionBox, velZ);
 		}
 
-		onGround = oldVelY != velY;
+		onGround = oldVelY < 0.0 && oldVelY < velY;
 
 		posX += velX;
 		posY += velY;

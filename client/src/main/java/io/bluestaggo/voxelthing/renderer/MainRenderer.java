@@ -54,8 +54,9 @@ public class MainRenderer {
 		skyFramebuffer.resize(game.window.getWidth(), game.window.getHeight());
 
 		updateTick += game.window.getDeltaTime();
-		if (updateTick >= 1.0D) {
+		if (updateTick >= 1.0) {
 			worldRenderer.moveRenderers();
+			updateTick %= 1.0;
 		}
 
 		camera.setFar(worldRenderer.renderDistance * 32);

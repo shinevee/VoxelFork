@@ -2,7 +2,7 @@ package io.bluestaggo.voxelthing.world;
 
 import io.bluestaggo.voxelthing.world.block.Block;
 
-public class Chunk {
+public class Chunk implements IBlockAccess {
 	public static final int SIZE_POW2 = 5;
 	public static final int LENGTH = 1 << SIZE_POW2;
 	public static final int LENGTH_MASK = (1 << SIZE_POW2) - 1;
@@ -38,6 +38,7 @@ public class Chunk {
 		return z + (this.z << Chunk.SIZE_POW2);
 	}
 
+	@Override
 	public short getBlockId(int x, int y, int z) {
 		if (!containsLocal(x, y, z)) {
 			return this.world.getBlockId(toGlobalX(x), toGlobalY(y), toGlobalZ(z));
@@ -46,6 +47,7 @@ public class Chunk {
 		return blocks[arrayCoords(x, y, z)];
 	}
 
+	@Override
 	public Block getBlock(int x, int y, int z) {
 		return Block.fromId(getBlockId(x, y, z));
 	}

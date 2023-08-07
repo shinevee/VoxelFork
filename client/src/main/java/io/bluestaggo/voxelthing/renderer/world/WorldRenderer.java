@@ -11,6 +11,7 @@ import org.joml.FrustumIntersection;
 import org.joml.Vector3f;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.lwjgl.opengl.GL33C.*;
 
@@ -20,6 +21,7 @@ public class WorldRenderer {
 
 	private World world;
 	private ChunkRenderer[] chunkRenderers;
+	private List<ChunkRenderer> sortedChunkRenderers;
 	private int minX, minY, minZ;
 	private int maxX, maxY, maxZ;
 	private int renderRange;
@@ -63,10 +65,6 @@ public class WorldRenderer {
 	}
 
 	public void draw() {
-		var sortedChunkRenderers = Arrays.stream(chunkRenderers)
-				.sorted(this::compareChunks)
-				.toList();
-
 		int updates = 0;
 		int maxUpdates = 5;
 
@@ -77,14 +75,6 @@ public class WorldRenderer {
 			if (!chunkRenderer.inFrustum(frustum)) continue;
 
 			if (updates < maxUpdates) {
-				int cx = chunkRenderer.getX();
-				int cy = chunkRenderer.getY();
-				int cz = chunkRenderer.getZ();
-
-				if (world.getChunkAt(cx, cy, cz) == null) {
-					world.loadChunkAt(cx, cy, cz);
-				}
-
 				boolean neededUpdate = chunkRenderer.needsUpdate();
 				chunkRenderer.render();
 				if (neededUpdate && !chunkRenderer.isEmpty()) {
@@ -131,6 +121,10 @@ public class WorldRenderer {
 				}
 			}
 		}
+
+		sortedChunkRenderers = Arrays.stream(chunkRenderers)
+				.sorted(this::compareChunks)
+				.toList();
 	}
 
 	private int compareChunks(ChunkRenderer a, ChunkRenderer b) {

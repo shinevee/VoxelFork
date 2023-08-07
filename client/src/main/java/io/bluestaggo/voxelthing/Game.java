@@ -93,7 +93,16 @@ public class Game {
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_F)) {
-			renderer.worldRenderer.renderDistance += window.isKeyDown(GLFW_KEY_LEFT_SHIFT) ? 1 : -1;
+			int dist = renderer.worldRenderer.renderDistance;
+			if (window.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
+				if (dist < 16) {
+					dist <<= 1;
+				}
+			} else if (dist > 1) {
+				dist >>= 1;
+			}
+
+			renderer.worldRenderer.renderDistance = dist;
 			renderer.worldRenderer.loadRenderers();
 		}
 
@@ -105,6 +114,15 @@ public class Game {
 			player.velY = 0.0;
 			player.velZ = 0.0;
 		}
+
+		long freeMB = Runtime.getRuntime().freeMemory() / 1000000L;
+		long totalMB = Runtime.getRuntime().totalMemory() / 1000000L;
+		long maxMB = Runtime.getRuntime().maxMemory() / 1000000L;
+
+		window.setTitle("Voxel Thing ("
+				+ (totalMB - freeMB) + " / " + maxMB + "MB, "
+				+ (int)(window.getDeltaTime() * 1000.0D) + "ms)"
+				+ " [dist: " + renderer.worldRenderer.renderDistance + "]");
 	}
 
 	private void draw() {

@@ -1,8 +1,11 @@
 package io.bluestaggo.voxelthing.world.block;
 
 import io.bluestaggo.voxelthing.math.AABB;
-import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.Direction;
+import io.bluestaggo.voxelthing.world.IBlockAccess;
+import io.bluestaggo.voxelthing.world.block.texture.AllSidesTexture;
+import io.bluestaggo.voxelthing.world.block.texture.GrassTexture;
+import io.bluestaggo.voxelthing.world.block.texture.IBlockTexture;
 
 import java.util.Arrays;
 
@@ -15,12 +18,12 @@ public class Block {
 	private static Block[] blocks = new Block[256];
 
 	public static final Block STONE = new Block().withTex(1, 0);
-	public static final Block GRASS = new Block().withTex(0, 0);
+	public static final Block GRASS = new Block().withTex(new GrassTexture(0, 1, 0, 0, 0, 2));
 	public static final Block DIRT = new Block().withTex(0, 2);
 	public static final Block BRICK = new Block().withTex(1, 2);
 
 	public final short id;
-	private int texX, texY;
+	private IBlockTexture texture;
 
 	public Block() {
 		id = ++nextId;
@@ -40,22 +43,21 @@ public class Block {
 		return blocks[id & 0xFFFF];
 	}
 
-	public Block withTex(int x, int y) {
-		this.texX = x;
-		this.texY = y;
+	protected Block withTex(int x, int y) {
+		return withTex(new AllSidesTexture(x, y));
+	}
+
+	protected Block withTex(IBlockTexture texture) {
+		this.texture = texture;
 		return this;
 	}
 
-	public int getTexX() {
-		return texX;
+	public IBlockTexture getTexture() {
+		return texture;
 	}
 
-	public int getTexY() {
-		return texY;
-	}
-
-	public boolean isFaceDrawn(Chunk chunk, int x, int y, int z, Direction face) {
-		return chunk.getBlockId(x, y, z) == 0;
+	public boolean isFaceDrawn(IBlockAccess blockAccess, int x, int y, int z, Direction face) {
+		return blockAccess.getBlockId(x, y, z) == 0;
 	}
 
 	public AABB getCollisionBox(int x, int y, int z) {

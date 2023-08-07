@@ -19,43 +19,58 @@ public class GenerationInfo {
 	public GenerationInfo(long salt, int cx, int cz) {
 		randSeed = salt;
 
-		long seed = splitMix();
+		long baseSeed = splitMix();
+		long hillSeed = splitMix();
+		long cliffSeed = splitMix();
+		long cliffHeightSeed = splitMix();
 		caveSeed = splitMix();
 
 		chunkX = cx;
 		chunkZ = cz;
 
-		final int baseHeightOctaves = 4;
+		final int baseOctaves = 4;
 		final double baseScale = 250.0;
 		final float baseHeightScale = 8.0f;
 
-		final int hillHeightOctaves = 3;
+		final int hillOctaves = 3;
 		final double hillScale = 250.0;
 		final float hillHeightScale = 16.0f;
 		final float hillHeightScaleMod = 4.0f;
 		final float hillThresholdMin = -0.5f;
 		final float hillThresholdMax = 1.0f;
 
+		final int cliffOctaves = 2;
+		final double cliffScale = 250.0;
+		final float cliffThreshold = 0.5f;
+
+		final int cliffHeightOctaves = 1;
+		final double cliffHeightScale = 100.0;
+		final float cliffHeightMin = 2.0f;
+		final float cliffHeightMax = 8.0f;
+
 		for (int x = 0; x < Chunk.LENGTH; x++) {
 			for (int z = 0; z < Chunk.LENGTH; z++) {
 				int xx = (cx * Chunk.LENGTH + x);
 				int zz = (cz * Chunk.LENGTH + z);
 
-				float baseHeight = OpenSimplex2Octaves.noise2(seed, baseHeightOctaves, xx / baseScale, zz / baseScale);
-				float hill = OpenSimplex2Octaves.noise2(~seed, hillHeightOctaves, xx / hillScale, zz / hillScale);
+				float baseHeight = OpenSimplex2Octaves.noise2(baseSeed, baseOctaves, xx / baseScale, zz / baseScale);
+				float hill = OpenSimplex2Octaves.noise2(hillSeed, hillOctaves, xx / hillScale, zz / hillScale);
 				hill = 1.0f - (float) Math.cos(MathUtil.threshold(hill, hillThresholdMin, hillThresholdMax) * MathUtil.PI_F / 2.0f);
 
 				float addedBaseHeight = baseHeightScale * MathUtil.lerp(1.0f, hillHeightScaleMod, hill);
-				hill = hill * hillHeightScale;
-				baseHeight = baseHeight * addedBaseHeight + addedBaseHeight;
+				baseHeight = baseHeight * addedBaseHeight + hill * hillHeightScale;
 
-				height[x + z * Chunk.LENGTH] = baseHeight + hill;
+				float cliff = OpenSimplex2Octaves.noise2(cliffSeed, cliffOctaves, xx / cliffScale, zz / cliffScale);
+				float cliffHeight = OpenSimplex2Octaves.noise2(cliffHeightSeed, cliffHeightOctaves, xx / cliffHeightScale, zz / cliffHeightScale);
+				cliffHeight = MathUtil.lerp(cliffHeightMin, cliffHeightMax, cliffHeight / 2.0f + 0.5f) * (1.0f - hill);
+
+				if (cliff > cliffThreshold) {
+					baseHeight += cliffHeight;
+				}
+
+				height[x + z * Chunk.LENGTH] = baseHeight;
 			}
 		}
-	}
-
-	private static int index3D(int x, int y, int z, int length) {
-		return ((x * length) + y) * length + z;
 	}
 
 	private long splitMix() {
@@ -86,14 +101,14 @@ public class GenerationInfo {
 		int yy = (y & Chunk.LENGTH_MASK) >> shiftPow2;
 		int zz = z >> shiftPow2;
 
-		float c000 = caveInfo[index3D(xx, yy, zz, 9)];
-		float c001 = caveInfo[index3D(xx, yy, zz + 1, 9)];
-		float c010 = caveInfo[index3D(xx, yy + 1, zz, 9)];
-		float c011 = caveInfo[index3D(xx, yy + 1, zz + 1, 9)];
-		float c100 = caveInfo[index3D(xx + 1, yy, zz, 9)];
-		float c101 = caveInfo[index3D(xx + 1, yy, zz + 1, 9)];
-		float c110 = caveInfo[index3D(xx + 1, yy + 1, zz, 9)];
-		float c111 = caveInfo[index3D(xx + 1, yy + 1, zz + 1, 9)];
+		float c000 = caveInfo[MathUtil.index3D(xx, yy, zz, 9)];
+		float c001 = caveInfo[MathUtil.index3D(xx, yy, zz + 1, 9)];
+		float c010 = caveInfo[MathUtil.index3D(xx, yy + 1, zz, 9)];
+		float c011 = caveInfo[MathUtil.index3D(xx, yy + 1, zz + 1, 9)];
+		float c100 = caveInfo[MathUtil.index3D(xx + 1, yy, zz, 9)];
+		float c101 = caveInfo[MathUtil.index3D(xx + 1, yy, zz + 1, 9)];
+		float c110 = caveInfo[MathUtil.index3D(xx + 1, yy + 1, zz, 9)];
+		float c111 = caveInfo[MathUtil.index3D(xx + 1, yy + 1, zz + 1, 9)];
 		float caveInfo = MathUtil.trilinear(c000, c001, c010, c011, c100, c101, c110, c111,
 					(x & shiftMask) / (float) shiftDiv, (y & shiftMask) / (float) shiftDiv, (z & shiftMask) / (float) shiftDiv);
 		float cheeseThreshold = MathUtil.clamp(-y / cheeseDensitySpread + cheeseDensitySurface, cheeseMinDensity, cheeseMaxDensity);
@@ -116,7 +131,7 @@ public class GenerationInfo {
 					int zz = (z << (Chunk.SIZE_POW2 - 3)) + (chunkZ << Chunk.SIZE_POW2);
 
 					float cheese = OpenSimplex2Octaves.noise3_ImproveXZ(caveSeed, cheeseOctaves, xx / cheeseScaleXZ, yy / cheeseScaleY, zz / cheeseScaleXZ);
-					caveInfo[index3D(x, y, z, 9)] = cheese;
+					caveInfo[MathUtil.index3D(x, y, z, 9)] = cheese;
 				}
 			}
 		}

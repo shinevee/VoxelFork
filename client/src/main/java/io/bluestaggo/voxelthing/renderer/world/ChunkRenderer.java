@@ -5,6 +5,8 @@ import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.Chunk;
+import io.bluestaggo.voxelthing.world.ChunkCache;
+import io.bluestaggo.voxelthing.world.IBlockAccess;
 import io.bluestaggo.voxelthing.world.World;
 import org.joml.FrustumIntersection;
 
@@ -52,6 +54,8 @@ public class ChunkRenderer {
 		boolean wasEmpty = empty;
 
 		if (needsUpdate) {
+			IBlockAccess cache = new ChunkCache(world, x, y, z);
+
 			empty = true;
 			Chunk chunk = world.getChunkAt(x, y, z);
 
@@ -60,10 +64,10 @@ public class ChunkRenderer {
 				return;
 			}
 
-			for (int x = 0; x < Chunk.LENGTH; x++) {
-				for (int y = 0; y < Chunk.LENGTH; y++) {
-					for (int z = 0; z < Chunk.LENGTH; z++) {
-						 empty &= !renderer.blockRenderer.render(bindings, chunk, x, y, z);
+			for (int xx = 0; xx < Chunk.LENGTH; xx++) {
+				for (int yy = 0; yy < Chunk.LENGTH; yy++) {
+					for (int zz = 0; zz < Chunk.LENGTH; zz++) {
+						 empty &= !renderer.blockRenderer.render(bindings, cache, chunk, xx, yy, zz);
 					}
 				}
 			}

@@ -7,7 +7,7 @@ Nothing much here yet, huh? What will this be? Well, it is heading towards being
 - Move mouse: Look around
 - Space: Jump
 - R: Teleport to a random position
-- F: Decrease fog distance
-- Shift + F: Increase fog distance
+- F: Halve fog distance
+- Shift + F: Double fog distance
 - Middle click: Lock / unlock mouse
 - Escape: Quit game
