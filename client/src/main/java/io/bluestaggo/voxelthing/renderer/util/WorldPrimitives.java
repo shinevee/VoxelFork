@@ -1,6 +1,6 @@
 package io.bluestaggo.voxelthing.renderer.util;
 
-import io.bluestaggo.voxelthing.renderer.Bindings;
+import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
 import io.bluestaggo.voxelthing.renderer.world.WorldVertex;
 
 public final class WorldPrimitives {

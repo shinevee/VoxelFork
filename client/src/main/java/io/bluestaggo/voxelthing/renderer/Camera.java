@@ -72,6 +72,10 @@ public class Camera {
 		return position;
 	}
 
+	public Vector3f getPosition(Vector3f vector) {
+		return vector.set(position);
+	}
+
 	public float getNear() {
 		return near;
 	}

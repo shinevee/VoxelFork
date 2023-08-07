@@ -1,4 +1,4 @@
-package io.bluestaggo.voxelthing.renderer;
+package io.bluestaggo.voxelthing.renderer.vertices;
 
 import io.bluestaggo.voxelthing.util.IntList;
 import org.lwjgl.system.MemoryUtil;

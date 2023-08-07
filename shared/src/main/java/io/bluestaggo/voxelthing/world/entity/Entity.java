@@ -64,10 +64,19 @@ public class Entity {
 		double oldVelY = velY;
 
 		for (AABB box : intersectingBoxes) {
-			velX = box.calcXOffset(collisionBox, velX);
 			velY = box.calcYOffset(collisionBox, velY);
+		}
+		collisionBox.offset(0.0, velY, 0.0, collisionBox);
+
+		for (AABB box : intersectingBoxes) {
+			velX = box.calcXOffset(collisionBox, velX);
+		}
+		collisionBox.offset(velX, 0.0, 0.0, collisionBox);
+
+		for (AABB box : intersectingBoxes) {
 			velZ = box.calcZOffset(collisionBox, velZ);
 		}
+		collisionBox.offset(0.0, 0.0, velZ, collisionBox);
 
 		onGround = oldVelY < 0.0 && oldVelY < velY;
 

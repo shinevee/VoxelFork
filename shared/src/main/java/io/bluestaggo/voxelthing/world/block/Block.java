@@ -20,7 +20,7 @@ public class Block {
 	public static final Block STONE = new Block().withTex(1, 0);
 	public static final Block GRASS = new Block().withTex(new GrassTexture(0, 1, 0, 0, 0, 2));
 	public static final Block DIRT = new Block().withTex(0, 2);
-	public static final Block BRICK = new Block().withTex(1, 2);
+	public static final Block BRICK = new Block().withTex(3, 2);
 
 	public final short id;
 	private IBlockTexture texture;

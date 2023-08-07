@@ -1,21 +1,21 @@
 package io.bluestaggo.voxelthing.util;
 
-import java.nio.IntBuffer;
+import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class IntList {
+public class FloatList {
 	private static final int DEFAULT_CAPACITY = 16;
 	private static final int SOFT_MAX_ARRAY_LENGTH = Integer.MAX_VALUE - 8;
 
-	private int[] data;
+	private float[] data;
 	private int size;
 
-	public IntList() {
-		data = new int[DEFAULT_CAPACITY];
+	public FloatList() {
+		data = new float[DEFAULT_CAPACITY];
 	}
 
-	public IntList(int... data) {
+	public FloatList(float... data) {
 		this.data = data;
 		this.size = data.length;
 	}
@@ -24,14 +24,14 @@ public class IntList {
 		return size;
 	}
 
-	public void add(int e) {
+	public void add(float e) {
 		if (size == data.length) {
 			data = grow();
 		}
 		data[size++] = e;
 	}
 
-	public void add(int... e) {
+	public void add(float... e) {
 		while (size + e.length > data.length) {
 			data = grow();
 		}
@@ -39,25 +39,25 @@ public class IntList {
 		size += e.length;
 	}
 
-	public int get(int index) {
+	public float get(int index) {
 		Objects.checkIndex(index, size);
 		return data[index];
 	}
 
 	public void clear() {
-		data = new int[DEFAULT_CAPACITY];
+		data = new float[DEFAULT_CAPACITY];
 		size = 0;
 	}
 
-	public int[] toArray() {
+	public float[] toArray() {
 		return Arrays.copyOf(data, size);
 	}
 
-	public void putToBuffer(IntBuffer buffer) {
+	public void putToBuffer(FloatBuffer buffer) {
 		buffer.put(data, 0, size);
 	}
 
-	private int[] grow() {
+	private float[] grow() {
 		int newCapacity;
 
 		int minCapacity = size + 1;

@@ -1,6 +1,6 @@
 package io.bluestaggo.voxelthing.renderer.world;
 
-import io.bluestaggo.voxelthing.renderer.Bindings;
+import io.bluestaggo.voxelthing.renderer.vertices.FloatBindings;
 import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.IBlockAccess;
@@ -20,14 +20,14 @@ public class BlockRenderer {
 
 	@FunctionalInterface
 	private interface SideRenderer {
-		void render(Bindings<WorldVertex> bindings, IBlockAccess blockAccess, Block block, int x, int y, int z);
+		void render(FloatBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z);
 	}
 
 	private float getShade(int amount) {
 		return 1.0f - SHADE_FACTOR * amount;
 	}
 
-	public boolean render(Bindings<WorldVertex> bindings, IBlockAccess blockAccess, Chunk chunk, int x, int y, int z) {
+	public boolean render(FloatBindings bindings, IBlockAccess blockAccess, Chunk chunk, int x, int y, int z) {
 		Block block = chunk.getBlock(x, y, z);
 		if (block == null) {
 			return false;
@@ -45,7 +45,7 @@ public class BlockRenderer {
 		return true;
 	}
 
-	private void renderNorthFace(Bindings<WorldVertex> bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
+	private void renderNorthFace(FloatBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
 		Vector2i texture = block.getTexture().getTexture(Direction.NORTH, blockAccess, x, y, z);
 		float texX = texture.x * Block.TEXTURE_WIDTH;
 		float texY = texture.y * Block.TEXTURE_WIDTH;
@@ -53,14 +53,14 @@ public class BlockRenderer {
 		float texYp = texY + Block.TEXTURE_WIDTH;
 		float shade = getShade(1);
 
-		bindings.addVertex(new WorldVertex( x,      y + 1,  z,  shade,  shade,  shade,  texXp,  texY    ));
-		bindings.addVertex(new WorldVertex( x,      y,      z,  shade,  shade,  shade,  texXp,  texYp   ));
-		bindings.addVertex(new WorldVertex( x + 1,  y,      z,  shade,  shade,  shade,  texX ,  texYp   ));
-		bindings.addVertex(new WorldVertex( x + 1,  y + 1,  z,  shade,  shade,  shade,  texX ,  texY    ));
+		bindings.addVertices(   x,      y + 1,  z,  shade,  shade,  shade,  texXp,  texY    );
+		bindings.addVertices(   x,      y,      z,  shade,  shade,  shade,  texXp,  texYp   );
+		bindings.addVertices(   x + 1,  y,      z,  shade,  shade,  shade,  texX ,  texYp   );
+		bindings.addVertices(   x + 1,  y + 1,  z,  shade,  shade,  shade,  texX ,  texY    );
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
-	private void renderSouthFace(Bindings<WorldVertex> bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
+	private void renderSouthFace(FloatBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
 		Vector2i texture = block.getTexture().getTexture(Direction.SOUTH, blockAccess, x, y, z);
 		float texX = texture.x * Block.TEXTURE_WIDTH;
 		float texY = texture.y * Block.TEXTURE_WIDTH;
@@ -68,14 +68,14 @@ public class BlockRenderer {
 		float texYp = texY + Block.TEXTURE_WIDTH;
 		float shade = getShade(3);
 
-		bindings.addVertex(new WorldVertex( x + 1,  y + 1,  z + 1,  shade,  shade,  shade,  texXp,  texY    ));
-		bindings.addVertex(new WorldVertex( x + 1,  y,      z + 1,  shade,  shade,  shade,  texXp,  texYp   ));
-		bindings.addVertex(new WorldVertex( x,      y,      z + 1,  shade,  shade,  shade,  texX ,  texYp   ));
-		bindings.addVertex(new WorldVertex( x,      y + 1,  z + 1,  shade,  shade,  shade,  texX ,  texY    ));
+		bindings.addVertices(   x + 1,  y + 1,  z + 1,  shade,  shade,  shade,  texXp,  texY    );
+		bindings.addVertices(   x + 1,  y,      z + 1,  shade,  shade,  shade,  texXp,  texYp   );
+		bindings.addVertices(   x,      y,      z + 1,  shade,  shade,  shade,  texX ,  texYp   );
+		bindings.addVertices(   x,      y + 1,  z + 1,  shade,  shade,  shade,  texX ,  texY    );
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
-	private void renderWestFace(Bindings<WorldVertex> bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
+	private void renderWestFace(FloatBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
 		Vector2i texture = block.getTexture().getTexture(Direction.WEST, blockAccess, x, y, z);
 		float texX = texture.x * Block.TEXTURE_WIDTH;
 		float texY = texture.y * Block.TEXTURE_WIDTH;
@@ -83,14 +83,14 @@ public class BlockRenderer {
 		float texYp = texY + Block.TEXTURE_WIDTH;
 		float shade = getShade(2);
 
-		bindings.addVertex(new WorldVertex( x,  y + 1,  z + 1,  shade,  shade,  shade,  texXp,  texY    ));
-		bindings.addVertex(new WorldVertex( x,  y,      z + 1,  shade,  shade,  shade,  texXp,  texYp   ));
-		bindings.addVertex(new WorldVertex( x,  y,      z,      shade,  shade,  shade,  texX ,  texYp   ));
-		bindings.addVertex(new WorldVertex( x,  y + 1,  z,      shade,  shade,  shade,  texX ,  texY    ));
+		bindings.addVertices(   x,  y + 1,  z + 1,  shade,  shade,  shade,  texXp,  texY    );
+		bindings.addVertices(   x,  y,      z + 1,  shade,  shade,  shade,  texXp,  texYp   );
+		bindings.addVertices(   x,  y,      z,      shade,  shade,  shade,  texX ,  texYp   );
+		bindings.addVertices(   x,  y + 1,  z,      shade,  shade,  shade,  texX ,  texY    );
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
-	private void renderEastFace(Bindings<WorldVertex> bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
+	private void renderEastFace(FloatBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
 		Vector2i texture = block.getTexture().getTexture(Direction.EAST, blockAccess, x, y, z);
 		float texX = texture.x * Block.TEXTURE_WIDTH;
 		float texY = texture.y * Block.TEXTURE_WIDTH;
@@ -98,14 +98,14 @@ public class BlockRenderer {
 		float texYp = texY + Block.TEXTURE_WIDTH;
 		float shade = getShade(2);
 
-		bindings.addVertex(new WorldVertex( x + 1,  y + 1,  z,      shade,  shade,  shade,  texXp,  texY    ));
-		bindings.addVertex(new WorldVertex( x + 1,  y,      z,      shade,  shade,  shade,  texXp,  texYp   ));
-		bindings.addVertex(new WorldVertex( x + 1,  y,      z + 1,  shade,  shade,  shade,  texX ,  texYp   ));
-		bindings.addVertex(new WorldVertex( x + 1,  y + 1,  z + 1,  shade,  shade,  shade,  texX ,  texY    ));
+		bindings.addVertices(   x + 1,  y + 1,  z,      shade,  shade,  shade,  texXp,  texY    );
+		bindings.addVertices(   x + 1,  y,      z,      shade,  shade,  shade,  texXp,  texYp   );
+		bindings.addVertices(   x + 1,  y,      z + 1,  shade,  shade,  shade,  texX ,  texYp   );
+		bindings.addVertices(   x + 1,  y + 1,  z + 1,  shade,  shade,  shade,  texX ,  texY    );
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
-	private void renderBottomFace(Bindings<WorldVertex> bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
+	private void renderBottomFace(FloatBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
 		Vector2i texture = block.getTexture().getTexture(Direction.BOTTOM, blockAccess, x, y, z);
 		float texX = texture.x * Block.TEXTURE_WIDTH;
 		float texY = texture.y * Block.TEXTURE_WIDTH;
@@ -113,14 +113,14 @@ public class BlockRenderer {
 		float texYp = texY + Block.TEXTURE_WIDTH;
 		float shade = getShade(4);
 
-		bindings.addVertex(new WorldVertex( x,      y,  z,      shade,  shade,  shade,  texXp,  texY    ));
-		bindings.addVertex(new WorldVertex( x,      y,  z + 1,  shade,  shade,  shade,  texXp,  texYp   ));
-		bindings.addVertex(new WorldVertex( x + 1,  y,  z + 1,  shade,  shade,  shade,  texX ,  texYp   ));
-		bindings.addVertex(new WorldVertex( x + 1,  y,  z,      shade,  shade,  shade,  texX ,  texY    ));
+		bindings.addVertices(   x,      y,  z,      shade,  shade,  shade,  texXp,  texY    );
+		bindings.addVertices(   x,      y,  z + 1,  shade,  shade,  shade,  texXp,  texYp   );
+		bindings.addVertices(   x + 1,  y,  z + 1,  shade,  shade,  shade,  texX ,  texYp   );
+		bindings.addVertices(   x + 1,  y,  z,      shade,  shade,  shade,  texX ,  texY    );
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
-	private void renderTopFace(Bindings<WorldVertex> bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
+	private void renderTopFace(FloatBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
 		Vector2i texture = block.getTexture().getTexture(Direction.TOP, blockAccess, x, y, z);
 		float texX = texture.x * Block.TEXTURE_WIDTH;
 		float texY = texture.y * Block.TEXTURE_WIDTH;
@@ -128,10 +128,10 @@ public class BlockRenderer {
 		float texYp = texY + Block.TEXTURE_WIDTH;
 		float shade = getShade(0);
 
-		bindings.addVertex(new WorldVertex( x,      y + 1,  z + 1,  shade,  shade,  shade,  texXp,  texY    ));
-		bindings.addVertex(new WorldVertex( x,      y + 1,  z,      shade,  shade,  shade,  texXp,  texYp   ));
-		bindings.addVertex(new WorldVertex( x + 1,  y + 1,  z,      shade,  shade,  shade,  texX ,  texYp   ));
-		bindings.addVertex(new WorldVertex( x + 1,  y + 1,  z + 1,  shade,  shade,  shade,  texX ,  texY    ));
+		bindings.addVertices(   x,      y + 1,  z + 1,  shade,  shade,  shade,  texXp,  texY    );
+		bindings.addVertices(   x,      y + 1,  z,      shade,  shade,  shade,  texXp,  texYp   );
+		bindings.addVertices(   x + 1,  y + 1,  z,      shade,  shade,  shade,  texX ,  texYp   );
+		bindings.addVertices(   x + 1,  y + 1,  z + 1,  shade,  shade,  shade,  texX ,  texY    );
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 }

@@ -1,4 +1,4 @@
-package io.bluestaggo.voxelthing.renderer;
+package io.bluestaggo.voxelthing.renderer.vertices;
 
 import io.bluestaggo.voxelthing.renderer.world.WorldVertex;
 import org.joml.Vector2f;
@@ -6,7 +6,9 @@ import org.joml.Vector3f;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.FloatBuffer;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL33C.*;
 

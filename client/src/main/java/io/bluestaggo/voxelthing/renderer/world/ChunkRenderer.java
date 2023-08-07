@@ -1,8 +1,8 @@
 package io.bluestaggo.voxelthing.renderer.world;
 
-import io.bluestaggo.voxelthing.renderer.Bindings;
-import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.math.MathUtil;
+import io.bluestaggo.voxelthing.renderer.MainRenderer;
+import io.bluestaggo.voxelthing.renderer.vertices.FloatBindings;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.ChunkCache;
@@ -18,7 +18,7 @@ public class ChunkRenderer {
 	private boolean empty;
 	private double firstAppearance;
 
-	private final Bindings<WorldVertex> bindings = new Bindings<>(WorldVertex.LAYOUT);
+	private final FloatBindings bindings = new FloatBindings(WorldVertex.FLOAT_LAYOUT);
 
 	public ChunkRenderer(MainRenderer renderer, World world, int x, int y, int z) {
 		this.renderer = renderer;
@@ -104,5 +104,9 @@ public class ChunkRenderer {
 
 	public double getFadeAmount(double time) {
 		return MathUtil.clamp(1.0 - (time - firstAppearance));
+	}
+
+	public void unload() {
+		this.bindings.unload();
 	}
 }

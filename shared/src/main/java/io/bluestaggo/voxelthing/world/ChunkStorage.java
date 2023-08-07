@@ -33,6 +33,7 @@ public class ChunkStorage {
 		if (chunk != null)
 			return chunk;
 
+		chunks[storageCoords(x, y, z)] = null;
 		chunk = new Chunk(world, x, y, z);
 		chunks[storageCoords(x, y, z)] = chunk;
 		return chunk;

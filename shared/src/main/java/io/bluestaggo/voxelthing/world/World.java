@@ -33,7 +33,7 @@ public class World implements IBlockAccess {
 					for (int zz = 0; zz < 32; zz++) {
 						for (int yy = 0; yy < 32; yy++) {
 							Block block = Block.STONE;
-							if ((x + z) % 2 ==0) {
+							if ((x + z) % 2 == 0) {
 								block = Block.BRICK;
 							} else {
 								if (yy >= 4) {

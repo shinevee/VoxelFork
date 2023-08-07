@@ -8,6 +8,7 @@ import io.bluestaggo.voxelthing.renderer.shader.WorldShader;
 import io.bluestaggo.voxelthing.renderer.world.BlockRenderer;
 import io.bluestaggo.voxelthing.renderer.world.WorldRenderer;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class MainRenderer {
 	private final Vector4f skyColor = new Vector4f(0.2f, 0.6f, 1.0f, 1.0f);
 	private final Framebuffer skyFramebuffer;
 
-	private double updateTick;
+	private Vector3f prevUpdatePos = new Vector3f();
 
 	public MainRenderer(Game game) {
 		this.game = game;
@@ -40,6 +41,7 @@ public class MainRenderer {
 			skyShader = new SkyShader();
 
 			camera = new Camera(game.window);
+			camera.getPosition(prevUpdatePos);
 
 			worldRenderer = new WorldRenderer(this);
 			blockRenderer = new BlockRenderer();
@@ -53,10 +55,9 @@ public class MainRenderer {
 	public void draw() {
 		skyFramebuffer.resize(game.window.getWidth(), game.window.getHeight());
 
-		updateTick += game.window.getDeltaTime();
-		if (updateTick >= 1.0) {
+		if (prevUpdatePos.distance(camera.getPosition()) > 32.0f) {
 			worldRenderer.moveRenderers();
-			updateTick %= 1.0;
+			camera.getPosition(prevUpdatePos);
 		}
 
 		camera.setFar(worldRenderer.renderDistance * 32);
@@ -109,6 +110,7 @@ public class MainRenderer {
 	}
 
 	public void unload() {
+		worldRenderer.unload();
 		skyShader.unload();
 		worldShader.unload();
 		skyFramebuffer.unload();

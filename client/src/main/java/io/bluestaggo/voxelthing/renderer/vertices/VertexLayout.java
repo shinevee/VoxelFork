@@ -1,4 +1,4 @@
-package io.bluestaggo.voxelthing.renderer;
+package io.bluestaggo.voxelthing.renderer.vertices;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

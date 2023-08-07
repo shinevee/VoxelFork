@@ -1,9 +1,9 @@
 package io.bluestaggo.voxelthing.renderer.world;
 
-import io.bluestaggo.voxelthing.renderer.Bindings;
 import io.bluestaggo.voxelthing.renderer.GLState;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.util.WorldPrimitives;
+import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.World;
@@ -13,7 +13,7 @@ import org.joml.Vector3f;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.lwjgl.opengl.GL33C.*;
+import static org.lwjgl.opengl.GL33C.GL_DEPTH_TEST;
 
 public class WorldRenderer {
 	private final MainRenderer renderer;
@@ -51,12 +51,18 @@ public class WorldRenderer {
 		maxX = maxY = maxZ = renderDistance;
 		renderRange = renderDistance * 2 + 1;
 
+		if (chunkRenderers != null) {
+			for (ChunkRenderer chunkRenderer : chunkRenderers) {
+				chunkRenderer.unload();
+			}
+		}
+
 		chunkRenderers = new ChunkRenderer[renderRange * renderRange * renderRange];
-		for (int x = 0; x < renderRange; x++) {
-			for (int z = 0; z < renderRange; z++) {
-				for (int y = 0; y < renderRange; y++) {
-					chunkRenderers[(x * renderRange + z) * renderRange + y]
-							= new ChunkRenderer(renderer, world, x - renderDistance, y - renderDistance, z - renderDistance);
+		for (int x = -renderDistance; x <= renderDistance; x++) {
+			for (int z = -renderDistance; z <= renderDistance; z++) {
+				for (int y = -renderDistance; y <= renderDistance; y++) {
+					int i = chunkRendererCoord(x, y, z);
+					chunkRenderers[i] = new ChunkRenderer(renderer, world, x, y, z);
 				}
 			}
 		}
@@ -178,6 +184,16 @@ public class WorldRenderer {
 		ChunkRenderer renderer = chunkRenderers[chunkRendererCoord(x, y, z)];
 		if (renderer.getX() == x && renderer.getY() == y && renderer.getZ() == z) {
 			renderer.queueUpdate();
+		}
+	}
+
+	public void unload() {
+		background.unload();
+
+		if (chunkRenderers != null) {
+			for (ChunkRenderer chunkRenderer : chunkRenderers) {
+				chunkRenderer.unload();
+			}
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package io.bluestaggo.voxelthing.renderer;
+package io.bluestaggo.voxelthing.renderer.vertices;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

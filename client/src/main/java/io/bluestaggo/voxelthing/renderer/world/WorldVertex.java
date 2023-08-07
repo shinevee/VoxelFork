@@ -1,12 +1,14 @@
 package io.bluestaggo.voxelthing.renderer.world;
 
-import io.bluestaggo.voxelthing.renderer.Normalized;
-import io.bluestaggo.voxelthing.renderer.VertexLayout;
+import io.bluestaggo.voxelthing.renderer.vertices.FloatVertexLayout;
+import io.bluestaggo.voxelthing.renderer.vertices.Normalized;
+import io.bluestaggo.voxelthing.renderer.vertices.VertexLayout;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 public class WorldVertex {
 	public static final VertexLayout<WorldVertex> LAYOUT = new VertexLayout<>(WorldVertex.class);
+	public static final FloatVertexLayout FLOAT_LAYOUT = new FloatVertexLayout(WorldVertex.class);
 
 	public Vector3f position;
 	public @Normalized Vector3f color;

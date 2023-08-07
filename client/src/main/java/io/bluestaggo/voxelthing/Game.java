@@ -6,11 +6,11 @@ import io.bluestaggo.voxelthing.window.ClientPlayerController;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.ClientWorld;
 import io.bluestaggo.voxelthing.world.World;
-import io.bluestaggo.voxelthing.world.entity.Player;
 import io.bluestaggo.voxelthing.world.entity.IPlayerController;
+import io.bluestaggo.voxelthing.world.entity.Player;
 
-import static org.lwjgl.opengl.GL33C.*;
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL33C.glClearColor;
 
 public class Game {
 	public static final float TICK_RATE = 1.0f / 20;
@@ -107,9 +107,9 @@ public class Game {
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_R)) {
-			player.posX = world.random.nextDouble(-100.0, 100.0);
+			player.posX = world.random.nextDouble(-1000.0, 1000.0);
 			player.posY = 64.0;
-			player.posZ = world.random.nextDouble(-100.0, 100.0);
+			player.posZ = world.random.nextDouble(-1000.0, 1000.0);
 			player.velX = 0.0;
 			player.velY = 0.0;
 			player.velZ = 0.0;

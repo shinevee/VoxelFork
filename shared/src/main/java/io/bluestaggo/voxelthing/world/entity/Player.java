@@ -7,7 +7,7 @@ public class Player extends Entity {
 	private final IPlayerController controller;
 
 	public double accel = 0.1;
-	public double friction = 0.8;
+	public double friction = 0.75;
 	public double jumpHeight = 0.5;
 
 	public Player(World world, IPlayerController controller) {
