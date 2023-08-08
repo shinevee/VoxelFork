@@ -11,6 +11,7 @@ import io.bluestaggo.voxelthing.renderer.shader.SkyShader;
 import io.bluestaggo.voxelthing.renderer.shader.WorldShader;
 import io.bluestaggo.voxelthing.renderer.world.BlockRenderer;
 import io.bluestaggo.voxelthing.renderer.world.WorldRenderer;
+import io.bluestaggo.voxelthing.window.Window;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -96,13 +97,29 @@ public class MainRenderer {
 			glActiveTexture(GL_TEXTURE0);
 			worldRenderer.draw();
 
-			Texture floof = textures.getTexture(game.getSkin());
+			Texture skin = textures.getTexture(game.getSkin());
+			int frame = game.getSkin().contains("floof") ? (int) (Window.getTimeElapsed() * 8.0D) % 8
+					: game.getSkin().contains("staggo") ? 1 : 0;
+			double walk = game.getSkin().contains("staggo") ? Math.sin(Window.getTimeElapsed() * 8.0D) : 0.0;
+			float minX = frame < 5 ? skin.uCoord(32) : skin.uCoord(64);
+			float maxX = frame < 5 ? skin.uCoord(64) : skin.uCoord(32);
+			float minY = frame < 5 ? skin.vCoord(frame * 32) : skin.vCoord((8 - frame) * 32);
+			float maxY = minY + skin.vCoord(32);
+
+			if (walk > 0.5) {
+				minX += skin.uCoord(32);
+				maxX += skin.uCoord(32);
+			} else if (walk < -0.5) {
+				minX -= skin.uCoord(32);
+				maxX -= skin.uCoord(32);
+			}
+
 			draw3D.drawBillboard(new Billboard()
-					.at((float) game.player.getRenderX(), (float) game.player.getRenderY(), (float) game.player.getRenderZ())
+					.at((float) game.player.getRenderX(), (float) (game.player.getRenderY() + Math.abs(walk / 2.0)), (float) game.player.getRenderZ())
 					.scale(2.0f, 2.0f)
 					.align(0.5f, 0.0f)
-					.withTexture(floof)
-					.withUV(floof.uCoord(32), floof.vCoord(0), floof.uCoord(64), floof.vCoord(32)), state);
+					.withTexture(skin)
+					.withUV(minX, minY, maxX, maxY), state);
 
 			Shader.stop();
 		}
