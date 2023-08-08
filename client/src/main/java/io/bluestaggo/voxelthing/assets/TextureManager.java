@@ -10,36 +10,32 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL33C.*;
-
 public class TextureManager {
 	public static final int MAX_TEXTURE_SIZE = 512;
 
-	private final Map<String, Integer> textures = new HashMap<>();
+	private final Map<String, Texture> textures = new HashMap<>();
 	private final ByteBuffer textureBuffer = MemoryUtil.memAlloc(MAX_TEXTURE_SIZE * MAX_TEXTURE_SIZE * 4);
 
-	public int getTexture(String path) {
+	public Texture getTexture(String path) {
 		if (path == null) {
-			return 0;
+			return getTexture("/assets/missing.png");
 		}
 
 		if (!textures.containsKey(path)) {
 			try {
 				return loadTexture(path);
 			} catch (IOException e) {
-				try {
-					int texture = loadTexture("/assets/missing.png");
-					textures.put(path, texture);
-					return texture;
-				} catch (IOException e2) {
-					throw new RuntimeException(e2);
+				if (path.equals("/assets/missing.png")) {
+					throw new RuntimeException("Failed to load placeholder texture!");
 				}
+				return getTexture("/assets/missing.png");
 			}
 		}
+
 		return textures.get(path);
 	}
 
-	private int loadTexture(String path) throws IOException {
+	private Texture loadTexture(String path) throws IOException {
 		try (InputStream imageStream = getClass().getResourceAsStream(path)) {
 			if (imageStream == null) {
 				throw new IOException("Image \"" + path + "\" does not exist!");
@@ -48,12 +44,6 @@ public class TextureManager {
 			BufferedImage image = ImageIO.read(imageStream);
 			int width = image.getWidth();
 			int height = image.getHeight();
-
-			// Flip image for OpenGL usage
-//			AffineTransform transform = AffineTransform.getScaleInstance(1, -1);
-//			transform.translate(0, -height);
-//			AffineTransformOp operation = new AffineTransformOp(transform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-//			image = operation.filter(image, null);
 
 			// Load ARGB data
 			int[] data = new int[width * height];
@@ -73,34 +63,11 @@ public class TextureManager {
 			textureBuffer.flip();
 
 			// Generate OpenGL texture
-			int handle = glGenTextures();
-			glBindTexture(GL_TEXTURE_2D, handle);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureBuffer);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 4);
-			glGenerateMipmap(GL_TEXTURE_2D);
+			Texture texture = new Texture(textureBuffer, width, height);
 
-			textures.put(path, handle);
+			textures.put(path, texture);
 			textureBuffer.clear();
-			return handle;
+			return texture;
 		}
-	}
-
-	public void useTexture(String path) {
-		useTexture(getTexture(path));
-	}
-
-	public void useTexture(String path, int index) {
-		useTexture(getTexture(path), index);
-	}
-
-	public void useTexture(int texture) {
-		glBindTexture(GL_TEXTURE_2D, texture);
-	}
-
-	public void useTexture(int texture, int index) {
-		glActiveTexture(GL_TEXTURE0 + index);
-		glBindTexture(GL_TEXTURE_2D, texture);
 	}
 }

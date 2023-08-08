@@ -1,7 +1,11 @@
 package io.bluestaggo.voxelthing.renderer;
 
 import io.bluestaggo.voxelthing.Game;
+import io.bluestaggo.voxelthing.assets.Texture;
 import io.bluestaggo.voxelthing.assets.TextureManager;
+import io.bluestaggo.voxelthing.renderer.draw.Billboard;
+import io.bluestaggo.voxelthing.renderer.draw.Draw3D;
+import io.bluestaggo.voxelthing.renderer.shader.IFogShader;
 import io.bluestaggo.voxelthing.renderer.shader.Shader;
 import io.bluestaggo.voxelthing.renderer.shader.SkyShader;
 import io.bluestaggo.voxelthing.renderer.shader.WorldShader;
@@ -25,12 +29,13 @@ public class MainRenderer {
 
 	public final WorldRenderer worldRenderer;
 	public final BlockRenderer blockRenderer;
+	public final Draw3D draw3D;
 
 	private final Vector4f fogColor = new Vector4f(0.6f, 0.8f, 1.0f, 1.0f);
 	private final Vector4f skyColor = new Vector4f(0.2f, 0.6f, 1.0f, 1.0f);
 	private final Framebuffer skyFramebuffer;
 
-	private Vector3f prevUpdatePos = new Vector3f();
+	private final Vector3f prevUpdatePos = new Vector3f();
 
 	public MainRenderer(Game game) {
 		this.game = game;
@@ -45,6 +50,7 @@ public class MainRenderer {
 
 			worldRenderer = new WorldRenderer(this);
 			blockRenderer = new BlockRenderer();
+			draw3D = new Draw3D(this);
 
 			skyFramebuffer = new Framebuffer(game.window.getWidth(), game.window.getHeight());
 		} catch (IOException e) {
@@ -55,7 +61,7 @@ public class MainRenderer {
 	public void draw() {
 		skyFramebuffer.resize(game.window.getWidth(), game.window.getHeight());
 
-		if (prevUpdatePos.distance(camera.getPosition()) > 32.0f) {
+		if (prevUpdatePos.distance(camera.getPosition()) > 8.0f) {
 			worldRenderer.moveRenderers();
 			camera.getPosition(prevUpdatePos);
 		}
@@ -68,6 +74,7 @@ public class MainRenderer {
 		Matrix4f view = camera.getView();
 		Matrix4f proj = camera.getProj();
 		Matrix4f viewProj = proj.mul(view, new Matrix4f());
+		draw3D.setup();
 
 		try (var state = new GLState()) {
 			state.enable(GL_CULL_FACE);
@@ -75,7 +82,7 @@ public class MainRenderer {
 			glCullFace(GL_FRONT);
 
 			setupSkyShader(view, proj);
-			textures.useTexture(null);
+			Texture.stop();
 			skyFramebuffer.use();
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			worldRenderer.drawSky();
@@ -83,10 +90,19 @@ public class MainRenderer {
 			worldRenderer.drawSky();
 
 			setupWorldShader(viewProj);
-			textures.useTexture("/assets/blocks.png", 0);
-			textures.useTexture(skyFramebuffer.getTexture(), 1);
+			textures.getTexture("/assets/blocks.png").use();
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, skyFramebuffer.getTexture());
+			glActiveTexture(GL_TEXTURE0);
 			worldRenderer.draw();
-			glActiveTexture(0);
+
+			Texture floof = textures.getTexture(game.getSkin());
+			draw3D.drawBillboard(new Billboard()
+					.at((float) game.player.getRenderX(), (float) game.player.getRenderY(), (float) game.player.getRenderZ())
+					.scale(2.0f, 2.0f)
+					.align(0.5f, 0.0f)
+					.withTexture(floof)
+					.withUV(floof.uCoord(32), floof.vCoord(0), floof.uCoord(64), floof.vCoord(32)), state);
 
 			Shader.stop();
 		}
@@ -95,10 +111,7 @@ public class MainRenderer {
 	private void setupWorldShader(Matrix4f viewProj) {
 		worldShader.use();
 		worldShader.mvp.set(viewProj);
-		worldShader.camPos.set(camera.getPosition());
-		worldShader.camFar.set(camera.getFar());
-		worldShader.width.set((float)game.window.getWidth());
-		worldShader.height.set((float)game.window.getHeight());
+		setupFogShader(worldShader);
 	}
 
 	private void setupSkyShader(Matrix4f view, Matrix4f proj) {
@@ -107,6 +120,13 @@ public class MainRenderer {
 		skyShader.proj.set(proj);
 		skyShader.fogCol.set(fogColor);
 		skyShader.skyCol.set(skyColor);
+	}
+
+	public void setupFogShader(IFogShader shader) {
+		shader.setupFog((float) game.window.getWidth(),
+				(float) game.window.getHeight(),
+				camera.getPosition(),
+				camera.getFar());
 	}
 
 	public void unload() {

@@ -31,7 +31,7 @@ public class IntList {
 		data[size++] = e;
 	}
 
-	public void add(int... e) {
+	public void addAll(int... e) {
 		while (size + e.length > data.length) {
 			data = grow();
 		}

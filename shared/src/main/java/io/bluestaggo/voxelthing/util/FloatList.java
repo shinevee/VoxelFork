@@ -31,7 +31,7 @@ public class FloatList {
 		data[size++] = e;
 	}
 
-	public void add(float... e) {
+	public void addAll(float... e) {
 		while (size + e.length > data.length) {
 			data = grow();
 		}

@@ -9,7 +9,7 @@ Key:
 - [x] Frustum culling
 - [x] Advanced block textures (e.g. grass sides)
 - [ ] 2D immediate mode renderer (for guis)
-- [ ] 3D immediate mode renderer (for entities)
+- [x] 3D immediate mode renderer (for entities)
 - [ ] Clouds
 
 ## Gameplay

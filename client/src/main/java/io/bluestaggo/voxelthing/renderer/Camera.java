@@ -52,8 +52,11 @@ public class Camera {
 		this.yaw = yaw;
 		this.pitch = pitch;
 		this.pitch = MathUtil.clamp(pitch, -89.0f, 89.0f);
-
 		updateVectors();
+	}
+
+	public void moveForward(float x) {
+		position.add(front.mul(x, new Vector3f()));
 	}
 
 	private void updateVectors() {
@@ -92,12 +95,24 @@ public class Camera {
 		this.far = far;
 	}
 
+	public float getYaw() {
+		return yaw;
+	}
+
+	public float getPitch() {
+		return pitch;
+	}
+
 	public Matrix4f getView() {
 		return view.identity().lookAt(position, target, up);
 	}
 
 	public Matrix4f getProj() {
 		return proj.identity().perspective(fov, (float) window.getWidth() / (float) window.getHeight(), near, far);
+	}
+
+	public Matrix4f getViewProj(Matrix4f viewProj) {
+		return proj.mul(view, viewProj);
 	}
 
 	public FrustumIntersection getFrustum() {

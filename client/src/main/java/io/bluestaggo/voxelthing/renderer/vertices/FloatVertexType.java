@@ -1,6 +1,9 @@
 package io.bluestaggo.voxelthing.renderer.vertices;
 
 public class FloatVertexType {
+	public static final FloatVertexType VECTOR2F = new FloatVertexType(2);
+	public static final FloatVertexType VECTOR3F = new FloatVertexType(3);
+
 	public final int size;
 	public final boolean normalized;
 

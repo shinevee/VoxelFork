@@ -2,10 +2,14 @@ package io.bluestaggo.voxelthing.renderer.shader;
 
 import io.bluestaggo.voxelthing.renderer.shader.uniform.*;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import static org.lwjgl.opengl.GL33C.*;
 
@@ -96,6 +100,10 @@ public class Shader {
 
 	public ShaderUniform<Float> getUniform1f(String name) {
 		return new Uniform1f(handle, name);
+	}
+
+	public ShaderUniform<Vector2f> getUniform2f(String name) {
+		return new Uniform2f(handle, name);
 	}
 
 	public ShaderUniform<Vector3f> getUniform3f(String name) {

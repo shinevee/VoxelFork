@@ -6,11 +6,24 @@ import java.util.List;
 import static org.lwjgl.opengl.GL33C.*;
 
 public class GLState implements AutoCloseable {
+	private final GLState parent;
 	private final List<Integer> enabled = new ArrayList<>();
 	private final List<Integer> disabled = new ArrayList<>();
 	private int depthFunc = 0;
 
+	public GLState() {
+		this(null);
+	}
+
+	public GLState(GLState parent) {
+		this.parent = parent;
+	}
+
 	public void enable(int state) {
+		if (parent != null && parent.enabled.contains(state)) {
+			return;
+		}
+
 		if (disabled.contains(state)) {
 			disabled.remove((Integer)state);
 		} else {
@@ -20,22 +33,16 @@ public class GLState implements AutoCloseable {
 	}
 
 	public void disable(int state) {
+		if (parent != null && parent.disabled.contains(state)) {
+			return;
+		}
+
 		if (enabled.contains(state)) {
 			enabled.remove((Integer)state);
 		} else {
 			disabled.add(state);
 		}
 		glDisable(state);
-	}
-
-	public void depthFunc(int func) {
-		if (func >= GL_NEVER && func <= GL_ALWAYS) {
-			depthFunc = func;
-			glDepthFunc(func);
-		} else {
-			depthFunc = 0;
-			glDepthFunc(GL_LESS);
-		}
 	}
 
 	@Override

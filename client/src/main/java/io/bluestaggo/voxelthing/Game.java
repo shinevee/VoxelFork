@@ -1,7 +1,6 @@
 package io.bluestaggo.voxelthing;
 
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
-import io.bluestaggo.voxelthing.renderer.shader.Shader;
 import io.bluestaggo.voxelthing.window.ClientPlayerController;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.ClientWorld;
@@ -14,6 +13,13 @@ import static org.lwjgl.opengl.GL33C.glClearColor;
 
 public class Game {
 	public static final float TICK_RATE = 1.0f / 20;
+
+	private static final String[] SKINS = {
+			"joel",
+			"staggo",
+			"floof"
+	};
+	private int currentSkin;
 
 	private static Game instance;
 
@@ -63,8 +69,6 @@ public class Game {
 		window.destroy();
 	}
 
-	private int fogAlgorithm = 1;
-
 	private void update(double delta) {
 		tickTime += delta;
 		player.onGameUpdate();
@@ -78,18 +82,16 @@ public class Game {
 		renderer.camera.setPosition((float) player.getRenderX(), (float) (player.getRenderY() + player.height - 0.3), (float) player.getRenderZ());
 		renderer.camera.setRotation((float) player.rotYaw, (float) player.rotPitch);
 
-		if (window.isMouseJustPressed(GLFW_MOUSE_BUTTON_MIDDLE)) {
-			window.toggleGrabCursor();
+		if (window.isKeyDown(GLFW_KEY_F5)) {
+			renderer.camera.moveForward(-4.0f);
 		}
 
-		if (window.isKeyJustPressed(GLFW_KEY_1)) {
-			if (++fogAlgorithm > 3) {
-				fogAlgorithm = 0;
-			}
+		if (window.isKeyJustPressed(GLFW_KEY_F6)) {
+			if (++currentSkin >= SKINS.length) currentSkin = 0;
+		}
 
-			renderer.worldShader.use();
-			renderer.worldShader.fogAlgorithm.set(fogAlgorithm);
-			Shader.stop();
+		if (window.isMouseJustPressed(GLFW_MOUSE_BUTTON_MIDDLE)) {
+			window.toggleGrabCursor();
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_F)) {
@@ -127,6 +129,10 @@ public class Game {
 
 	private void draw() {
 		renderer.draw();
+	}
+
+	public String getSkin() {
+		return "/assets/entities/" + SKINS[currentSkin] + ".png";
 	}
 
 	public static void main(String[] args) {

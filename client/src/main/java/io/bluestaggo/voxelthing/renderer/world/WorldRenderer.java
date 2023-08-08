@@ -13,7 +13,7 @@ import org.joml.Vector3f;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.lwjgl.opengl.GL33C.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL33C.*;
 
 public class WorldRenderer {
 	private final MainRenderer renderer;
@@ -31,7 +31,7 @@ public class WorldRenderer {
 	public WorldRenderer(MainRenderer renderer) {
 		this.renderer = renderer;
 
-		background = WorldPrimitives.generateSphere(1.0f, 16, 16);
+		background = WorldPrimitives.generateSphere(null, 1.0f, 16, 16);
 	}
 
 	public int chunkRendererCoord(int x, int y, int z) {
@@ -91,12 +91,16 @@ public class WorldRenderer {
 			renderer.worldShader.fade.set((float)chunkRenderer.getFadeAmount(currentTime));
 			chunkRenderer.draw();
 		}
+
+		renderer.worldShader.fade.set(0.0f);
 	}
 
 	public void drawSky() {
 		try (GLState state = new GLState()) {
 			state.disable(GL_DEPTH_TEST);
+			glCullFace(GL_FRONT);
 			background.draw();
+			glCullFace(GL_BACK);
 		}
 	}
 

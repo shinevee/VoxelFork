@@ -13,8 +13,9 @@ public class FloatBindings {
 	private final int vao;
 	private final int vbo;
 	private final int ebo;
-	private int vertexCount = 0;
-	private int indexSize = 0;
+	private int nextIndexSize;
+	private int vertexCount;
+	private int indexSize;
 
 	private final FloatList nextData = new FloatList();
 	private final IntList nextIndices = new IntList();
@@ -26,25 +27,27 @@ public class FloatBindings {
 		this.ebo = glGenBuffers();
 	}
 
+	public FloatBindings(FloatVertexType... vertexTypes) {
+		this(new FloatVertexLayout(vertexTypes));
+	}
+
 	public void addVertex(float vertex) {
 		nextData.add(vertex);
-		vertexCount++;
 	}
 
 	public void addVertices(float... vertices) {
-		nextData.add(vertices);
-		vertexCount += vertices.length;
+		nextData.addAll(vertices);
 	}
 
 	public void addIndex(int index) {
 		nextIndices.add(index);
-		if (index + 1 > indexSize) {
-			indexSize = index + 1;
+		if (index + 1 > nextIndexSize) {
+			nextIndexSize = index + 1;
 		}
 	}
 
 	public void addIndices(int... indices) {
-		int offset = indexSize;
+		int offset = nextIndexSize;
 		for (int index : indices) {
 			addIndex(index + offset);
 		}
@@ -52,9 +55,14 @@ public class FloatBindings {
 
 	public void upload(boolean dynamic) {
 		setData(nextData, nextIndices, dynamic);
+		clear();
+	}
+
+	public void clear() {
 		nextData.clear();
 		nextIndices.clear();
-		indexSize = 0;
+		indexSize = nextIndexSize;
+		nextIndexSize = 0;
 	}
 
 	public int getVertexCount() {
@@ -68,7 +76,8 @@ public class FloatBindings {
 	public void setData(FloatList data, IntList indices, boolean dynamic) {
 		glBindVertexArray(vao);
 		layout.bufferData(vbo, data, dynamic);
-		this.vertexCount = indices.size();
+		vertexCount = indices.size();
+		if (vertexCount == 0) vertexCount = data.size();
 
 		IntBuffer intBuffer = MemoryUtil.memAllocInt(indices.size());
 		indices.putToBuffer(intBuffer);
@@ -82,7 +91,11 @@ public class FloatBindings {
 
 	public void draw() {
 		glBindVertexArray(vao);
-		glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0);
+		if (indexSize > 0) {
+			glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, 0);
+		} else {
+			glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+		}
 	}
 
 	public void unload() {

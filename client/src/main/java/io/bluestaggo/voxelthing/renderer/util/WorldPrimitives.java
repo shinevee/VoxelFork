@@ -8,9 +8,10 @@ public final class WorldPrimitives {
 		throw new AssertionError("No io.bluestaggo.voxelthing.renderer.util.WorldPrimitives instances for you!");
 	}
 
-	public static Bindings<WorldVertex> generateSphere(float radius, int rings, int sectors) {
-		var sphere = new Bindings<>(WorldVertex.LAYOUT);
+	public static Bindings<WorldVertex> generateSphere(Bindings<WorldVertex> bindings, float radius, int rings, int sectors) {
+		if (bindings == null) bindings = new Bindings<>(WorldVertex.LAYOUT);
 
+		bindings.clear();
 		double sectorStep = 2.0F * Math.PI / sectors;
 		double ringStep = Math.PI / rings;
 
@@ -25,7 +26,7 @@ public final class WorldPrimitives {
 				float y = (float)(xy * Math.sin(sectorAngle));
 				float u = (float)j / sectors;
 				float v = (float)i / sectors;
-				sphere.addVertex(new WorldVertex(x, y, z, 1.0f, 1.0f, 1.0f, u, v));
+				bindings.addVertex(new WorldVertex(x, y, z, 1.0f, 1.0f, 1.0f, u, v));
 			}
 		}
 
@@ -35,20 +36,20 @@ public final class WorldPrimitives {
 
 			for (int j = 0; j < sectors; ++j, ++k1, ++k2) {
 				if (i != 0) {
-					sphere.addIndex(k1);
-					sphere.addIndex(k2);
-					sphere.addIndex(k1 + 1);
+					bindings.addIndex(k1);
+					bindings.addIndex(k2);
+					bindings.addIndex(k1 + 1);
 				}
 
 				if (i != rings - 1) {
-					sphere.addIndex(k1 + 1);
-					sphere.addIndex(k2);
-					sphere.addIndex(k2 + 1);
+					bindings.addIndex(k1 + 1);
+					bindings.addIndex(k2);
+					bindings.addIndex(k2 + 1);
 				}
 			}
 		}
 
-		sphere.upload(false);
-		return sphere;
+		bindings.upload(false);
+		return bindings;
 	}
 }
