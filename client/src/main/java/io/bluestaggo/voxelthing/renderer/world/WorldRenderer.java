@@ -72,7 +72,7 @@ public class WorldRenderer {
 
 	public void draw() {
 		int updates = 0;
-		int maxUpdates = 5;
+		int maxUpdates = 1;
 
 		FrustumIntersection frustum = this.renderer.camera.getFrustum();
 		double currentTime = Window.getTimeElapsed();

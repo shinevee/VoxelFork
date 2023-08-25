@@ -72,6 +72,7 @@ public class Game {
 	private void update(double delta) {
 		tickTime += delta;
 		player.onGameUpdate();
+		player.noClip = window.isKeyDown(GLFW_KEY_Q);
 
 		if (tickTime >= TICK_RATE) {
 			tickTime %= TICK_RATE;
@@ -92,6 +93,14 @@ public class Game {
 
 		if (window.isMouseJustPressed(GLFW_MOUSE_BUTTON_MIDDLE)) {
 			window.toggleGrabCursor();
+		}
+
+		if (window.isKeyJustPressed(GLFW_KEY_LEFT_BRACKET) && renderer.screen.scale > 0.5f) {
+			renderer.screen.scale -= 0.5f;
+		}
+
+		if (window.isKeyJustPressed(GLFW_KEY_RIGHT_BRACKET)) {
+			renderer.screen.scale += 0.5f;
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_F)) {
@@ -124,7 +133,9 @@ public class Game {
 		window.setTitle("Voxel Thing ("
 				+ (totalMB - freeMB) + " / " + maxMB + "MB, "
 				+ (int)(window.getDeltaTime() * 1000.0D) + "ms)"
-				+ " [dist: " + renderer.worldRenderer.renderDistance + "]");
+				+ " [dist: " + renderer.worldRenderer.renderDistance
+				+ ", guiScale: " + renderer.screen.scale
+				+ "]");
 	}
 
 	private void draw() {

@@ -3,13 +3,10 @@ package io.bluestaggo.voxelthing.renderer.shader.uniform;
 import org.joml.Matrix4f;
 
 import static org.lwjgl.opengl.GL20C.glUniformMatrix4fv;
-import static org.lwjgl.opengl.GL33C.glGetUniformLocation;
 
-public class UniformMatrix4fv implements ShaderUniform<Matrix4f> {
-	public final int location;
-
+public class UniformMatrix4fv extends UniformBase<Matrix4f> {
 	public UniformMatrix4fv(int handle, CharSequence name) {
-		location = glGetUniformLocation(handle, name);
+		super(handle, name);
 	}
 
 	@Override

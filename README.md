@@ -6,10 +6,13 @@ Nothing much here yet, huh? What will this be? Well, it is heading towards being
 - WASD: Fly around
 - Move mouse: Look around
 - Space: Jump
+- Q: No-clip
 - R: Teleport to a random position
 - F: Halve fog distance
 - Shift + F: Double fog distance
 - F5: Third person
 - F6: Change skin
 - Middle click: Lock / unlock mouse
+- ]: Increase GUI scale
+- [: Decrease GUI scale
 - Escape: Quit game

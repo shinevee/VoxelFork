@@ -30,6 +30,7 @@ public class Entity {
 	public double rotYaw;
 
 	public boolean onGround;
+	public boolean noClip;
 
 	public Entity(World world) {
 		this.world = world;
@@ -58,27 +59,31 @@ public class Entity {
 	}
 
 	private void updateMovement() {
-		updateCollisionBox();
-		List<AABB> intersectingBoxes = world.getSurroundingCollision(collisionBox.expandToPoint(velX, velY, velZ, offsetBox));
+		if (!noClip) {
+			updateCollisionBox();
+			List<AABB> intersectingBoxes = world.getSurroundingCollision(collisionBox.expandToPoint(velX, velY, velZ, offsetBox));
 
-		double oldVelY = velY;
+			double oldVelY = velY;
 
-		for (AABB box : intersectingBoxes) {
-			velY = box.calcYOffset(collisionBox, velY);
+			for (AABB box : intersectingBoxes) {
+				velY = box.calcYOffset(collisionBox, velY);
+			}
+			collisionBox.offset(0.0, velY, 0.0, collisionBox);
+
+			for (AABB box : intersectingBoxes) {
+				velX = box.calcXOffset(collisionBox, velX);
+			}
+			collisionBox.offset(velX, 0.0, 0.0, collisionBox);
+
+			for (AABB box : intersectingBoxes) {
+				velZ = box.calcZOffset(collisionBox, velZ);
+			}
+			collisionBox.offset(0.0, 0.0, velZ, collisionBox);
+
+			onGround = oldVelY < 0.0 && oldVelY < velY;
+		} else {
+			onGround = true;
 		}
-		collisionBox.offset(0.0, velY, 0.0, collisionBox);
-
-		for (AABB box : intersectingBoxes) {
-			velX = box.calcXOffset(collisionBox, velX);
-		}
-		collisionBox.offset(velX, 0.0, 0.0, collisionBox);
-
-		for (AABB box : intersectingBoxes) {
-			velZ = box.calcZOffset(collisionBox, velZ);
-		}
-		collisionBox.offset(0.0, 0.0, velZ, collisionBox);
-
-		onGround = oldVelY < 0.0 && oldVelY < velY;
 
 		posX += velX;
 		posY += velY;

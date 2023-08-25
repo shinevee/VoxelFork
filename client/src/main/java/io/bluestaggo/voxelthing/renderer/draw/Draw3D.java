@@ -1,6 +1,5 @@
 package io.bluestaggo.voxelthing.renderer.draw;
 
-import io.bluestaggo.voxelthing.renderer.GLState;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.shader.BillboardShader;
 import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
@@ -9,8 +8,6 @@ import io.bluestaggo.voxelthing.renderer.vertices.FloatVertexType;
 import io.bluestaggo.voxelthing.renderer.world.WorldVertex;
 
 import java.io.IOException;
-
-import static org.lwjgl.opengl.GL33C.GL_CULL_FACE;
 
 public class Draw3D {
 	private final MainRenderer renderer;
@@ -54,20 +51,14 @@ public class Draw3D {
 	}
 
 	public void drawBillboard(Billboard billboard) {
-		drawBillboard(billboard, null);
-	}
-
-	public void drawBillboard(Billboard billboard, GLState stateParent) {
-		try (var state = new GLState(stateParent)) {
-			state.disable(GL_CULL_FACE);
-			billboardShader.use();
-			billboard.applyToShader(billboardShader, renderer.camera.getView());
-			this.billboard.draw();
-		}
+		billboardShader.use();
+		billboard.applyToShader(billboardShader, renderer.camera.getView());
+		this.billboard.draw();
 	}
 
 	public void unload() {
 		bindings.unload();
 		billboard.unload();
+		billboardShader.unload();
 	}
 }

@@ -1,5 +1,6 @@
 package io.bluestaggo.voxelthing.renderer.vertices;
 
+import io.bluestaggo.voxelthing.renderer.screen.ScreenVertex;
 import io.bluestaggo.voxelthing.renderer.world.WorldVertex;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -78,6 +79,32 @@ public enum VertexType {
 				floatBuffer.put(v.position.x);
 				floatBuffer.put(v.position.y);
 				floatBuffer.put(v.position.z);
+				floatBuffer.put(v.color.x);
+				floatBuffer.put(v.color.y);
+				floatBuffer.put(v.color.z);
+				floatBuffer.put(v.uv.x);
+				floatBuffer.put(v.uv.y);
+			}
+			floatBuffer.flip();
+			glBufferData(GL_ARRAY_BUFFER, floatBuffer, dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+			MemoryUtil.memFree(floatBuffer);
+		}
+	},
+	SCREENVERTEX(7, GL_FLOAT, 28, ScreenVertex.class) {
+		@Override
+		@SuppressWarnings("unchecked")
+		public void bufferData(List<?> data, Class<?> dataType, boolean dynamic) {
+			if (!ScreenVertex.class.isAssignableFrom(dataType)) {
+				throw new ClassCastException("Data is not ScreenVertex!");
+			}
+			bufferData((List<ScreenVertex>) data, dynamic);
+		}
+
+		private void bufferData(List<ScreenVertex> data, boolean dynamic) {
+			FloatBuffer floatBuffer = MemoryUtil.memAllocFloat(data.size() * 8);
+			for (ScreenVertex v : data) {
+				floatBuffer.put(v.position.x);
+				floatBuffer.put(v.position.y);
 				floatBuffer.put(v.color.x);
 				floatBuffer.put(v.color.y);
 				floatBuffer.put(v.color.z);

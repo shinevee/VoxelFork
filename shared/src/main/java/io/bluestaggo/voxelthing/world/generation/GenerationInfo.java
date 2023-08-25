@@ -7,13 +7,16 @@ import io.bluestaggo.voxelthing.world.Chunk;
 import java.util.Arrays;
 
 public class GenerationInfo {
+	private static final int LERP_MAP_LENGTH = (Chunk.LENGTH >> 2) + 1;
+	private static final int LERP_MAP_SIZE = LERP_MAP_LENGTH * LERP_MAP_LENGTH * LERP_MAP_LENGTH;
+
 	public final int chunkX, chunkZ;
 	private long randSeed;
 
 	private final long caveSeed;
 
 	private final float[] height = new float[Chunk.AREA];
-	private final float[] caveInfo = new float[729];
+	private final float[] caveInfo = new float[LERP_MAP_SIZE];
 	private int lastQueryLayer = Integer.MAX_VALUE;
 
 	public GenerationInfo(long salt, int cx, int cz) {
@@ -95,20 +98,20 @@ public class GenerationInfo {
 		final float cheeseDensitySurface = -0.5f;
 
 		int shiftPow2 = Chunk.SIZE_POW2 - 3;
-		int shiftMask = Chunk.LENGTH_MASK >> 3;
-		int shiftDiv = Chunk.LENGTH >> 3;
+		int shiftMask = 3;
+		int shiftDiv = 4;
 		int xx = x >> shiftPow2;
 		int yy = (y & Chunk.LENGTH_MASK) >> shiftPow2;
 		int zz = z >> shiftPow2;
 
-		float c000 = caveInfo[MathUtil.index3D(xx, yy, zz, 9)];
-		float c001 = caveInfo[MathUtil.index3D(xx, yy, zz + 1, 9)];
-		float c010 = caveInfo[MathUtil.index3D(xx, yy + 1, zz, 9)];
-		float c011 = caveInfo[MathUtil.index3D(xx, yy + 1, zz + 1, 9)];
-		float c100 = caveInfo[MathUtil.index3D(xx + 1, yy, zz, 9)];
-		float c101 = caveInfo[MathUtil.index3D(xx + 1, yy, zz + 1, 9)];
-		float c110 = caveInfo[MathUtil.index3D(xx + 1, yy + 1, zz, 9)];
-		float c111 = caveInfo[MathUtil.index3D(xx + 1, yy + 1, zz + 1, 9)];
+		float c000 = caveInfo[MathUtil.index3D(xx, yy, zz, LERP_MAP_LENGTH)];
+		float c001 = caveInfo[MathUtil.index3D(xx, yy, zz + 1, LERP_MAP_LENGTH)];
+		float c010 = caveInfo[MathUtil.index3D(xx, yy + 1, zz, LERP_MAP_LENGTH)];
+		float c011 = caveInfo[MathUtil.index3D(xx, yy + 1, zz + 1, LERP_MAP_LENGTH)];
+		float c100 = caveInfo[MathUtil.index3D(xx + 1, yy, zz, LERP_MAP_LENGTH)];
+		float c101 = caveInfo[MathUtil.index3D(xx + 1, yy, zz + 1, LERP_MAP_LENGTH)];
+		float c110 = caveInfo[MathUtil.index3D(xx + 1, yy + 1, zz, LERP_MAP_LENGTH)];
+		float c111 = caveInfo[MathUtil.index3D(xx + 1, yy + 1, zz + 1, LERP_MAP_LENGTH)];
 		float caveInfo = MathUtil.trilinear(c000, c001, c010, c011, c100, c101, c110, c111,
 					(x & shiftMask) / (float) shiftDiv, (y & shiftMask) / (float) shiftDiv, (z & shiftMask) / (float) shiftDiv);
 		float cheeseThreshold = MathUtil.clamp(-y / cheeseDensitySpread + cheeseDensitySurface, cheeseMinDensity, cheeseMaxDensity);
@@ -123,15 +126,15 @@ public class GenerationInfo {
 		final double cheeseScaleXZ = 100.0;
 		final double cheeseScaleY = 50.0;
 
-		for (int x = 0; x < 9; x++) {
-			for (int y = 0; y < 9; y++) {
-				for (int z = 0; z < 9; z++) {
+		for (int x = 0; x < LERP_MAP_LENGTH; x++) {
+			for (int y = 0; y < LERP_MAP_LENGTH; y++) {
+				for (int z = 0; z < LERP_MAP_LENGTH; z++) {
 					int xx = (x << (Chunk.SIZE_POW2 - 3)) + (chunkX << Chunk.SIZE_POW2);
 					int yy = (y << (Chunk.SIZE_POW2 - 3)) + (layer << Chunk.SIZE_POW2);
 					int zz = (z << (Chunk.SIZE_POW2 - 3)) + (chunkZ << Chunk.SIZE_POW2);
 
 					float cheese = OpenSimplex2Octaves.noise3_ImproveXZ(caveSeed, cheeseOctaves, xx / cheeseScaleXZ, yy / cheeseScaleY, zz / cheeseScaleXZ);
-					caveInfo[MathUtil.index3D(x, y, z, 9)] = cheese;
+					caveInfo[MathUtil.index3D(x, y, z, LERP_MAP_LENGTH)] = cheese;
 				}
 			}
 		}

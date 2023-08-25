@@ -54,16 +54,15 @@ public class ChunkRenderer {
 		boolean wasEmpty = empty;
 
 		if (needsUpdate) {
-			IBlockAccess cache = new ChunkCache(world, x, y, z);
-
 			empty = true;
-			Chunk chunk = world.getChunkAt(x, y, z);
+			Chunk chunk = world.getOrLoadChunkAt(x, y, z);
 
 			if (chunk == null || chunk.isEmpty()) {
 				needsUpdate = false;
 				return;
 			}
 
+			IBlockAccess cache = new ChunkCache(world, x, y, z);
 			for (int xx = 0; xx < Chunk.LENGTH; xx++) {
 				for (int yy = 0; yy < Chunk.LENGTH; yy++) {
 					for (int zz = 0; zz < Chunk.LENGTH; zz++) {

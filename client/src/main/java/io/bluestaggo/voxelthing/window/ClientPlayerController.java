@@ -26,12 +26,12 @@ public class ClientPlayerController implements IPlayerController {
 
 	@Override
 	public double moveYaw() {
-		return game.window.isCursorGrabbed() ? game.window.getMouseDeltaX() * game.mouseSensitivity : 0.0f;
+		return game.window.isCursorGrabbed() || game.window.isMouseDown(0) ? game.window.getMouseDeltaX() * game.mouseSensitivity : 0.0f;
 	}
 
 	@Override
 	public double movePitch() {
-		return game.window.isCursorGrabbed() ? game.window.getMouseDeltaY() * game.mouseSensitivity : 0.0f;
+		return game.window.isCursorGrabbed() || game.window.isMouseDown(0) ? game.window.getMouseDeltaY() * game.mouseSensitivity : 0.0f;
 	}
 
 	@Override

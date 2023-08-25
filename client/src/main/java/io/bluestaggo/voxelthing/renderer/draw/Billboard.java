@@ -9,12 +9,25 @@ import org.joml.Vector4f;
 
 public class Billboard {
 	private final Vector3f position = new Vector3f();
-	private final Vector2f size = new Vector2f(1.0f, 1.0f);
-	private final Vector2f align = new Vector2f(0.5f, 0.5f);
-	private final Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-	private final Vector4f uv = new Vector4f(0.0f, 1.0f, 1.0f, 0.0f);
+	private final Vector2f size = new Vector2f();
+	private final Vector2f align = new Vector2f();
+	private final Vector4f color = new Vector4f();
+	private final Vector4f uv = new Vector4f();
 	private Texture texture;
 	private boolean spherical;
+
+	public Billboard() {
+		clear();
+	}
+
+	public Billboard clear() {
+		position.zero();
+		size.set(1.0f, 1.0f);
+		align.set(0.5f, 0.5f);
+		color.set(1.0f, 1.0f, 1.0f, 1.0f);
+		uv.set(0.0f, 1.0f, 1.0f, 0.0f);
+		return this;
+	}
 
 	public Billboard at(float x, float y, float z) {
 		position.set(x, y, z);
@@ -75,6 +88,7 @@ public class Billboard {
 		shader.modelView.set(modelView);
 		shader.size.set(size);
 		shader.align.set(align);
+		shader.hasTex.set(texture != null);
 		shader.color.set(color);
 		shader.uvRange.set(uv);
 	}

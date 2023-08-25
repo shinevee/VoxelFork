@@ -8,7 +8,7 @@ import org.joml.Vector4f;
 
 import java.io.IOException;
 
-public class BillboardShader extends Shader implements IFogShader {
+public class BillboardShader extends Shader implements BaseFogShader {
 	public final ShaderUniform<Matrix4f> modelView;
 	public final ShaderUniform<Matrix4f> proj;
 	public final ShaderUniform<Vector2f> align;
@@ -16,6 +16,7 @@ public class BillboardShader extends Shader implements IFogShader {
 	public final ShaderUniform<Vector4f> uvRange;
 
 	public final ShaderUniform<Integer> tex;
+	public final ShaderUniform<Boolean> hasTex;
 	public final ShaderUniform<Vector4f> color;
 	public final ShaderUniform<Integer> skyTex;
 	public final ShaderUniform<Float> skyWidth;
@@ -33,6 +34,7 @@ public class BillboardShader extends Shader implements IFogShader {
 		uvRange = getUniform4f("uvRange");
 
 		(tex = getUniform1i("tex")).set(0);
+		hasTex = getUniform1b("hasTex");
 		color = getUniform4f("color");
 		(skyTex = getUniform1i("skyTex")).set(1);
 		skyWidth = getUniform1f("skyWidth");

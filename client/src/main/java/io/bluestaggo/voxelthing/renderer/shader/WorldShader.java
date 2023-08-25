@@ -6,10 +6,11 @@ import org.joml.Vector3f;
 
 import java.io.IOException;
 
-public class WorldShader extends Shader implements IFogShader {
+public class WorldShader extends Shader implements BaseFogShader {
 	public final ShaderUniform<Matrix4f> mvp;
 
 	public final ShaderUniform<Integer> tex;
+	public final ShaderUniform<Boolean> hasTex;
 	public final ShaderUniform<Integer> skyTex;
 	public final ShaderUniform<Vector3f> camPos;
 	public final ShaderUniform<Float> camFar;
@@ -24,6 +25,7 @@ public class WorldShader extends Shader implements IFogShader {
 		mvp = getUniformMatrix4fv("mvp");
 
 		(tex = getUniform1i("tex")).set(0);
+		hasTex = getUniform1b("hasTex");
 		(skyTex = getUniform1i("skyTex")).set(1);
 		skyWidth = getUniform1f("skyWidth");
 		skyHeight = getUniform1f("skyHeight");

@@ -1,12 +1,10 @@
 package io.bluestaggo.voxelthing.renderer.shader.uniform;
 
-import static org.lwjgl.opengl.GL33C.*;
+import static org.lwjgl.opengl.GL33C.glUniform1i;
 
-public class Uniform1i implements ShaderUniform<Integer> {
-	public final int location;
-
+public class Uniform1i extends UniformBase<Integer> {
 	public Uniform1i(int handle, CharSequence name) {
-		location = glGetUniformLocation(handle, name);
+		super(handle, name);
 	}
 
 	@Override

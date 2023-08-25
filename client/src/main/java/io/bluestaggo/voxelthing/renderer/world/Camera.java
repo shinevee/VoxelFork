@@ -1,4 +1,4 @@
-package io.bluestaggo.voxelthing.renderer;
+package io.bluestaggo.voxelthing.renderer.world;
 
 import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.window.Window;
@@ -25,9 +25,10 @@ public class Camera {
 
 	private final Matrix4f view = new Matrix4f();
 	private final Matrix4f proj = new Matrix4f();
+	private final Matrix4f viewProj = new Matrix4f();
 
 	public Camera(Window window) {
-		this(window, 70.0f, 0.1f, 256.0f);
+		this(window, 60.0f, 0.1f, 256.0f);
 	}
 
 	public Camera(Window window, float fov, float near, float far) {
@@ -35,7 +36,7 @@ public class Camera {
 
 		front = new Vector3f(0.0f, 0.0f, -1.0f);
 
-		this.fov = fov;
+		this.fov = (float) Math.toRadians(fov);
 		this.near = near;
 		this.far = far;
 
@@ -46,6 +47,7 @@ public class Camera {
 		this.position.x = x;
 		this.position.y = y;
 		this.position.z = z;
+		updateVectors();
 	}
 
 	public void setRotation(float yaw, float pitch) {
@@ -57,6 +59,7 @@ public class Camera {
 
 	public void moveForward(float x) {
 		position.add(front.mul(x, new Vector3f()));
+		updateVectors();
 	}
 
 	private void updateVectors() {
@@ -68,7 +71,7 @@ public class Camera {
 		front.cross(0.0f, 1.0f, 0.0f, right);
 		right.cross(front, up);
 		position.add(front, target);
-		frustum.set(getProj().mul(getView()));
+		frustum.set(getViewProj(viewProj));
 	}
 
 	public Vector3f getPosition() {

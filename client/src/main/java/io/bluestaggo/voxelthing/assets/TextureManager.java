@@ -15,6 +15,7 @@ public class TextureManager {
 
 	private final Map<String, Texture> textures = new HashMap<>();
 	private final ByteBuffer textureBuffer = MemoryUtil.memAlloc(MAX_TEXTURE_SIZE * MAX_TEXTURE_SIZE * 4);
+	private boolean useMipmaps = false;
 
 	public Texture getTexture(String path) {
 		if (path == null) {
@@ -33,6 +34,13 @@ public class TextureManager {
 		}
 
 		return textures.get(path);
+	}
+
+	public Texture getWorldTexture(String path) {
+		useMipmaps = true;
+		Texture texture = getTexture(path);
+		useMipmaps = false;
+		return texture;
 	}
 
 	private Texture loadTexture(String path) throws IOException {
@@ -63,7 +71,9 @@ public class TextureManager {
 			textureBuffer.flip();
 
 			// Generate OpenGL texture
-			Texture texture = new Texture(textureBuffer, width, height);
+			Texture texture = useMipmaps
+					? new MipmappedTexture(textureBuffer, width, height)
+					: new Texture(textureBuffer, width, height);
 
 			textures.put(path, texture);
 			textureBuffer.clear();

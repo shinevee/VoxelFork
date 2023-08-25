@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
 import java.util.stream.Stream;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL33C.*;
+import static org.lwjgl.opengl.GL33C.glViewport;
 
 public class Window {
 	public static final int DEFAULT_WIDTH = 640;
@@ -223,6 +223,10 @@ public class Window {
 
 	public boolean isKeyJustPressed(int key) {
 		return keyStates[key].justPressed();
+	}
+
+	public boolean isMouseDown(int mouse) {
+		return mouseStates[mouse].isPressed();
 	}
 
 	public boolean isMouseJustPressed(int mouse) {

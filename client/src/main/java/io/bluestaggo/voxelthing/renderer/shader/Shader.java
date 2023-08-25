@@ -94,6 +94,10 @@ public class Shader {
 		glUseProgram(handle);
 	}
 
+	public ShaderUniform<Boolean> getUniform1b(String name) {
+		return new Uniform1b(handle, name);
+	}
+
 	public ShaderUniform<Integer> getUniform1i(String name) {
 		return new Uniform1i(handle, name);
 	}
