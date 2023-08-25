@@ -40,7 +40,8 @@ public class Game {
 	private static final String[] SKINS = {
 			"joel",
 			"staggo",
-			"floof"
+			"floof",
+			"talon"
 	};
 	private int currentSkin;
 	private boolean thirdPerson;

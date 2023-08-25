@@ -112,21 +112,22 @@ public class MainRenderer {
 			glActiveTexture(GL_TEXTURE0);
 			worldRenderer.draw();
 
-			Texture skin = textures.getTexture(game.getSkin());
-			int frame = game.getSkin().contains("floof") ? (int) (Window.getTimeElapsed() * 8.0D) % 8
-					: game.getSkin().contains("staggo") ? 1 : 0;
-			double walk = game.getSkin().contains("staggo") ? Math.sin(Window.getTimeElapsed() * 8.0D) : 0.0;
-			float minX = frame < 5 ? skin.uCoord(32) : skin.uCoord(64);
-			float maxX = frame < 5 ? skin.uCoord(64) : skin.uCoord(32);
-			float minY = frame < 5 ? skin.vCoord(frame * 32) : skin.vCoord((8 - frame) * 32);
-			float maxY = minY + skin.vCoord(32);
+			String skin = game.getSkin();
+			Texture skinTex = textures.getTexture(skin);
+			int frame = skin.contains("floof") || skin.contains("talon") ? (int) (Window.getTimeElapsed() * 8.0D) % 8
+					: skin.contains("staggo") || skin.contains("talon") ? 1 : 0;
+			double walk = skin.contains("staggo") || skin.contains("talon") ? Math.sin(Window.getTimeElapsed() * 8.0D) : 0.0;
+			float minX = frame < 5 ? skinTex.uCoord(32) : skinTex.uCoord(64);
+			float maxX = frame < 5 ? skinTex.uCoord(64) : skinTex.uCoord(32);
+			float minY = frame < 5 ? skinTex.vCoord(frame * 32) : skinTex.vCoord((8 - frame) * 32);
+			float maxY = minY + skinTex.vCoord(32);
 
 			if (walk > 0.2) {
-				minX += skin.uCoord(32);
-				maxX += skin.uCoord(32);
+				minX += skinTex.uCoord(32);
+				maxX += skinTex.uCoord(32);
 			} else if (walk < -0.2) {
-				minX -= skin.uCoord(32);
-				maxX -= skin.uCoord(32);
+				minX -= skinTex.uCoord(32);
+				maxX -= skinTex.uCoord(32);
 			}
 
 			Texture.stop();
@@ -138,7 +139,7 @@ public class MainRenderer {
 						.scale(2.0f, 2.0f)
 						.align(0.5f, 0.0f)
 						.setSpherical(false)
-						.withTexture(skin)
+						.withTexture(skinTex)
 						.withUV(minX, minY, maxX, maxY));
 			}
 
@@ -154,7 +155,7 @@ public class MainRenderer {
 			Quad quad = new Quad();
 			draw2D.drawQuad(quad.clear().at(0, screen.getHeight() - 32 - (float) Math.abs(walk / 2.0) * 16.0f)
 					.size(32, 32)
-					.withTexture(skin)
+					.withTexture(skinTex)
 					.withUV(minX, minY, maxX, maxY));
 
 			fonts.outlined.print("§00ffffVOXEL THING    §00ff00" + Game.VERSION, 5, 5, 1.0f, 1.0f, 1.0f);
