@@ -53,8 +53,8 @@ public class BlockRenderer {
 		float texYp = texY + Block.TEXTURE_WIDTH;
 		float shade = getShade(1);
 
-		bindings.addVertices(   x + 1,  y + 1,  z,  shade,  shade,  shade,  texX ,  texY    );
-		bindings.addVertices(   x + 1,  y,      z,  shade,  shade,  shade,  texX ,  texYp   );
+		bindings.addVertices(   x + 1,  y + 1,  z,  shade,  shade,  shade,  texX,   texY    );
+		bindings.addVertices(   x + 1,  y,      z,  shade,  shade,  shade,  texX,   texYp   );
 		bindings.addVertices(   x,      y,      z,  shade,  shade,  shade,  texXp,  texYp   );
 		bindings.addVertices(   x,      y + 1,  z,  shade,  shade,  shade,  texXp,  texY    );
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
@@ -68,8 +68,8 @@ public class BlockRenderer {
 		float texYp = texY + Block.TEXTURE_WIDTH;
 		float shade = getShade(3);
 
-		bindings.addVertices(   x,      y + 1,  z + 1,  shade,  shade,  shade,  texX ,  texY    );
-		bindings.addVertices(   x,      y,      z + 1,  shade,  shade,  shade,  texX ,  texYp   );
+		bindings.addVertices(   x,      y + 1,  z + 1,  shade,  shade,  shade,  texX,   texY    );
+		bindings.addVertices(   x,      y,      z + 1,  shade,  shade,  shade,  texX,   texYp   );
 		bindings.addVertices(   x + 1,  y,      z + 1,  shade,  shade,  shade,  texXp,  texYp   );
 		bindings.addVertices(   x + 1,  y + 1,  z + 1,  shade,  shade,  shade,  texXp,  texY    );
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
@@ -83,8 +83,8 @@ public class BlockRenderer {
 		float texYp = texY + Block.TEXTURE_WIDTH;
 		float shade = getShade(2);
 
-		bindings.addVertices(   x,  y + 1,  z,      shade,  shade,  shade,  texX ,  texY    );
-		bindings.addVertices(   x,  y,      z,      shade,  shade,  shade,  texX ,  texYp   );
+		bindings.addVertices(   x,  y + 1,  z,      shade,  shade,  shade,  texX,   texY    );
+		bindings.addVertices(   x,  y,      z,      shade,  shade,  shade,  texX,   texYp   );
 		bindings.addVertices(   x,  y,      z + 1,  shade,  shade,  shade,  texXp,  texYp   );
 		bindings.addVertices(   x,  y + 1,  z + 1,  shade,  shade,  shade,  texXp,  texY    );
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
@@ -98,8 +98,8 @@ public class BlockRenderer {
 		float texYp = texY + Block.TEXTURE_WIDTH;
 		float shade = getShade(2);
 
-		bindings.addVertices(   x + 1,  y + 1,  z + 1,  shade,  shade,  shade,  texX ,  texY    );
-		bindings.addVertices(   x + 1,  y,      z + 1,  shade,  shade,  shade,  texX ,  texYp   );
+		bindings.addVertices(   x + 1,  y + 1,  z + 1,  shade,  shade,  shade,  texX,   texY    );
+		bindings.addVertices(   x + 1,  y,      z + 1,  shade,  shade,  shade,  texX,   texYp   );
 		bindings.addVertices(   x + 1,  y,      z,      shade,  shade,  shade,  texXp,  texYp   );
 		bindings.addVertices(   x + 1,  y + 1,  z,      shade,  shade,  shade,  texXp,  texY    );
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
@@ -113,8 +113,8 @@ public class BlockRenderer {
 		float texYp = texY + Block.TEXTURE_WIDTH;
 		float shade = getShade(4);
 
-		bindings.addVertices(   x + 1,  y,  z,      shade,  shade,  shade,  texX ,  texY    );
-		bindings.addVertices(   x + 1,  y,  z + 1,  shade,  shade,  shade,  texX ,  texYp   );
+		bindings.addVertices(   x + 1,  y,  z,      shade,  shade,  shade,  texX,   texY    );
+		bindings.addVertices(   x + 1,  y,  z + 1,  shade,  shade,  shade,  texX,   texYp   );
 		bindings.addVertices(   x,      y,  z + 1,  shade,  shade,  shade,  texXp,  texYp   );
 		bindings.addVertices(   x,      y,  z,      shade,  shade,  shade,  texXp,  texY    );
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
@@ -128,8 +128,8 @@ public class BlockRenderer {
 		float texYp = texY + Block.TEXTURE_WIDTH;
 		float shade = getShade(0);
 
-		bindings.addVertices(   x + 1,  y + 1,  z + 1,  shade,  shade,  shade,  texX ,  texY    );
-		bindings.addVertices(   x + 1,  y + 1,  z,      shade,  shade,  shade,  texX ,  texYp   );
+		bindings.addVertices(   x + 1,  y + 1,  z + 1,  shade,  shade,  shade,  texX,   texY    );
+		bindings.addVertices(   x + 1,  y + 1,  z,      shade,  shade,  shade,  texX,   texYp   );
 		bindings.addVertices(   x,      y + 1,  z,      shade,  shade,  shade,  texXp,  texYp   );
 		bindings.addVertices(   x,      y + 1,  z + 1,  shade,  shade,  shade,  texXp,  texY    );
 		bindings.addIndices(0, 1, 2, 2, 3, 0);

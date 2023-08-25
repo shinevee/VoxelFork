@@ -80,4 +80,11 @@ public class TextureManager {
 			return texture;
 		}
 	}
+
+	public void clear() {
+		for (Texture texture : textures.values()) {
+			texture.unload();
+		}
+		textures.clear();
+	}
 }

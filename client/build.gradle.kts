@@ -1,3 +1,6 @@
+import java.text.SimpleDateFormat
+import java.util.*
+
 plugins {
     application
 }
@@ -32,4 +35,25 @@ dependencies {
 
 application {
     mainClass.set("io.bluestaggo.voxelthing.Game")
+}
+
+tasks.compileJava {
+	dependsOn("genMetadata")
+}
+
+task("genMetadata") {
+	val resources = sourceSets.main.get().output.resourcesDir
+	resources?.mkdirs()
+
+	val versionFile = file("$resources/version.txt")
+	versionFile.createNewFile()
+	versionFile.writeText(getaVersion())
+}
+
+fun getaVersion(): String {
+    var version = providers.gradleProperty("voxelthing.version").get();
+	if (version == "dev") {
+		version = "dev ${SimpleDateFormat("yyyyMMdd").format(Date())}"
+	}
+	return version;
 }

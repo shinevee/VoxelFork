@@ -1,6 +1,7 @@
 package io.bluestaggo.voxelthing.renderer;
 
 import io.bluestaggo.voxelthing.Game;
+import io.bluestaggo.voxelthing.assets.FontManager;
 import io.bluestaggo.voxelthing.assets.Texture;
 import io.bluestaggo.voxelthing.assets.TextureManager;
 import io.bluestaggo.voxelthing.renderer.draw.Billboard;
@@ -27,14 +28,17 @@ public class MainRenderer {
 	public final Screen screen;
 
 	public final TextureManager textures;
+	public final FontManager fonts;
+
 	public final WorldShader worldShader;
 	public final SkyShader skyShader;
 	public final ScreenShader screenShader;
 
+	public final Draw3D draw3D;
 	public final WorldRenderer worldRenderer;
 	public final BlockRenderer blockRenderer;
+
 	public final Draw2D draw2D;
-	public final Draw3D draw3D;
 
 	private final Vector4f fogColor = new Vector4f(0.6f, 0.8f, 1.0f, 1.0f);
 	private final Vector4f skyColor = new Vector4f(0.2f, 0.6f, 1.0f, 1.0f);
@@ -51,14 +55,17 @@ public class MainRenderer {
 			screen = new Screen(game.window);
 
 			textures = new TextureManager();
+			fonts = new FontManager(this);
+
 			worldShader = new WorldShader();
 			skyShader = new SkyShader();
 			screenShader = new ScreenShader();
 
+			draw3D = new Draw3D(this);
 			worldRenderer = new WorldRenderer(this);
 			blockRenderer = new BlockRenderer();
+
 			draw2D = new Draw2D(this);
-			draw3D = new Draw3D(this);
 
 			skyFramebuffer = new Framebuffer(game.window.getWidth(), game.window.getHeight());
 		} catch (IOException e) {
@@ -138,23 +145,50 @@ public class MainRenderer {
 			Texture.stop();
 			Shader.stop();
 
+			screenShader.use();
+			screenShader.mvp.set(screen.getViewProj());
+
 			state.disable(GL_CULL_FACE);
 			state.disable(GL_DEPTH_TEST);
 
 			Quad quad = new Quad();
-			draw2D.drawQuad(quad.at(38.0f + (float) game.window.getMouseDeltaX(), 38.0f - (float) game.window.getMouseDeltaY())
-					.size(14, 14)
-					.withColor(0.0f, 0.0f, 0.0f));
-			draw2D.drawQuad(quad.offset(2, 2)
-					.size(10, 10)
-					.withColor(
-							game.window.isMouseDown(1) ? 0.0f : 1.0f,
-							game.window.isMouseDown(0) ? 0.0f : 1.0f,
-							game.window.isMouseDown(2) ? 1.0f : 0.0f));
-			draw2D.drawQuad(quad.clear().at(0, screen.getHeight() - 64 - (float) Math.abs(walk / 2.0) * 32.0f)
-					.size(64, 64)
+			draw2D.drawQuad(quad.clear().at(0, screen.getHeight() - 32 - (float) Math.abs(walk / 2.0) * 16.0f)
+					.size(32, 32)
 					.withTexture(skin)
 					.withUV(minX, minY, maxX, maxY));
+
+			fonts.outlined.print("§00ffffVOXEL THING    §00ff00" + Game.VERSION, 5, 5, 1.0f, 1.0f, 1.0f);
+
+			if (game.showDebug()) {
+				long freeMB = Runtime.getRuntime().freeMemory() / 1000000L;
+				long totalMB = Runtime.getRuntime().totalMemory() / 1000000L;
+				long maxMB = Runtime.getRuntime().maxMemory() / 1000000L;
+
+				String[] lines = {
+						"Speed", (int)(game.window.getDeltaTime() * 1000.0D) + "ms",
+						"Memory", (totalMB - freeMB) + " / " + maxMB + " MB",
+						"Render Distance", String.valueOf(worldRenderer.renderDistance),
+						"GUI Scale", String.valueOf(screen.scale <= 0.0f ? "auto" : screen.scale)
+				};
+
+				StringBuilder debugBuilder = new StringBuilder();
+
+				for (int i = 0; i < lines.length / 2; i++) {
+					String label = lines[i * 2];
+					String value = lines[i * 2 + 1];
+
+					if (!debugBuilder.isEmpty()) {
+						debugBuilder.append('\n');
+					}
+
+					debugBuilder.append("§ffff7f");
+					debugBuilder.append(label);
+					debugBuilder.append(": §ffffff");
+					debugBuilder.append(value);
+				}
+
+				fonts.shadowed.print(debugBuilder.toString(), 5, 15);
+			}
 		}
 	}
 
@@ -180,10 +214,15 @@ public class MainRenderer {
 	}
 
 	public void unload() {
+		textures.clear();
+
+		draw2D.unload();
+
+		draw3D.unload();
 		worldRenderer.unload();
+
 		skyShader.unload();
 		worldShader.unload();
 		skyFramebuffer.unload();
-		draw3D.unload();
 	}
 }

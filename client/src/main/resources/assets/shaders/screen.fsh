@@ -9,7 +9,7 @@ uniform sampler2D tex;
 uniform bool hasTex = true;
 
 void main() {
-    if (!hasTex && texture(tex, uv).a == 0.0) discard;
+    if (hasTex && texture(tex, uv).a == 0.0) discard;
     vec4 screenColor = vec4(color, 1.0);
     if (hasTex) screenColor *= texture(tex, uv);
     fColor = screenColor;

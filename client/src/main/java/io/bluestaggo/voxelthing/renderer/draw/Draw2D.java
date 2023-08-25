@@ -42,6 +42,14 @@ public class Draw2D {
 		bindings.addVertex(vertex);
 	}
 
+	public void addIndex(int i) {
+		bindings.addIndex(i);
+	}
+
+	public void addIndices(int... i) {
+		bindings.addIndices(i);
+	}
+
 	public void draw() {
 		renderer.screenShader.use();
 		bindings.upload(true);
@@ -52,10 +60,6 @@ public class Draw2D {
 		quadShader.use();
 		quad.applyToShader(quadShader, renderer.screen.getViewProj());
 		this.quad.draw();
-	}
-
-	public void setup() {
-		quadShader.use();
 	}
 
 	public void unload() {

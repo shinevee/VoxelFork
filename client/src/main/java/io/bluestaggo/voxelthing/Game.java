@@ -8,11 +8,34 @@ import io.bluestaggo.voxelthing.world.World;
 import io.bluestaggo.voxelthing.world.entity.IPlayerController;
 import io.bluestaggo.voxelthing.world.entity.Player;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL33C.glClearColor;
 
 public class Game {
+	public static final String VERSION;
 	public static final float TICK_RATE = 1.0f / 20;
+
+	static {
+		String version = "???";
+
+		try (InputStream stream = Game.class.getResourceAsStream("/version.txt")) {
+			if (stream == null) {
+				throw new IOException("Failed to get version!");
+			}
+
+			var reader = new BufferedReader(new InputStreamReader(stream));
+			version = reader.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		VERSION = version;
+	}
 
 	private static final String[] SKINS = {
 			"joel",
@@ -20,6 +43,8 @@ public class Game {
 			"floof"
 	};
 	private int currentSkin;
+	private boolean thirdPerson;
+	private boolean debugMenu = true;
 
 	private static Game instance;
 
@@ -83,24 +108,8 @@ public class Game {
 		renderer.camera.setPosition((float) player.getRenderX(), (float) (player.getRenderY() + player.height - 0.3), (float) player.getRenderZ());
 		renderer.camera.setRotation((float) player.rotYaw, (float) player.rotPitch);
 
-		if (window.isKeyDown(GLFW_KEY_F5)) {
+		if (thirdPerson) {
 			renderer.camera.moveForward(-4.0f);
-		}
-
-		if (window.isKeyJustPressed(GLFW_KEY_F6)) {
-			if (++currentSkin >= SKINS.length) currentSkin = 0;
-		}
-
-		if (window.isMouseJustPressed(GLFW_MOUSE_BUTTON_MIDDLE)) {
-			window.toggleGrabCursor();
-		}
-
-		if (window.isKeyJustPressed(GLFW_KEY_LEFT_BRACKET) && renderer.screen.scale > 0.5f) {
-			renderer.screen.scale -= 0.5f;
-		}
-
-		if (window.isKeyJustPressed(GLFW_KEY_RIGHT_BRACKET)) {
-			renderer.screen.scale += 0.5f;
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_F)) {
@@ -126,16 +135,29 @@ public class Game {
 			player.velZ = 0.0;
 		}
 
-		long freeMB = Runtime.getRuntime().freeMemory() / 1000000L;
-		long totalMB = Runtime.getRuntime().totalMemory() / 1000000L;
-		long maxMB = Runtime.getRuntime().maxMemory() / 1000000L;
+		if (window.isKeyJustPressed(GLFW_KEY_LEFT_BRACKET) && renderer.screen.scale > 0.0f) {
+			renderer.screen.scale -= 0.5f;
+		}
 
-		window.setTitle("Voxel Thing ("
-				+ (totalMB - freeMB) + " / " + maxMB + "MB, "
-				+ (int)(window.getDeltaTime() * 1000.0D) + "ms)"
-				+ " [dist: " + renderer.worldRenderer.renderDistance
-				+ ", guiScale: " + renderer.screen.scale
-				+ "]");
+		if (window.isKeyJustPressed(GLFW_KEY_RIGHT_BRACKET)) {
+			renderer.screen.scale += 0.5f;
+		}
+
+		if (window.isKeyJustPressed(GLFW_KEY_F3)) {
+			debugMenu = !debugMenu;
+		}
+
+		if (window.isKeyJustPressed(GLFW_KEY_F5)) {
+			thirdPerson = !thirdPerson;
+		}
+
+		if (window.isKeyJustPressed(GLFW_KEY_F6)) {
+			if (++currentSkin >= SKINS.length) currentSkin = 0;
+		}
+
+		if (window.isMouseJustPressed(GLFW_MOUSE_BUTTON_MIDDLE)) {
+			window.toggleGrabCursor();
+		}
 	}
 
 	private void draw() {
@@ -144,6 +166,10 @@ public class Game {
 
 	public String getSkin() {
 		return "/assets/entities/" + SKINS[currentSkin] + ".png";
+	}
+
+	public boolean showDebug() {
+		return debugMenu;
 	}
 
 	public static void main(String[] args) {

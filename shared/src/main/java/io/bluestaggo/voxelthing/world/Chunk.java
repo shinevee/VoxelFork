@@ -12,7 +12,7 @@ public class Chunk implements IBlockAccess {
 	public final World world;
 	public final int x, y, z;
 
-	private final short[] blocks = new short[VOLUME];
+	private short[] blocks;
 	private boolean empty = true;
 
 	public Chunk(World world, int x, int y, int z) {
@@ -44,6 +44,10 @@ public class Chunk implements IBlockAccess {
 			return this.world.getBlockId(toGlobalX(x), toGlobalY(y), toGlobalZ(z));
 		}
 
+		if (blocks == null) {
+			return 0;
+		}
+
 		return blocks[arrayCoords(x, y, z)];
 	}
 
@@ -53,6 +57,14 @@ public class Chunk implements IBlockAccess {
 	}
 
 	public void setBlockId(int x, int y, int z, short id) {
+		if (blocks == null) {
+			if (id > 0) {
+				blocks = new short[VOLUME];
+			} else {
+				return;
+			}
+		}
+
 		blocks[arrayCoords(x, y, z)] = id;
 		if (id > 0) {
 			empty = false;

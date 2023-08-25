@@ -10,6 +10,7 @@ Nothing much here yet, huh? What will this be? Well, it is heading towards being
 - R: Teleport to a random position
 - F: Halve fog distance
 - Shift + F: Double fog distance
+- F3: Debug menu
 - F5: Third person
 - F6: Change skin
 - Middle click: Lock / unlock mouse

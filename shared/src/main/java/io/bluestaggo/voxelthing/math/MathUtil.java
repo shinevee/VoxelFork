@@ -52,4 +52,8 @@ public final class MathUtil {
 	public static int index3D(int x, int y, int z, int length) {
 		return ((x * length) + y) * length + z;
 	}
+
+	public static int hexValue(char c) {
+		return (c | 32) % 39 - 9;
+	}
 }
