@@ -8,6 +8,7 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 public class Billboard {
+	private static final Billboard shared = new Billboard();
 	private final Vector3f position = new Vector3f();
 	private final Vector2f size = new Vector2f();
 	private final Vector2f align = new Vector2f();
@@ -26,7 +27,13 @@ public class Billboard {
 		align.set(0.5f, 0.5f);
 		color.set(1.0f, 1.0f, 1.0f, 1.0f);
 		uv.set(0.0f, 1.0f, 1.0f, 0.0f);
+		texture = null;
+		spherical = false;
 		return this;
+	}
+
+	public static Billboard shared() {
+		return shared.clear();
 	}
 
 	public Billboard at(float x, float y, float z) {
@@ -86,6 +93,7 @@ public class Billboard {
 		}
 
 		shader.modelView.set(modelView);
+		shader.position.set(position);
 		shader.size.set(size);
 		shader.align.set(align);
 		shader.hasTex.set(texture != null);

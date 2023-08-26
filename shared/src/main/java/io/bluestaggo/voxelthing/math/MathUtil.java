@@ -56,4 +56,12 @@ public final class MathUtil {
 	public static int hexValue(char c) {
 		return (c | 32) % 39 - 9;
 	}
+
+	public static float floorMod(float x, float y) {
+		float mod = x % y;
+		if (mod < 0) {
+			mod += y;
+		}
+		return mod;
+	}
 }

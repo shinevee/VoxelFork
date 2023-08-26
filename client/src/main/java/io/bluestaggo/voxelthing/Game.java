@@ -106,7 +106,7 @@ public class Game {
 		}
 
 		world.partialTick = (tickTime % TICK_RATE) / TICK_RATE;
-		renderer.camera.setPosition((float) player.getRenderX(), (float) (player.getRenderY() + player.height - 0.3), (float) player.getRenderZ());
+		renderer.camera.setPosition((float) player.getPartialX(), (float) (player.getPartialY() + player.height - 0.3), (float) player.getPartialZ());
 		renderer.camera.setRotation((float) player.rotYaw, (float) player.rotPitch);
 
 		if (thirdPerson) {
@@ -167,6 +167,10 @@ public class Game {
 
 	public String getSkin() {
 		return "/assets/entities/" + SKINS[currentSkin] + ".png";
+	}
+
+	public boolean showThirdPerson() {
+		return thirdPerson;
 	}
 
 	public boolean showDebug() {

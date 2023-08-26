@@ -1,6 +1,7 @@
 package io.bluestaggo.voxelthing.world;
 
 import io.bluestaggo.voxelthing.math.AABB;
+import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.generation.GenCache;
 import io.bluestaggo.voxelthing.world.generation.GenerationInfo;
@@ -182,6 +183,10 @@ public class World implements IBlockAccess {
 		}
 
 		return boxes;
+	}
+
+	public double scaleToTick(double a, double b) {
+		return MathUtil.lerp(a, b, partialTick);
 	}
 
 	public void onBlockUpdate(int x, int y, int z) {

@@ -7,6 +7,7 @@ import org.joml.Vector2f;
 import org.joml.Vector4f;
 
 public class Quad {
+	private static final Quad shared = new Quad();
 	private final Vector2f position = new Vector2f();
 	private final Vector2f size = new Vector2f();
 	private final Vector4f color = new Vector4f();
@@ -22,7 +23,12 @@ public class Quad {
 		size.set(1.0f, 1.0f);
 		color.set(1.0f, 1.0f, 1.0f, 1.0f);
 		uv.set(0.0f, 1.0f, 1.0f, 0.0f);
+		texture = null;
 		return this;
+	}
+
+	public static Quad shared() {
+		return shared.clear();
 	}
 
 	public Quad at(float x, float y) {

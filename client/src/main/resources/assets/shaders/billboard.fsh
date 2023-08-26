@@ -21,7 +21,7 @@ float doFog(float fog) {
 }
 
 void main() {
-    if (texture(tex, uv).a < 0.5) discard;
+    if (texture(tex, uv).a == 0.0) discard;
     float fog = clamp(distance(fPos, camPos) / camFar, 0.0, 1.0);
     fog = clamp(doFog(fog), 0.0, 1.0);
 

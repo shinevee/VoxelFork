@@ -13,10 +13,13 @@ public class ScreenShader extends Shader {
 
 	public ScreenShader() throws IOException {
 		super("/assets/shaders/screen");
+		use();
 
 		mvp = getUniformMatrix4fv("mvp");
 
 		(tex = getUniform1i("tex")).set(0);
 		hasTex = getUniform1b("hasTex");
+
+		stop();
 	}
 }

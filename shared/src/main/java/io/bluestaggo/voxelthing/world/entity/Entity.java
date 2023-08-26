@@ -9,6 +9,8 @@ import java.util.List;
 public class Entity {
 	public final World world;
 
+	protected String texture;
+
 	private final AABB collisionBox = new AABB();
 	private final AABB offsetBox = new AABB();
 	public double width = 0.4;
@@ -34,6 +36,7 @@ public class Entity {
 
 	public Entity(World world) {
 		this.world = world;
+		texture = "/assets/entities/template.png";
 		posY = 64.0;
 	}
 
@@ -91,23 +94,55 @@ public class Entity {
 		updateCollisionBox();
 	}
 
-	public double getRenderX() {
+	public double getPartialX() {
 		return MathUtil.lerp(prevPosX, posX, world.partialTick);
 	}
 
-	public double getRenderY() {
+	public double getPartialY() {
 		return MathUtil.lerp(prevPosY, posY, world.partialTick);
 	}
 
-	public double getRenderZ() {
+	public double getPartialZ() {
 		return MathUtil.lerp(prevPosZ, posZ, world.partialTick);
 	}
 
-	public double getRenderYaw() {
-		return MathUtil.lerp(prevRotYaw, rotYaw, world.partialTick);
+	public float getRenderX() {
+		return (float) getPartialX();
 	}
 
-	public double getRenderPitch() {
-		return MathUtil.lerp(prevRotPitch, rotPitch, world.partialTick);
+	public float getRenderY() {
+		return (float) getPartialY();
+	}
+
+	public float getRenderZ() {
+		return (float) getPartialZ();
+	}
+
+	public float getRenderYaw() {
+		return (float) MathUtil.lerp(prevRotYaw, rotYaw, world.partialTick);
+	}
+
+	public float getRenderPitch() {
+		return (float) MathUtil.lerp(prevRotPitch, rotPitch, world.partialTick);
+	}
+
+	public float getRenderWidth() {
+		return 2.0f;
+	}
+
+	public float getRenderHeight() {
+		return 2.0f;
+	}
+
+	public int getRenderFrame() {
+		return 0;
+	}
+
+	public int getRenderRotation(float cameraAngle) {
+		return (int) (MathUtil.floorMod(getRenderYaw() - 180.0f - cameraAngle + 22.5f, 360.0f) / 45.0f) % 8;
+	}
+
+	public String getTexture() {
+		return texture;
 	}
 }

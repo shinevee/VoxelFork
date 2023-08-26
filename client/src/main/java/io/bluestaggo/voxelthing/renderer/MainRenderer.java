@@ -4,16 +4,14 @@ import io.bluestaggo.voxelthing.Game;
 import io.bluestaggo.voxelthing.assets.FontManager;
 import io.bluestaggo.voxelthing.assets.Texture;
 import io.bluestaggo.voxelthing.assets.TextureManager;
-import io.bluestaggo.voxelthing.renderer.draw.Billboard;
 import io.bluestaggo.voxelthing.renderer.draw.Draw2D;
 import io.bluestaggo.voxelthing.renderer.draw.Draw3D;
-import io.bluestaggo.voxelthing.renderer.draw.Quad;
 import io.bluestaggo.voxelthing.renderer.screen.Screen;
 import io.bluestaggo.voxelthing.renderer.shader.*;
 import io.bluestaggo.voxelthing.renderer.world.BlockRenderer;
 import io.bluestaggo.voxelthing.renderer.world.Camera;
+import io.bluestaggo.voxelthing.renderer.world.EntityRenderer;
 import io.bluestaggo.voxelthing.renderer.world.WorldRenderer;
-import io.bluestaggo.voxelthing.window.Window;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -37,6 +35,7 @@ public class MainRenderer {
 	public final Draw3D draw3D;
 	public final WorldRenderer worldRenderer;
 	public final BlockRenderer blockRenderer;
+	public final EntityRenderer entityRenderer;
 
 	public final Draw2D draw2D;
 
@@ -64,6 +63,7 @@ public class MainRenderer {
 			draw3D = new Draw3D(this);
 			worldRenderer = new WorldRenderer(this);
 			blockRenderer = new BlockRenderer();
+			entityRenderer = new EntityRenderer(this);
 
 			draw2D = new Draw2D(this);
 
@@ -87,10 +87,16 @@ public class MainRenderer {
 		glClearColor(skyColor.x, skyColor.y, skyColor.z, skyColor.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		draw3D.setup();
+
+		render3D();
+		render2D();
+	}
+
+	private void render3D() {
 		Matrix4f view = camera.getView();
 		Matrix4f proj = camera.getProj();
 		Matrix4f viewProj = proj.mul(view, new Matrix4f());
-		draw3D.setup();
 
 		try (var state = new GLState()) {
 			state.enable(GL_CULL_FACE);
@@ -107,89 +113,57 @@ public class MainRenderer {
 
 			setupWorldShader(viewProj);
 			textures.getWorldTexture("/assets/blocks.png").use();
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, skyFramebuffer.getTexture());
-			glActiveTexture(GL_TEXTURE0);
+			useSkyTexture(1);
 			worldRenderer.draw();
 
+			state.disable(GL_CULL_FACE);
+
 			String skin = game.getSkin();
-			Texture skinTex = textures.getTexture(skin);
-			int frame = skin.contains("floof") || skin.contains("talon") ? (int) (Window.getTimeElapsed() * 8.0D) % 8
-					: skin.contains("staggo") || skin.contains("talon") ? 1 : 0;
-			double walk = skin.contains("staggo") || skin.contains("talon") ? Math.sin(Window.getTimeElapsed() * 8.0D) : 0.0;
-			float minX = frame < 5 ? skinTex.uCoord(32) : skinTex.uCoord(64);
-			float maxX = frame < 5 ? skinTex.uCoord(64) : skinTex.uCoord(32);
-			float minY = frame < 5 ? skinTex.vCoord(frame * 32) : skinTex.vCoord((8 - frame) * 32);
-			float maxY = minY + skinTex.vCoord(32);
-
-			if (walk > 0.2) {
-				minX += skinTex.uCoord(32);
-				maxX += skinTex.uCoord(32);
-			} else if (walk < -0.2) {
-				minX -= skinTex.uCoord(32);
-				maxX -= skinTex.uCoord(32);
-			}
-
-			Texture.stop();
-
-			try (var billboardState = new GLState(state)) {
-				billboardState.disable(GL_CULL_FACE);
-				draw3D.drawBillboard(new Billboard()
-						.at((float) game.player.getRenderX(), (float) (game.player.getRenderY() + Math.abs(walk / 2.0)), (float) game.player.getRenderZ())
-						.scale(2.0f, 2.0f)
-						.align(0.5f, 0.0f)
-						.setSpherical(false)
-						.withTexture(skinTex)
-						.withUV(minX, minY, maxX, maxY));
+			game.player.setTexture(skin);
+			if (game.showThirdPerson()) {
+				entityRenderer.renderEntity(game.player);
 			}
 
 			Texture.stop();
 			Shader.stop();
+		}
+	}
 
-			screenShader.use();
-			screenShader.mvp.set(screen.getViewProj());
+	private void render2D() {
+		screenShader.use();
+		screenShader.mvp.set(screen.getViewProj());
 
-			state.disable(GL_CULL_FACE);
-			state.disable(GL_DEPTH_TEST);
+		fonts.outlined.print("§00ffffVOXEL THING    §00ff00" + Game.VERSION, 5, 5, 1.0f, 1.0f, 1.0f);
 
-			Quad quad = new Quad();
-			draw2D.drawQuad(quad.clear().at(0, screen.getHeight() - 32 - (float) Math.abs(walk / 2.0) * 16.0f)
-					.size(32, 32)
-					.withTexture(skinTex)
-					.withUV(minX, minY, maxX, maxY));
+		if (game.showDebug()) {
+			long freeMB = Runtime.getRuntime().freeMemory() / 1000000L;
+			long totalMB = Runtime.getRuntime().totalMemory() / 1000000L;
+			long maxMB = Runtime.getRuntime().maxMemory() / 1000000L;
 
-			fonts.outlined.print("§00ffffVOXEL THING    §00ff00" + Game.VERSION, 5, 5, 1.0f, 1.0f, 1.0f);
+			String[] lines = {
+					"Speed", (int)(game.window.getDeltaTime() * 1000.0D) + "ms",
+					"Memory", (totalMB - freeMB) + " / " + maxMB + " MB",
+					"Render Distance", String.valueOf(worldRenderer.renderDistance),
+					"GUI Scale", String.valueOf(screen.scale <= 0.0f ? "auto" : screen.scale)
+			};
 
-			if (game.showDebug()) {
-				long freeMB = Runtime.getRuntime().freeMemory() / 1000000L;
-				long totalMB = Runtime.getRuntime().totalMemory() / 1000000L;
-				long maxMB = Runtime.getRuntime().maxMemory() / 1000000L;
+			StringBuilder debugBuilder = new StringBuilder();
 
-				String[] lines = {
-						"Speed", (int)(game.window.getDeltaTime() * 1000.0D) + "ms",
-						"Memory", (totalMB - freeMB) + " / " + maxMB + " MB",
-						"Render Distance", String.valueOf(worldRenderer.renderDistance),
-						"GUI Scale", String.valueOf(screen.scale <= 0.0f ? "auto" : screen.scale)
-				};
+			for (int i = 0; i < lines.length / 2; i++) {
+				String label = lines[i * 2];
+				String value = lines[i * 2 + 1];
 
-				StringBuilder debugBuilder = new StringBuilder();
-
-				for (int i = 0; i < lines.length / 2; i++) {
-					String label = lines[i * 2];
-					String value = lines[i * 2 + 1];
-
-					if (!debugBuilder.isEmpty()) {
-						debugBuilder.append('\n');
-					}
-
-					debugBuilder.append("§ffff7f");
-					debugBuilder.append(label);
-					debugBuilder.append(": §ffffff");
-					debugBuilder.append(value);
+				if (!debugBuilder.isEmpty()) {
+					debugBuilder.append('\n');
 				}
 
-				fonts.shadowed.print(debugBuilder.toString(), 5, 15);
+				debugBuilder.append("§ffff7f");
+				debugBuilder.append(label);
+				debugBuilder.append(": §ffffff");
+				debugBuilder.append(value);
 			}
+
+			fonts.shadowed.print(debugBuilder.toString(), 5, 15);
 		}
 	}
 
@@ -212,6 +186,12 @@ public class MainRenderer {
 				(float) game.window.getHeight(),
 				camera.getPosition(),
 				camera.getFar());
+	}
+
+	public void useSkyTexture(int i) {
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, skyFramebuffer.getTexture());
+		glActiveTexture(GL_TEXTURE0);
 	}
 
 	public void unload() {

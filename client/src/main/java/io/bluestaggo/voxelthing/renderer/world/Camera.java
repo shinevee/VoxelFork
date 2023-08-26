@@ -51,8 +51,7 @@ public class Camera {
 	}
 
 	public void setRotation(float yaw, float pitch) {
-		this.yaw = yaw;
-		this.pitch = pitch;
+		this.yaw = MathUtil.floorMod(yaw, 360.0f);
 		this.pitch = MathUtil.clamp(pitch, -89.0f, 89.0f);
 		updateVectors();
 	}

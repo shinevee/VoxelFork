@@ -19,6 +19,7 @@ public class QuadShader extends Shader {
 
 	public QuadShader() throws IOException {
 		super("/assets/shaders/quad");
+		use();
 
 		viewProj = getUniformMatrix4fv("viewProj");
 		size = getUniform2f("size");
@@ -28,5 +29,7 @@ public class QuadShader extends Shader {
 		(tex = getUniform1i("tex")).set(0);
 		hasTex = getUniform1b("hasTex");
 		color = getUniform4f("color");
+
+		stop();
 	}
 }
