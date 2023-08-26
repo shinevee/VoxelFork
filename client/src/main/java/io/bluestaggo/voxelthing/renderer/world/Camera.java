@@ -2,8 +2,10 @@ package io.bluestaggo.voxelthing.renderer.world;
 
 import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.window.Window;
+import io.bluestaggo.voxelthing.world.BlockRaycast;
 import org.joml.FrustumIntersection;
 import org.joml.Matrix4f;
+import org.joml.Vector3d;
 import org.joml.Vector3f;
 
 public class Camera {
@@ -54,6 +56,14 @@ public class Camera {
 		this.yaw = MathUtil.floorMod(yaw, 360.0f);
 		this.pitch = MathUtil.clamp(pitch, -89.0f, 89.0f);
 		updateVectors();
+	}
+
+	public BlockRaycast getRaycast(double length) {
+		return new BlockRaycast(
+				new Vector3d(position),
+				new Vector3d(front),
+				length
+		);
 	}
 
 	public void moveForward(float x) {

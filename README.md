@@ -6,6 +6,9 @@ Nothing much here yet, huh? What will this be? Well, it is heading towards being
 - WASD: Fly around
 - Move mouse: Look around
 - Space: Jump
+- 1-9: Select block
+- Left click: Place block
+- Right click: Break block
 - Q: No-clip
 - R: Teleport to a random position
 - F: Halve fog distance

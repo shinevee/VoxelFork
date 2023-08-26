@@ -15,6 +15,10 @@ public final class MathUtil {
 		return clamp(x, 0.0, 1.0);
 	}
 
+	public static int clamp(int x, int min, int max) {
+		return Math.min(Math.max(x, min), max);
+	}
+
 	public static float clamp(float x, float min, float max) {
 		return Math.min(Math.max(x, min), max);
 	}
@@ -63,5 +67,9 @@ public final class MathUtil {
 			mod += y;
 		}
 		return mod;
+	}
+
+	public static float squareOut(float x) {
+		return 1.0f - (1.0f - x) * (1.0f - x);
 	}
 }

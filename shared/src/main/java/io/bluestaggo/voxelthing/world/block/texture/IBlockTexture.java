@@ -5,5 +5,9 @@ import io.bluestaggo.voxelthing.world.IBlockAccess;
 import org.joml.Vector2i;
 
 public interface IBlockTexture {
-	Vector2i getTexture(Direction face, IBlockAccess blockAccess, int x, int y, int z);
+	Vector2i get(Direction face, IBlockAccess blockAccess, int x, int y, int z);
+
+	default Vector2i get(Direction face) {
+		return get(face, null, 0, 0, 0);
+	}
 }

@@ -14,33 +14,39 @@ public class TextureManager {
 	public static final int MAX_TEXTURE_SIZE = 512;
 
 	private final Map<String, Texture> textures = new HashMap<>();
+	private final Map<String, Texture> mipmappedTextures = new HashMap<>();
 	private final ByteBuffer textureBuffer = MemoryUtil.memAlloc(MAX_TEXTURE_SIZE * MAX_TEXTURE_SIZE * 4);
 	private boolean useMipmaps = false;
 
-	public Texture getTexture(String path) {
+	private Texture getTextureFromMap(Map<String, Texture> map, String path) {
 		if (path == null) {
-			return getTexture("/assets/missing.png");
+			return getTextureFromMap(map, "/assets/missing.png");
 		}
 
 		if (!textures.containsKey(path)) {
 			try {
-				return loadTexture(path);
+				Texture texture = loadTexture(path);
+				map.put(path, texture);
+				return texture;
 			} catch (IOException e) {
 				if (path.equals("/assets/missing.png")) {
 					throw new RuntimeException("Failed to load placeholder texture!");
 				}
-				return getTexture("/assets/missing.png");
+				return getTextureFromMap(map, "/assets/missing.png");
 			}
 		}
 
 		return textures.get(path);
 	}
 
-	public Texture getWorldTexture(String path) {
-		useMipmaps = true;
-		Texture texture = getTexture(path);
+	public Texture getTexture(String path) {
 		useMipmaps = false;
-		return texture;
+		return getTextureFromMap(textures, path);
+	}
+
+	public Texture getMipmappedTexture(String path) {
+		useMipmaps = true;
+		return getTextureFromMap(mipmappedTextures, path);
 	}
 
 	private Texture loadTexture(String path) throws IOException {
@@ -75,7 +81,6 @@ public class TextureManager {
 					? new MipmappedTexture(textureBuffer, width, height)
 					: new Texture(textureBuffer, width, height);
 
-			textures.put(path, texture);
 			textureBuffer.clear();
 			return texture;
 		}

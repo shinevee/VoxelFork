@@ -14,6 +14,6 @@ Key:
 
 ## Gameplay
 - [x] Player entity with physics
-- [ ] Block building and destruction
-- [ ] 🤔 Block ID flattening? It takes up more memory, but it should not affect performance much.
+- [x] Block building and destruction
 - [ ] World saving and loading
+- [ ] 🤔 Block ID flattening? It takes up more memory, but it should not affect performance much.

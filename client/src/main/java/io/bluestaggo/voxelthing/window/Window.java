@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -225,12 +226,24 @@ public class Window {
 		return keyStates[key].justPressed();
 	}
 
+	public int[] getKeysJustPressed() {
+		return IntStream.range(0, keyStates.length)
+				.filter(this::isKeyJustPressed)
+				.toArray();
+	}
+
 	public boolean isMouseDown(int mouse) {
 		return mouseStates[mouse].isPressed();
 	}
 
 	public boolean isMouseJustPressed(int mouse) {
 		return mouseStates[mouse].justPressed();
+	}
+
+	public int[] getMouseButtonsJustPressed() {
+		return IntStream.range(0, mouseStates.length)
+				.filter(this::isMouseJustPressed)
+				.toArray();
 	}
 
 	public static double getTimeElapsed() {

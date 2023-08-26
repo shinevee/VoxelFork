@@ -20,7 +20,7 @@ public class Quad {
 
 	public Quad clear() {
 		position.zero();
-		size.set(1.0f, 1.0f);
+		size.zero();
 		color.set(1.0f, 1.0f, 1.0f, 1.0f);
 		uv.set(0.0f, 1.0f, 1.0f, 0.0f);
 		texture = null;
@@ -78,6 +78,9 @@ public class Quad {
 	public void applyToShader(QuadShader shader, Matrix4f viewProj) {
 		if (texture != null) {
 			texture.use();
+			if (size.x == 0.0f && size.y == 0.0f) {
+				size.set(texture.width, texture.height);
+			}
 		}
 
 		shader.viewProj.set(viewProj);

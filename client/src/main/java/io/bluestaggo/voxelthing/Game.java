@@ -1,9 +1,13 @@
 package io.bluestaggo.voxelthing;
 
+import io.bluestaggo.voxelthing.gui.GuiScreen;
+import io.bluestaggo.voxelthing.gui.IngameGui;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.window.ClientPlayerController;
 import io.bluestaggo.voxelthing.window.Window;
+import io.bluestaggo.voxelthing.world.BlockRaycast;
 import io.bluestaggo.voxelthing.world.ClientWorld;
+import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.World;
 import io.bluestaggo.voxelthing.world.entity.IPlayerController;
 import io.bluestaggo.voxelthing.world.entity.Player;
@@ -18,7 +22,8 @@ import static org.lwjgl.opengl.GL33C.glClearColor;
 
 public class Game {
 	public static final String VERSION;
-	public static final float TICK_RATE = 1.0f / 20;
+	public static final int TICKS_PER_SECOND = 20;
+	public static final float TICK_RATE = 1.0f / TICKS_PER_SECOND;
 
 	static {
 		String version = "???";
@@ -43,7 +48,7 @@ public class Game {
 			"floof",
 			"talon"
 	};
-	private int currentSkin;
+	private int currentSkin = VERSION.contains("dev") ? 1 : 0;
 	private boolean thirdPerson;
 	private boolean debugMenu = true;
 
@@ -56,9 +61,14 @@ public class Game {
 	public Player player;
 	public IPlayerController playerController;
 
+	private final GuiScreen inGameGui;
+
+	private BlockRaycast blockRaycast;
+
 	public float mouseSensitivity = 0.25f;
 
 	private double tickTime;
+	private double partialTick;
 
 	public Game() {
 		instance = this;
@@ -72,6 +82,8 @@ public class Game {
 
 		world = new ClientWorld(this);
 		player = new Player(world, playerController);
+
+		inGameGui = new IngameGui(this);
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	}
@@ -97,20 +109,37 @@ public class Game {
 
 	private void update(double delta) {
 		tickTime += delta;
+
+		inGameGui.handleInput();
 		player.onGameUpdate();
 		player.noClip = window.isKeyDown(GLFW_KEY_Q);
 
 		if (tickTime >= TICK_RATE) {
 			tickTime %= TICK_RATE;
+			inGameGui.tick();
 			player.tick();
 		}
 
-		world.partialTick = (tickTime % TICK_RATE) / TICK_RATE;
+		partialTick = tickTime / TICK_RATE;
+		if (world != null) {
+			world.partialTick = partialTick;
+		}
 		renderer.camera.setPosition((float) player.getPartialX(), (float) (player.getPartialY() + player.height - 0.3), (float) player.getPartialZ());
 		renderer.camera.setRotation((float) player.rotYaw, (float) player.rotPitch);
 
 		if (thirdPerson) {
 			renderer.camera.moveForward(-4.0f);
+		}
+
+		if (world != null) {
+			blockRaycast = renderer.camera.getRaycast(5.0f);
+			if (world.doRaycast(blockRaycast)) {
+				int x = blockRaycast.getHitX();
+				int y = blockRaycast.getHitY();
+				int z = blockRaycast.getHitZ();
+				int block = world.getBlockId(x, y, z);
+				Direction face = blockRaycast.getHitFace();
+			}
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_F)) {
@@ -163,6 +192,7 @@ public class Game {
 
 	private void draw() {
 		renderer.draw();
+		inGameGui.draw();
 	}
 
 	public String getSkin() {
@@ -175,6 +205,14 @@ public class Game {
 
 	public boolean showDebug() {
 		return debugMenu;
+	}
+
+	public double getPartialTick() {
+		return partialTick;
+	}
+
+	public BlockRaycast getBlockRaycast() {
+		return blockRaycast;
 	}
 
 	public static void main(String[] args) {

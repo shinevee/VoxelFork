@@ -5,6 +5,7 @@ import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.generation.GenCache;
 import io.bluestaggo.voxelthing.world.generation.GenerationInfo;
+import org.joml.Vector3d;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,7 @@ public class World implements IBlockAccess {
 						for (int yy = 0; yy < 32; yy++) {
 							Block block = Block.STONE;
 							if ((x + z) % 2 == 0) {
-								block = Block.BRICK;
+								block = Block.BRICKS;
 							} else {
 								if (yy >= 4) {
 									block = Block.DIRT;
@@ -115,6 +116,20 @@ public class World implements IBlockAccess {
 		onBlockUpdate(x, y, z);
 	}
 
+	public void setBlockId(int x, int y, int z, short block) {
+		Chunk chunk = getChunkAtBlock(x, y, z);
+		if (chunk == null) {
+			return;
+		}
+		chunk.setBlockId(
+				Math.floorMod(x, Chunk.LENGTH),
+				Math.floorMod(y, Chunk.LENGTH),
+				Math.floorMod(z, Chunk.LENGTH),
+				block
+		);
+		onBlockUpdate(x, y, z);
+	}
+
 	public void loadChunkAt(int cx, int cy, int cz) {
 		if (chunkStorage.getChunkAt(cx, cy, cz) != null) {
 			return;
@@ -183,6 +198,32 @@ public class World implements IBlockAccess {
 		}
 
 		return boxes;
+	}
+
+	public boolean doRaycast(BlockRaycast raycast) {
+		Vector3d pos = new Vector3d(raycast.position);
+		Vector3d dir = raycast.direction;
+		float dist = 0.0f;
+
+		while (dist < raycast.length) {
+			int x = (int) Math.floor(pos.x());
+			int y = (int) Math.floor(pos.y());
+			int z = (int) Math.floor(pos.z());
+
+			Block block = getBlock(x, y, z);
+			if (block != null) {
+				AABB collision = block.getCollisionBox(x, y, z);
+				if (collision.contains(pos.x, pos.y, pos.z)) {
+					raycast.setResult(x, y, z, collision.getClosestFace(pos, dir));
+					return true;
+				}
+			}
+
+			pos.add(dir);
+			dist += BlockRaycast.STEP_DISTANCE;
+		}
+
+		return false;
 	}
 
 	public double scaleToTick(double a, double b) {

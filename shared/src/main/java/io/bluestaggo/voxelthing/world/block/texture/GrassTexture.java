@@ -11,12 +11,12 @@ public class GrassTexture extends SideTopBottomTexture {
 	}
 
 	@Override
-	public Vector2i getTexture(Direction face, IBlockAccess blockAccess, int x, int y, int z) {
+	public Vector2i get(Direction face, IBlockAccess blockAccess, int x, int y, int z) {
 		return switch (face) {
 			case TOP -> top;
 			case BOTTOM -> bottom;
 			default -> {
-				if (blockAccess.getBlockId(x + face.X, y - 1, z + face.Z) == Block.GRASS.id) {
+				if (blockAccess != null && blockAccess.getBlockId(x + face.X, y - 1, z + face.Z) == Block.GRASS.id) {
 					yield top;
 				}
 				yield side;

@@ -1,12 +1,23 @@
 package io.bluestaggo.voxelthing.math;
 
+import io.bluestaggo.voxelthing.world.Direction;
+import org.joml.Vector3d;
+
 public class AABB {
+	private static final Vector3d[] FACES = new Vector3d[6];
+
 	public double minX;
 	public double minY;
 	public double minZ;
 	public double maxX;
 	public double maxY;
 	public double maxZ;
+
+	static {
+		for (int i = 0; i < 6; i++) {
+			FACES[i] = new Vector3d();
+		}
+	}
 
 	public AABB() {
 		this(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
@@ -100,9 +111,59 @@ public class AABB {
 		return off;
 	}
 
+	public double getMidX() {
+		return MathUtil.lerp(minX, maxX, 0.5);
+	}
+
+	public double getMidY() {
+		return MathUtil.lerp(minY, maxY, 0.5);
+	}
+
+	public double getMidZ() {
+		return MathUtil.lerp(minZ, maxZ, 0.5);
+	}
+
 	public boolean intersects(AABB other) {
 		return other.maxX > minX && other.minX < maxX
 				&& other.maxY > minY && other.minY < maxY
 				&& other.maxZ > minZ && other.minZ < maxZ;
+	}
+
+	public boolean contains(double x, double y, double z) {
+		return x > minX && x < maxX
+				&& y > minY && y < maxY
+				&& z > minZ && z < maxZ;
+	}
+
+	public Direction getClosestFace(Vector3d pos, Vector3d dir) {
+		dir.normalize().mul(0.01);
+
+		while (contains(pos.x, pos.y, pos.z)) {
+			pos.sub(dir);
+		}
+
+		double midX = getMidX();
+		double midY = getMidY();
+		double midZ = getMidZ();
+
+		FACES[Direction.NORTH.ordinal()].set(midX, midY, minZ);
+		FACES[Direction.SOUTH.ordinal()].set(midX, midY, maxZ);
+		FACES[Direction.WEST.ordinal()].set(minX, midY, midZ);
+		FACES[Direction.EAST.ordinal()].set(maxX, midY, midZ);
+		FACES[Direction.BOTTOM.ordinal()].set(midX, minY, midZ);
+		FACES[Direction.TOP.ordinal()].set(midX, maxY, midZ);
+
+		int closestFace = 0;
+		double closestDist = FACES[0].distanceSquared(pos);
+
+		for (int i = 1; i < 6; i++) {
+			double dist = FACES[i].distanceSquared(pos);
+			if (dist < closestDist) {
+				closestDist = dist;
+				closestFace = i;
+			}
+		}
+
+		return Direction.values()[closestFace];
 	}
 }

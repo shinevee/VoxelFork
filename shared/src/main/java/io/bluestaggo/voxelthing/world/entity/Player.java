@@ -58,8 +58,10 @@ public class Player extends Entity {
 		walkAmount += walkAdd * 1.5;
 		prevRenderWalk = renderWalk;
 		renderWalk = Math.sin(walkAmount) * Math.min(walkAdd * 10.0, 1.0);
-		prevWalkDir = walkDir;
-		walkDir = Math.toDegrees(new Vector2d(velX, velZ).angle(new Vector2d(-1.0f, 0.0f)));
+		if (walkAmount > 0.1) {
+			prevWalkDir = walkDir;
+			walkDir = Math.toDegrees(new Vector2d(velX, velZ).angle(new Vector2d(-1.0f, 0.0f)));
+		}
 
 		if (walkAmount - prevWalkAmount < 0.1) {
 			walkAmount = 0.0;
@@ -75,10 +77,7 @@ public class Player extends Entity {
 	}
 
 	private float getRenderWalkDir() {
-		if (walkAmount > 0.5) {
-			return (float) world.scaleToTick(prevWalkDir, walkDir);
-		}
-		return 180.0f - getRenderYaw();
+		return (float) world.scaleToTick(prevWalkDir, walkDir);
 	}
 
 	@Override

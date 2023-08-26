@@ -16,11 +16,9 @@ public class EntityRenderer {
 		Texture texture = renderer.textures.getTexture(entity.getTexture());
 
 		int rotation = entity.getRenderRotation(renderer.camera.getYaw());
-		boolean flip = rotation > 4;
-
-		float minX = texture.uCoord(entity.getRenderFrame() * 32 + (flip ? 32 : 0));
-		float minY = texture.vCoord(flip ? 96 - rotation * 32 : rotation * 32);
-		float maxX = minX + texture.uCoord(flip ? -32 : 32);
+		float minX = texture.uCoord(entity.getRenderFrame() * 32);
+		float minY = texture.vCoord(rotation * 32);
+		float maxX = minX + texture.uCoord(32);
 		float maxY = minY + texture.vCoord(32);
 
 		renderer.draw3D.drawBillboard(Billboard.shared()

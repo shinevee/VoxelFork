@@ -112,7 +112,7 @@ public class MainRenderer {
 			worldRenderer.drawSky();
 
 			setupWorldShader(viewProj);
-			textures.getWorldTexture("/assets/blocks.png").use();
+			textures.getMipmappedTexture("/assets/blocks.png").use();
 			useSkyTexture(1);
 			worldRenderer.draw();
 

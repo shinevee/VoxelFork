@@ -12,7 +12,7 @@ public class AllSidesTexture implements IBlockTexture {
 	}
 
 	@Override
-	public Vector2i getTexture(Direction face, IBlockAccess blockAccess, int x, int y, int z) {
+	public Vector2i get(Direction face, IBlockAccess blockAccess, int x, int y, int z) {
 		return vec;
 	}
 }

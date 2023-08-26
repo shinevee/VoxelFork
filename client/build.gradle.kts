@@ -52,8 +52,6 @@ task("genMetadata") {
 
 fun getaVersion(): String {
     var version = providers.gradleProperty("voxelthing.version").get();
-	if (version == "dev") {
-		version = "dev ${SimpleDateFormat("yyyyMMdd").format(Date())}"
-	}
+	version = version.replace("dev", "dev ${SimpleDateFormat("yyyyMMdd").format(Date())}");
 	return version;
 }

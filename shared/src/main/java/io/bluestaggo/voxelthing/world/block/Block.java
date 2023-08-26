@@ -4,6 +4,7 @@ import io.bluestaggo.voxelthing.math.AABB;
 import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.IBlockAccess;
 import io.bluestaggo.voxelthing.world.block.texture.AllSidesTexture;
+import io.bluestaggo.voxelthing.world.block.texture.ColumnTexture;
 import io.bluestaggo.voxelthing.world.block.texture.GrassTexture;
 import io.bluestaggo.voxelthing.world.block.texture.IBlockTexture;
 
@@ -20,7 +21,10 @@ public class Block {
 	public static final Block STONE = new Block().withTex(1, 0);
 	public static final Block GRASS = new Block().withTex(new GrassTexture(0, 1, 0, 0, 0, 2));
 	public static final Block DIRT = new Block().withTex(0, 2);
-	public static final Block BRICK = new Block().withTex(3, 2);
+	public static final Block COBBLESTONE = new Block().withTex(1, 1);
+	public static final Block BRICKS = new Block().withTex(3, 2);
+	public static final Block PLANKS = new Block().withTex(3, 0);
+	public static final Block LOG = new Block().withTex(new ColumnTexture(3, 1, 4, 1));
 
 	public final short id;
 	private IBlockTexture texture;
