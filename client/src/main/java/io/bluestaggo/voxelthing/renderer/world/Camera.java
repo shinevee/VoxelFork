@@ -53,6 +53,9 @@ public class Camera {
 
 	public void setRotation(float yaw, float pitch) {
 		this.yaw = yaw % 360.0f;
+		if (Math.abs(Math.abs(pitch) - 90.0f) < 0.1f) {
+			pitch = 90.1f * Math.signum(pitch);
+		}
 		this.pitch = pitch % 360.0f;
 		updateVectors();
 	}
@@ -70,18 +73,22 @@ public class Camera {
 		updateVectors();
 	}
 
-	private void updateVectors() {
-		double yaw = this.yaw;
-		if (Math.abs(pitch) > 90.0f) {
-			yaw += 180.0f;
-		}
+	public void moveRight(float x) {
+		position.add(right.mul(x, new Vector3f()));
+		updateVectors();
+	}
 
-		front.set(
-				(float) (Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch))),
-				(float) (Math.sin(Math.toRadians(pitch))),
-				(float) (Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)))
-		).normalize();
+	private void updateVectors() {
+		boolean flip = Math.abs(pitch) > 90.0f;
+
+		front.set(0.0f, 0.0f, -1.0f);
+		front.rotateX((float) Math.toRadians(pitch));
+		front.rotateY((float) Math.toRadians(-yaw - 90.0f));
+
 		front.cross(0.0f, 1.0f, 0.0f, right);
+		if (flip) {
+			right.rotateY((float) Math.toRadians(180.0));
+		}
 		right.cross(front, up);
 		position.add(front, target);
 		frustum.set(getViewProj(viewProj));

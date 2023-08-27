@@ -154,7 +154,9 @@ public class Game {
 		if (thirdPerson) {
 			renderer.camera.moveForward(-4.0f);
 		} else if (viewBobbing) {
-			renderer.camera.setPosition((float) player.getRenderX(), (float) (player.getRenderY() + player.height - 0.3), (float) player.getRenderZ());
+			py += Math.abs(player.getRenderWalk()) * 0.2f;
+			renderer.camera.setPosition(px, py, pz);
+			renderer.camera.moveRight((float) player.getRenderWalk() * -0.1f);
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_F)) {

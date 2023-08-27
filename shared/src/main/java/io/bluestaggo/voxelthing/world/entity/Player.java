@@ -63,11 +63,11 @@ public class Player extends Entity {
 		prevRenderWalk = renderWalk;
 		renderWalk = Math.sin(walkAmount) * Math.min(walkAdd * 10.0, 1.0);
 		prevWalkDir = walkDir;
-		if (walkAdd > 0.0) {
+		if (walkAdd > 0.1) {
 			walkDir = Math.toDegrees(new Vector2d(velX, velZ).angle(new Vector2d(-1.0f, 0.0f)));
 		}
 
-		if (walkAmount - prevWalkAmount < 0.01) {
+		if (onGround && walkAmount - prevWalkAmount < 0.01) {
 			walkAmount = 0.0;
 		}
 
@@ -94,9 +94,9 @@ public class Player extends Entity {
 		int frame = 1;
 		double walk = getRenderWalk();
 
-		if (walk > 0.5) {
+		if (walk >= 0.5) {
 			frame++;
-		} else if (walk < -0.5) {
+		} else if (walk <= -0.5) {
 			frame--;
 		}
 

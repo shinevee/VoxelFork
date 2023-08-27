@@ -35,6 +35,7 @@ public class Entity {
 	public double rotPitch;
 	public double rotYaw;
 
+	private boolean wasOnGround;
 	public boolean onGround;
 	public boolean noClip;
 
@@ -59,7 +60,7 @@ public class Entity {
 	}
 
 	protected void update() {
-		if (velY > -2.0) {
+		if (velY > -4.0) {
 			velY -= 0.1;
 		}
 	}
@@ -69,6 +70,7 @@ public class Entity {
 	}
 
 	private void updateMovement() {
+		wasOnGround = onGround;
 		if (!noClip) {
 			updateCollisionBox();
 			List<AABB> intersectingBoxes = world.getSurroundingCollision(collisionBox.expandToPoint(velX, velY, velZ, offsetBox));
@@ -99,6 +101,14 @@ public class Entity {
 		posY += velY;
 		posZ += velZ;
 		updateCollisionBox();
+	}
+
+	public boolean justLanded() {
+		return onGround && !wasOnGround;
+	}
+
+	public boolean justFell() {
+		return wasOnGround && !onGround;
 	}
 
 	public double getPartialX() {
