@@ -1,5 +1,6 @@
 package io.bluestaggo.voxelthing;
 
+import io.bluestaggo.voxelthing.gui.DebugGui;
 import io.bluestaggo.voxelthing.gui.GuiScreen;
 import io.bluestaggo.voxelthing.gui.IngameGui;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
@@ -7,7 +8,6 @@ import io.bluestaggo.voxelthing.window.ClientPlayerController;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.BlockRaycast;
 import io.bluestaggo.voxelthing.world.ClientWorld;
-import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.World;
 import io.bluestaggo.voxelthing.world.entity.IPlayerController;
 import io.bluestaggo.voxelthing.world.entity.Player;
@@ -48,9 +48,11 @@ public class Game {
 			"floof",
 			"talon"
 	};
-	private int currentSkin = VERSION.contains("dev") ? 1 : 0;
+	private int currentSkin = VERSION.contains("dev") || VERSION.equals("???") ? 1 : 0;
 	private boolean thirdPerson;
 	private boolean debugMenu = true;
+	private boolean drawGui = true;
+	private boolean viewBobbing = true;
 
 	private static Game instance;
 
@@ -61,6 +63,7 @@ public class Game {
 	public Player player;
 	public IPlayerController playerController;
 
+	private final GuiScreen debugGui;
 	private final GuiScreen inGameGui;
 
 	private BlockRaycast blockRaycast;
@@ -83,6 +86,7 @@ public class Game {
 		world = new ClientWorld(this);
 		player = new Player(world, playerController);
 
+		debugGui = new DebugGui(this);
 		inGameGui = new IngameGui(this);
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -124,22 +128,33 @@ public class Game {
 		if (world != null) {
 			world.partialTick = partialTick;
 		}
-		renderer.camera.setPosition((float) player.getPartialX(), (float) (player.getPartialY() + player.height - 0.3), (float) player.getPartialZ());
-		renderer.camera.setRotation((float) player.rotYaw, (float) player.rotPitch);
 
-		if (thirdPerson) {
-			renderer.camera.moveForward(-4.0f);
+		float px = (float) player.getPartialX();
+		float py = (float) player.getPartialY();
+		float pz = (float) player.getPartialZ();
+		float yaw = (float) player.rotYaw;
+		float pitch = (float) player.rotPitch;
+
+		py += player.height - 0.3;
+		if (viewBobbing) {
+			if (thirdPerson) {
+				py -= player.getPartialVelY() * 0.2;
+			}
+			pitch += player.getPartialVelY() * 2.5f;
 		}
+
+		renderer.camera.setPosition(px, py, pz);
+		renderer.camera.setRotation(yaw, pitch);
 
 		if (world != null) {
 			blockRaycast = renderer.camera.getRaycast(5.0f);
-			if (world.doRaycast(blockRaycast)) {
-				int x = blockRaycast.getHitX();
-				int y = blockRaycast.getHitY();
-				int z = blockRaycast.getHitZ();
-				int block = world.getBlockId(x, y, z);
-				Direction face = blockRaycast.getHitFace();
-			}
+			world.doRaycast(blockRaycast);
+		}
+
+		if (thirdPerson) {
+			renderer.camera.moveForward(-4.0f);
+		} else if (viewBobbing) {
+			renderer.camera.setPosition((float) player.getRenderX(), (float) (player.getRenderY() + player.height - 0.3), (float) player.getRenderZ());
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_F)) {
@@ -173,8 +188,16 @@ public class Game {
 			renderer.screen.scale += 0.5f;
 		}
 
+		if (window.isKeyJustPressed(GLFW_KEY_F1)) {
+			drawGui = !drawGui;
+		}
+
 		if (window.isKeyJustPressed(GLFW_KEY_F3)) {
 			debugMenu = !debugMenu;
+		}
+
+		if (window.isKeyJustPressed(GLFW_KEY_F4)) {
+			viewBobbing = !viewBobbing;
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_F5)) {
@@ -192,7 +215,13 @@ public class Game {
 
 	private void draw() {
 		renderer.draw();
-		inGameGui.draw();
+
+		if (drawGui) {
+			if (debugMenu) {
+				debugGui.draw();
+			}
+			inGameGui.draw();
+		}
 	}
 
 	public String getSkin() {
@@ -203,16 +232,16 @@ public class Game {
 		return thirdPerson;
 	}
 
-	public boolean showDebug() {
-		return debugMenu;
-	}
-
 	public double getPartialTick() {
 		return partialTick;
 	}
 
 	public BlockRaycast getBlockRaycast() {
 		return blockRaycast;
+	}
+
+	public boolean viewBobbingEnabled() {
+		return viewBobbing;
 	}
 
 	public static void main(String[] args) {

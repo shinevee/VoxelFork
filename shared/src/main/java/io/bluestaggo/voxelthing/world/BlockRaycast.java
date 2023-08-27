@@ -3,7 +3,7 @@ package io.bluestaggo.voxelthing.world;
 import org.joml.Vector3d;
 
 public class BlockRaycast {
-	public static final float STEP_DISTANCE = 0.1f;
+	public static final float STEP_DISTANCE = 1.0f / 16.0f;
 
 	public final Vector3d position;
 	public final Vector3d direction;

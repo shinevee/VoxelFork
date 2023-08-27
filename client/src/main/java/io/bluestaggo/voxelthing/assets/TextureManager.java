@@ -23,7 +23,7 @@ public class TextureManager {
 			return getTextureFromMap(map, "/assets/missing.png");
 		}
 
-		if (!textures.containsKey(path)) {
+		if (!map.containsKey(path)) {
 			try {
 				Texture texture = loadTexture(path);
 				map.put(path, texture);
@@ -36,7 +36,7 @@ public class TextureManager {
 			}
 		}
 
-		return textures.get(path);
+		return map.get(path);
 	}
 
 	public Texture getTexture(String path) {

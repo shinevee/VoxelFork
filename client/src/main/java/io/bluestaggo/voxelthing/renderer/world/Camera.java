@@ -1,6 +1,5 @@
 package io.bluestaggo.voxelthing.renderer.world;
 
-import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.BlockRaycast;
 import org.joml.FrustumIntersection;
@@ -53,8 +52,8 @@ public class Camera {
 	}
 
 	public void setRotation(float yaw, float pitch) {
-		this.yaw = MathUtil.floorMod(yaw, 360.0f);
-		this.pitch = MathUtil.clamp(pitch, -89.0f, 89.0f);
+		this.yaw = yaw % 360.0f;
+		this.pitch = pitch % 360.0f;
 		updateVectors();
 	}
 
@@ -72,6 +71,11 @@ public class Camera {
 	}
 
 	private void updateVectors() {
+		double yaw = this.yaw;
+		if (Math.abs(pitch) > 90.0f) {
+			yaw += 180.0f;
+		}
+
 		front.set(
 				(float) (Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch))),
 				(float) (Math.sin(Math.toRadians(pitch))),

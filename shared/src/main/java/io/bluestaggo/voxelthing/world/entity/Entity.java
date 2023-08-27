@@ -16,18 +16,22 @@ public class Entity {
 	public double width = 0.4;
 	public double height = 1.8;
 
-	public double prevPosX;
-	public double prevPosY;
-	public double prevPosZ;
+	private double prevPosX;
+	private double prevPosY;
+	private double prevPosZ;
 	public double posX;
 	public double posY;
 	public double posZ;
+
+	private double prevVelX;
+	private double prevVelY;
+	private double prevVelZ;
 	public double velX;
 	public double velY;
 	public double velZ;
 
-	public double prevRotPitch;
-	public double prevRotYaw;
+	private double prevRotPitch;
+	private double prevRotYaw;
 	public double rotPitch;
 	public double rotYaw;
 
@@ -44,6 +48,9 @@ public class Entity {
 		prevPosX = posX;
 		prevPosY = posY;
 		prevPosZ = posZ;
+		prevVelX = velX;
+		prevVelY = velY;
+		prevVelZ = velZ;
 		prevRotYaw = rotYaw;
 		prevRotPitch = rotPitch;
 
@@ -116,6 +123,18 @@ public class Entity {
 
 	public float getRenderZ() {
 		return (float) getPartialZ();
+	}
+
+	public double getPartialVelX() {
+		return MathUtil.lerp(prevVelX, velX, world.partialTick);
+	}
+
+	public double getPartialVelY() {
+		return MathUtil.lerp(prevVelY, velY, world.partialTick);
+	}
+
+	public double getPartialVelZ() {
+		return MathUtil.lerp(prevVelZ, velZ, world.partialTick);
 	}
 
 	public float getRenderYaw() {

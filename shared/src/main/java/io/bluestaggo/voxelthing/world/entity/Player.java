@@ -14,8 +14,8 @@ public class Player extends Entity {
 	private double prevWalkDir;
 	private double walkDir;
 
-	public double accel = 0.1;
-	public double friction = 0.75;
+	public double accel = 0.2;
+	public double friction = 0.6;
 	public double jumpHeight = 0.5;
 
 	public Player(World world, IPlayerController controller) {
@@ -54,16 +54,20 @@ public class Player extends Entity {
 		velZ *= friction;
 
 		double walkAdd = Math.min(Math.sqrt(velX * velX + velZ * velZ), 1.0);
+		if (!onGround) {
+			walkAdd /= 2.5;
+		}
+
 		prevWalkAmount = walkAmount;
 		walkAmount += walkAdd * 1.5;
 		prevRenderWalk = renderWalk;
 		renderWalk = Math.sin(walkAmount) * Math.min(walkAdd * 10.0, 1.0);
-		if (walkAmount > 0.1) {
-			prevWalkDir = walkDir;
+		prevWalkDir = walkDir;
+		if (walkAdd > 0.0) {
 			walkDir = Math.toDegrees(new Vector2d(velX, velZ).angle(new Vector2d(-1.0f, 0.0f)));
 		}
 
-		if (walkAmount - prevWalkAmount < 0.1) {
+		if (walkAmount - prevWalkAmount < 0.01) {
 			walkAmount = 0.0;
 		}
 
@@ -72,17 +76,17 @@ public class Player extends Entity {
 		}
 	}
 
-	private double getRenderWalk() {
+	public double getRenderWalk() {
 		return world.scaleToTick(prevRenderWalk, renderWalk);
 	}
 
-	private float getRenderWalkDir() {
+	public float getRenderWalkDir() {
 		return (float) world.scaleToTick(prevWalkDir, walkDir);
 	}
 
 	@Override
 	public float getRenderY() {
-		return super.getRenderY() + (float) Math.abs(getRenderWalk() / 2.0);
+		return super.getRenderY() + (float) Math.abs(getRenderWalk() / 3.0);
 	}
 
 	@Override
@@ -90,9 +94,9 @@ public class Player extends Entity {
 		int frame = 1;
 		double walk = getRenderWalk();
 
-		if (walk > 0.2) {
+		if (walk > 0.5) {
 			frame++;
-		} else if (walk < -0.2) {
+		} else if (walk < -0.5) {
 			frame--;
 		}
 

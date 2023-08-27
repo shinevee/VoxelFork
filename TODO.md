@@ -15,5 +15,12 @@ Key:
 ## Gameplay
 - [x] Player entity with physics
 - [x] Block building and destruction
+- [ ] Block inventory
+- [ ] Partial blocks (e.g. slabs)
 - [ ] World saving and loading
-- [ ] 🤔 Block ID flattening? It takes up more memory, but it should not affect performance much.
+- [ ] 🤔 Block ID flattening? 
+
+## Bugs
+- [ ] Fix raycasts
+- [ ] Fix player animation jitter
+- [ ] Fix distance jitter

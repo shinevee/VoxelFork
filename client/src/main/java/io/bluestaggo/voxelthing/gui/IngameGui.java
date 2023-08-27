@@ -22,6 +22,7 @@ public class IngameGui extends GuiScreen {
 	private int heldIndex = 0;
 	private int[] prevHoverProgress = new int[9];
 	private int[] hoverProgress = new int[9];
+	private int swingTick = 0;
 
 	static {
 		for (short i = 0; i < 9; i++) {
@@ -58,10 +59,85 @@ public class IngameGui extends GuiScreen {
 			hover = MathUtil.clamp(hover, 0, Game.TICKS_PER_SECOND / 4);
 			hoverProgress[i] = hover;
 		}
+
+		if (swingTick > 0) {
+			swingTick--;
+		}
 	}
 
 	@Override
 	public void draw() {
+		MainRenderer r = game.renderer;
+
+		if (!game.showThirdPerson()) {
+			drawCrosshair();
+			drawHand();
+		}
+
+		drawHotbar();
+	}
+
+	private void drawCrosshair() {
+		MainRenderer r = game.renderer;
+		Texture crosshairTexture = r.textures.getTexture("/assets/gui/crosshair.png");
+		r.draw2D.drawQuad(Quad.shared()
+				.at((int)(r.screen.getWidth() - crosshairTexture.width) / 2, (int)(r.screen.getHeight() - crosshairTexture.height) / 2)
+				.withTexture(crosshairTexture));
+	}
+
+	private void drawHand() {
+		MainRenderer r = game.renderer;
+
+		Block block = getPlacedBlock();
+		Texture playerTexture = r.textures.getTexture(game.player.getTexture());
+		Texture blocksTexture = r.textures.getTexture("/assets/blocks.png");
+
+		float handSize = r.screen.getHeight();
+		float hover = MathUtil.lerp(prevHoverProgress[heldIndex], hoverProgress[heldIndex], (float) game.getPartialTick()) / (Game.TICKS_PER_SECOND / 4.0f);
+		hover = MathUtil.squareOut(hover);
+		double swing = Math.max(swingTick - game.getPartialTick(), 0.0) / 5.0;
+		swing *= swing;
+
+		float bobX = (float) (swing / -4.0) * handSize;
+		float bobY = (float) ((1.0 - hover * (block == null ? 1.0 : 0.9))
+				+ (swing / 2.0)) * handSize;
+
+		if (game.viewBobbingEnabled()) {
+			bobX += (float) (game.player.getRenderWalk() * 0.1) * handSize;
+			bobY += (float) ((Math.abs(game.player.getRenderWalk()) * 0.1)
+					+ Math.max(game.player.getPartialVelY() * 0.2, -0.25)) * handSize;
+		}
+
+		r.draw2D.drawQuad(Quad.shared()
+				.at(r.screen.getWidth() - handSize + bobX,
+						r.screen.getHeight() - handSize + bobY + handSize / 4.0f)
+				.size(handSize, handSize)
+				.withTexture(playerTexture)
+				.withUV(1.0f - playerTexture.uCoord(32), 1.0f - playerTexture.vCoord(32), 1.0f, 1.0f));
+
+		if (block != null) {
+			Vector2i texture = block.getTexture().get(Direction.NORTH, null, 0, 0, 0);
+
+			float minU = blocksTexture.uCoord(texture.x * 16);
+			float minV = blocksTexture.vCoord(texture.y * 16);
+			float maxU = minU + blocksTexture.uCoord(16);
+			float maxV = minV + blocksTexture.vCoord(16);
+
+			Quad blockQuad = Quad.shared()
+					.at(r.screen.getWidth() + (bobX - handSize / 1.8f), r.screen.getHeight() + (bobY - handSize / 1.8f))
+					.size(handSize * 0.35f, handSize * 0.4f)
+					.withTexture(blocksTexture)
+					.withUV(minU, minV, maxU, maxV);
+
+			r.draw2D.drawQuad(blockQuad);
+			r.draw2D.drawQuad(blockQuad
+					.size(handSize * 0.15f, handSize * 0.4f)
+					.offset(handSize * 0.35f, 0.0f)
+					.withColor(0.75f, 0.75f, 0.75f));
+		}
+	}
+
+	private void drawHotbar() {
 		MainRenderer r = game.renderer;
 
 		Texture hotbarTexture = r.textures.getTexture("/assets/gui/hotbar.png");
@@ -109,11 +185,6 @@ public class IngameGui extends GuiScreen {
 			hotbarQuad.offset(slotWidth, hover);
 			blockQuad.offset(slotWidth, hover);
 		}
-
-		Texture crosshairTexture = r.textures.getTexture("/assets/gui/crosshair.png");
-		r.draw2D.drawQuad(Quad.shared()
-				.at((r.screen.getWidth() - crosshairTexture.width) / 2.0f, (r.screen.getHeight() - crosshairTexture.height) / 2.0f)
-				.withTexture(crosshairTexture));
 	}
 
 	private Block getPlacedBlock() {
@@ -137,9 +208,20 @@ public class IngameGui extends GuiScreen {
 			} else if (button == 1) {
 				Block placedBlock = getPlacedBlock();
 				if (placedBlock != null) {
-					game.world.setBlock(x + face.X, y + face.Y, z + face.Z, placedBlock);
+					x += face.X;
+					y += face.Y;
+					z += face.Z;
+
+					if (game.world.getBlockId(x, y, z) == 0) {
+						game.world.setBlock(x, y, z, placedBlock);
+						swingTick = 5;
+					}
 				}
 			}
+		}
+
+		if (button == 0) {
+			swingTick = 5;
 		}
 	}
 }

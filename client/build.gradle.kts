@@ -2,35 +2,76 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 plugins {
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     application
 }
 
 val lwjglVersion = "3.3.2"
 val jomlVersion = "1.10.5"
-val lwjglNatives = "natives-windows"
+
+val platforms = arrayOf(
+    "linux",
+    "linux-arm64",
+    "linux-arm32",
+    "macos",
+    "macos-arm64",
+    "windows",
+    "windows-x86",
+    "windows-arm64"
+);
+
+val lwjglModules = arrayOf(
+    "glfw",
+    "openal",
+    "opengl",
+    "stb"
+)
+
+var platform = providers.gradleProperty("voxelthing.client.platform").getOrElse(Pair(
+    System.getProperty("os.name")!!,
+    System.getProperty("os.arch")!!
+).let { (name, arch) ->
+    when {
+        arrayOf("Linux", "FreeBSD", "SunOS", "Unit").any { name.startsWith(it) } ->
+            if (arrayOf("arm", "aarch64").any { arch.startsWith(it) })
+                "linux${if (arch.contains("64") || arch.startsWith("armv8")) "-arm64" else "-arm32"}"
+            else
+                "linux"
+
+        arrayOf("Mac OS X", "Darwin").any { name.startsWith(it) }                ->
+            "macos${if (arch.startsWith("aarch64")) "-arm64" else ""}"
+
+        arrayOf("Windows").any { name.startsWith(it) }                           ->
+            if (arch.contains("64"))
+                "windows${if (arch.startsWith("aarch64")) "-arm64" else ""}"
+            else
+                "windows-x86"
+
+        else -> throw Error("Unrecognized or unsupported platform. Please set \"lwjglNatives\" manually")
+    }
+})
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-	implementation(platform("org.lwjgl:lwjgl-bom:$lwjglVersion"))
+    implementation(platform("org.lwjgl:lwjgl-bom:$lwjglVersion"))
 
-	implementation("org.lwjgl:lwjgl")
-	implementation("org.lwjgl:lwjgl-assimp")
-	implementation("org.lwjgl:lwjgl-glfw")
-	implementation("org.lwjgl:lwjgl-openal")
-	implementation("org.lwjgl:lwjgl-opengl")
-	implementation("org.lwjgl:lwjgl-stb")
-	runtimeOnly("org.lwjgl:lwjgl::$lwjglNatives")
-	runtimeOnly("org.lwjgl:lwjgl-assimp::$lwjglNatives")
-	runtimeOnly("org.lwjgl:lwjgl-glfw::$lwjglNatives")
-	runtimeOnly("org.lwjgl:lwjgl-openal::$lwjglNatives")
-	runtimeOnly("org.lwjgl:lwjgl-opengl::$lwjglNatives")
-	runtimeOnly("org.lwjgl:lwjgl-stb::$lwjglNatives")
-	implementation("org.joml:joml:${jomlVersion}")
+    implementation("org.lwjgl:lwjgl")
+    for (m in lwjglModules) {
+        implementation("org.lwjgl:lwjgl-$m")
+    }
+    implementation("org.joml:joml:${jomlVersion}")
 
-	implementation(project(":shared"))
+    for (p in platforms.filter { platform == "all" || it == platform }) {
+        runtimeOnly("org.lwjgl:lwjgl::natives-$p")
+        for (m in lwjglModules) {
+            runtimeOnly("org.lwjgl:lwjgl-$m::natives-$p")
+        }
+    }
+
+    implementation(project(":shared"))
 }
 
 application {
@@ -38,20 +79,28 @@ application {
 }
 
 tasks.compileJava {
-	dependsOn("genMetadata")
+    dependsOn("genMetadata")
+}
+
+tasks.withType<Jar> {
+    manifest {
+        attributes["Main-Class"] = "io.bluestaggo.voxelthing.Game"
+    }
+
+    archiveBaseName.set("voxelthing")
 }
 
 task("genMetadata") {
-	val resources = sourceSets.main.get().output.resourcesDir
-	resources?.mkdirs()
+    val resources = sourceSets.main.get().output.resourcesDir
+    resources?.mkdirs()
 
-	val versionFile = file("$resources/version.txt")
-	versionFile.createNewFile()
-	versionFile.writeText(getaVersion())
+    val versionFile = file("$resources/version.txt")
+    versionFile.createNewFile()
+    versionFile.writeText(getaVersion())
 }
 
 fun getaVersion(): String {
     var version = providers.gradleProperty("voxelthing.version").get();
-	version = version.replace("dev", "dev ${SimpleDateFormat("yyyyMMdd").format(Date())}");
-	return version;
+    version = version.replace("dev", "dev ${SimpleDateFormat("yyyyMMdd").format(Date())}");
+    return version;
 }

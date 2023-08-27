@@ -13,6 +13,7 @@ public class Screen {
 
 	private float width = -1;
 	private float height = -1;
+	private float autoScale = 0.0f;
 	public float scale = 0.0f;
 
 	public Screen(Window window) {
@@ -23,17 +24,17 @@ public class Screen {
 	public void updateDimensions() {
 		float newWidth = window.getWidth();
 		float newHeight = window.getHeight();
-		float newScale = scale;
+		autoScale = scale;
 
 		if (scale <= 0.0f) {
-			newScale = 1.0f;
-			while (newWidth / (newScale + 1) >= VIRTUAL_WIDTH && newHeight / (newScale + 1) >= VIRTUAL_HEIGHT) {
-				newScale++;
+			autoScale = 1.0f;
+			while (newWidth / (autoScale + 1) >= VIRTUAL_WIDTH && newHeight / (autoScale + 1) >= VIRTUAL_HEIGHT) {
+				autoScale++;
 			}
 		}
 
-		newWidth /= newScale;
-		newHeight /= newScale;
+		newWidth /= autoScale;
+		newHeight /= autoScale;
 
 		if (width != newWidth || height != newHeight) {
 			width = newWidth;
@@ -52,5 +53,9 @@ public class Screen {
 
 	public float getHeight() {
 		return height;
+	}
+
+	public float getScale() {
+		return autoScale;
 	}
 }
