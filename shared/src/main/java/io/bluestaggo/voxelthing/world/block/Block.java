@@ -4,11 +4,15 @@ import io.bluestaggo.voxelthing.math.AABB;
 import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.IBlockAccess;
 import io.bluestaggo.voxelthing.world.block.texture.AllSidesTexture;
+import io.bluestaggo.voxelthing.world.block.texture.BlockTexture;
 import io.bluestaggo.voxelthing.world.block.texture.ColumnTexture;
 import io.bluestaggo.voxelthing.world.block.texture.GrassTexture;
-import io.bluestaggo.voxelthing.world.block.texture.IBlockTexture;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.IntStream;
 
 public class Block {
 	public static final int TEXTURE_RES = 512;
@@ -17,6 +21,8 @@ public class Block {
 
 	private static short nextId = 0;
 	private static Block[] blocks = new Block[256];
+	private static final List<Block> REGISTERED_BLOCKS_MUTABLE = new ArrayList<>();
+	public static final List<Block> REGISTERED_BLOCKS = Collections.unmodifiableList(REGISTERED_BLOCKS_MUTABLE);
 
 	public static final Block STONE = new Block().withTex(1, 0);
 	public static final Block GRASS = new Block().withTex(new GrassTexture(0, 1, 0, 0, 0, 2));
@@ -25,9 +31,19 @@ public class Block {
 	public static final Block BRICKS = new Block().withTex(3, 2);
 	public static final Block PLANKS = new Block().withTex(3, 0);
 	public static final Block LOG = new Block().withTex(new ColumnTexture(3, 1, 4, 1));
+	public static final Block LEAVES = new Block().withTex(4, 0).transparency(BlockTransparency.THICK);
+	public static final Block GLASS = new Block().withTex(4, 2).transparency(BlockTransparency.FULL);
+	public static final Block SAND = new Block().withTex(2, 0);
+	public static final Block GRAVEL = new Block().withTex(2, 1);
+	public static final Block STONE_BRICKS = new Block().withTex(2, 2);
+	public static final Block POLISHED_STONE = new Block().withTex(1, 2);
+	public static final Block[] WOOL = IntStream.range(0, 16)
+			.mapToObj(i -> new Block().withTex(i % 4, i / 4 + 3))
+			.toArray(Block[]::new);
 
 	public final short id;
-	private IBlockTexture texture;
+	protected BlockTexture texture;
+	protected BlockTransparency transparency = BlockTransparency.NONE;
 
 	public Block() {
 		id = ++nextId;
@@ -37,7 +53,9 @@ public class Block {
 		if (id >= blocks.length) {
 			blocks = Arrays.copyOf(blocks, blocks.length + 256);
 		}
+
 		blocks[id] = this;
+		REGISTERED_BLOCKS_MUTABLE.add(this);
 	}
 
 	public static Block fromId(short id) {
@@ -51,17 +69,39 @@ public class Block {
 		return withTex(new AllSidesTexture(x, y));
 	}
 
-	protected Block withTex(IBlockTexture texture) {
+	protected Block withTex(BlockTexture texture) {
 		this.texture = texture;
 		return this;
 	}
 
-	public IBlockTexture getTexture() {
+	protected Block transparency(BlockTransparency transparency) {
+		this.transparency = transparency;
+		return this;
+	}
+
+	public BlockTexture getTexture() {
 		return texture;
 	}
 
+	public boolean isTransparent() {
+		return transparency.transparent;
+	}
+
 	public boolean isFaceDrawn(IBlockAccess blockAccess, int x, int y, int z, Direction face) {
-		return blockAccess.getBlockId(x, y, z) == 0;
+		Block block = blockAccess.getBlock(x, y, z);
+		if (block == null) {
+			return true;
+		}
+
+		if (transparency.transparent) {
+			if (!transparency.drawSameFaces) {
+				return block != this;
+			}
+		} else {
+			return block.isTransparent();
+		}
+
+		return true;
 	}
 
 	public AABB getCollisionBox(int x, int y, int z) {

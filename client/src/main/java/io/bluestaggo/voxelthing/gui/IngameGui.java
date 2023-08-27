@@ -10,47 +10,41 @@ import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.block.Block;
 import org.joml.Vector2i;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_1;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_9;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class IngameGui extends GuiScreen {
-	private static final List<Block> blocks = new ArrayList<>();
-
-	private int heldIndex = 0;
-	private int[] prevHoverProgress = new int[9];
-	private int[] hoverProgress = new int[9];
+	private int[] prevHoverProgress;
+	private int[] hoverProgress;
 	private int swingTick = 0;
-
-	static {
-		for (short i = 0; i < 9; i++) {
-			Block block = Block.fromId(i);
-			if (block != null) {
-				blocks.add(block);
-			}
-		}
-	}
 
 	public IngameGui(Game game) {
 		super(game);
+		prevHoverProgress = new int[game.palette.length];
+		hoverProgress = new int[game.palette.length];
 	}
 
 	@Override
 	protected void onKeyPressed(int key) {
+		int newIndex = game.heldItem;
+
 		if (key >= GLFW_KEY_1 && key <= GLFW_KEY_9) {
-			heldIndex = key - GLFW_KEY_1;
+			newIndex = key - GLFW_KEY_1;
+		} else if (key == GLFW_KEY_0) {
+			newIndex = 9;
+		}
+
+		if (newIndex >= 0 && newIndex < game.palette.length) {
+			game.heldItem = newIndex;
 		}
 	}
 
 	@Override
 	public void tick() {
-		for (int i = 0; i < 9; i++) {
+		for (int i = 0; i < game.palette.length; i++) {
 			int hover = hoverProgress[i];
 			prevHoverProgress[i] = hover;
 
-			if (i == heldIndex) {
+			if (i == game.heldItem) {
 				hover++;
 			} else {
 				hover--;
@@ -67,8 +61,6 @@ public class IngameGui extends GuiScreen {
 
 	@Override
 	public void draw() {
-		MainRenderer r = game.renderer;
-
 		if (!game.showThirdPerson()) {
 			drawCrosshair();
 			drawHand();
@@ -93,14 +85,14 @@ public class IngameGui extends GuiScreen {
 		Texture blocksTexture = r.textures.getTexture("/assets/blocks.png");
 
 		float handSize = r.screen.getHeight();
-		float hover = MathUtil.lerp(prevHoverProgress[heldIndex], hoverProgress[heldIndex], (float) game.getPartialTick()) / (Game.TICKS_PER_SECOND / 4.0f);
+		float hover = MathUtil.lerp(prevHoverProgress[game.heldItem], hoverProgress[game.heldItem], (float) game.getPartialTick()) / (Game.TICKS_PER_SECOND / 4.0f);
 		hover = MathUtil.squareOut(hover);
-		double swing = Math.max(swingTick - game.getPartialTick(), 0.0) / 5.0;
+		double swing = Math.max(swingTick - game.getPartialTick(), 0.0) / 10.0;
 		swing *= swing;
 
-		float bobX = (float) (swing / -4.0) * handSize;
+		float bobX = (float) (MathUtil.sinPi(swing) / -3.0) * handSize;
 		float bobY = (float) ((1.0 - hover * (block == null ? 1.0 : 0.9))
-				+ (swing / 2.0)) * handSize;
+				+ (MathUtil.sinPi(swing * 2.0) / 6.0)) * handSize;
 
 		if (game.viewBobbingEnabled()) {
 			bobX += (float) (game.player.getRenderWalk() * -0.05) * handSize;
@@ -116,7 +108,7 @@ public class IngameGui extends GuiScreen {
 				.withUV(1.0f - playerTexture.uCoord(32), 1.0f - playerTexture.vCoord(32), 1.0f, 1.0f));
 
 		if (block != null) {
-			Vector2i texture = block.getTexture().get(Direction.NORTH, null, 0, 0, 0);
+			Vector2i texture = block.getTexture().get(Direction.NORTH);
 
 			float minU = blocksTexture.uCoord(texture.x * 16);
 			float minV = blocksTexture.vCoord(texture.y * 16);
@@ -145,7 +137,7 @@ public class IngameGui extends GuiScreen {
 		int slotWidth = hotbarTexture.width / 2;
 		int slotHeight = hotbarTexture.height;
 
-		float startX = (r.screen.getWidth() - slotWidth * 9) / 2.0f;
+		float startX = (r.screen.getWidth() - slotWidth * game.palette.length) / 2.0f;
 		float startY = r.screen.getHeight() - slotHeight - 5;
 
 		var hotbarQuad = new Quad()
@@ -158,8 +150,8 @@ public class IngameGui extends GuiScreen {
 				.size(16, 16)
 				.withTexture(blocksTexture);
 
-		for (int i = 0; i < 9; i++) {
-			Block block = i < blocks.size() ? blocks.get(i) : null;
+		for (int i = 0; i < game.palette.length; i++) {
+			Block block = game.palette[i];
 
 			float hover = MathUtil.lerp(prevHoverProgress[i], hoverProgress[i], (float) game.getPartialTick()) / (Game.TICKS_PER_SECOND / 4.0f);
 			hover = MathUtil.squareOut(hover);
@@ -168,11 +160,11 @@ public class IngameGui extends GuiScreen {
 			hotbarQuad.offset(0, -hover);
 			blockQuad.offset(0, -hover);
 
-			float slotOffset = i == heldIndex ? 0.5f : 0.0f;
+			float slotOffset = i == game.heldItem ? 0.5f : 0.0f;
 			r.draw2D.drawQuad(hotbarQuad.withUV(slotOffset, 0.0f, 0.5f + slotOffset, 1.0f));
 
 			if (block != null) {
-				Vector2i texture = block.getTexture().get(Direction.NORTH, null, 0, 0, 0);
+				Vector2i texture = block.getTexture().get(Direction.NORTH);
 
 				float minU = blocksTexture.uCoord(texture.x * 16);
 				float minV = blocksTexture.vCoord(texture.y * 16);
@@ -188,14 +180,14 @@ public class IngameGui extends GuiScreen {
 	}
 
 	private Block getPlacedBlock() {
-		if (heldIndex < 0 || heldIndex >= blocks.size()) {
+		if (game.heldItem < 0 || game.heldItem >= game.palette.length) {
 			return null;
 		}
-		return blocks.get(heldIndex);
+		return game.palette[game.heldItem];
 	}
 
 	@Override
-	protected void onMouseClicked(int button) {
+	protected void onMouseClicked(int button, int mx, int my) {
 		BlockRaycast raycast = game.getBlockRaycast();
 		if (raycast.blockHit()) {
 			int x = raycast.getHitX();
@@ -214,14 +206,14 @@ public class IngameGui extends GuiScreen {
 
 					if (game.world.getBlockId(x, y, z) == 0) {
 						game.world.setBlock(x, y, z, placedBlock);
-						swingTick = 5;
+						swingTick = 10;
 					}
 				}
 			}
 		}
 
 		if (button == 0) {
-			swingTick = 5;
+			swingTick = 10;
 		}
 	}
 }

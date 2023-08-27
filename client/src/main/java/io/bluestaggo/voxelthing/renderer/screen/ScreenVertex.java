@@ -27,4 +27,9 @@ public class ScreenVertex {
 		this.color = color;
 		this.uv = uv;
 	}
+
+	public ScreenVertex scaledTo(Screen screen) {
+		position.mul(screen.getScale()).floor().div(screen.getScale());
+		return this;
+	}
 }

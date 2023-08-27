@@ -9,6 +9,7 @@ Nothing much here yet, huh? What will this be? Well, it is heading towards being
 - 1-9: Select block
 - Left click: Place block
 - Right click: Break block
+- E: Inventory
 - Q: No-clip
 - R: Teleport to a random position
 - F: Halve fog distance

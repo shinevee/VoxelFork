@@ -72,4 +72,8 @@ public final class MathUtil {
 	public static float squareOut(float x) {
 		return 1.0f - (1.0f - x) * (1.0f - x);
 	}
+
+	public static double sinPi(double x) {
+		return Math.sin(x * Math.PI);
+	}
 }

@@ -12,6 +12,7 @@ public class QuadShader extends Shader {
 	public final ShaderUniform<Vector2f> offset;
 	public final ShaderUniform<Vector2f> size;
 	public final ShaderUniform<Vector4f> uvRange;
+	public final ShaderUniform<Float> screenScale;
 
 	public final ShaderUniform<Integer> tex;
 	public final ShaderUniform<Boolean> hasTex;
@@ -25,6 +26,7 @@ public class QuadShader extends Shader {
 		size = getUniform2f("size");
 		offset = getUniform2f("offset");
 		uvRange = getUniform4f("uvRange");
+		screenScale = getUniform1f("screenScale");
 
 		(tex = getUniform1i("tex")).set(0);
 		hasTex = getUniform1b("hasTex");

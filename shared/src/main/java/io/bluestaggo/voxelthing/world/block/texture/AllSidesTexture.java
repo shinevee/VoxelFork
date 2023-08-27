@@ -4,7 +4,7 @@ import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.IBlockAccess;
 import org.joml.Vector2i;
 
-public class AllSidesTexture implements IBlockTexture {
+public class AllSidesTexture implements BlockTexture {
 	protected final Vector2i vec;
 
 	public AllSidesTexture(int x, int y) {

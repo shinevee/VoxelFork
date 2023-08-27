@@ -87,13 +87,13 @@ public class MainRenderer {
 		glClearColor(skyColor.x, skyColor.y, skyColor.z, skyColor.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		draw3D.setup();
-
 		render3D();
 		render2D();
 	}
 
 	private void render3D() {
+		draw3D.setup();
+
 		Matrix4f view = camera.getView();
 		Matrix4f proj = camera.getProj();
 		Matrix4f viewProj = proj.mul(view, new Matrix4f());
@@ -130,6 +130,8 @@ public class MainRenderer {
 	}
 
 	private void render2D() {
+		draw2D.setup();
+
 		screenShader.use();
 		screenShader.mvp.set(screen.getViewProj());
 	}

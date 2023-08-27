@@ -4,7 +4,7 @@ import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.IBlockAccess;
 import org.joml.Vector2i;
 
-public class SideTopBottomTexture implements IBlockTexture {
+public class SideTopBottomTexture implements BlockTexture {
 	protected final Vector2i side;
 	protected final Vector2i top;
 	protected final Vector2i bottom;

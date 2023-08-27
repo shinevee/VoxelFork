@@ -116,10 +116,10 @@ public class Font {
 				float uMax = uMin + w / 256.0f;
 				float vMax = vMin + 1.0f / 16.0f;
 
-				d.addVertex(new ScreenVertex(   x,              y,              r * modR,   g * modG,   b * modB,   uMin,   vMin));
-				d.addVertex(new ScreenVertex(   x,              y + size * 16,  r * modR,   g * modG,   b * modB,   uMin,   vMax));
-				d.addVertex(new ScreenVertex(   x + size * w,   y + size * 16,  r * modR,   g * modG,   b * modB,   uMax,   vMax));
-				d.addVertex(new ScreenVertex(   x + size * w,   y,              r * modR,   g * modG,   b * modB,   uMax,   vMin));
+				d.addVertex(new ScreenVertex(   x,              y,              r * modR,   g * modG,   b * modB,   uMin,   vMin).scaledTo(renderer.screen));
+				d.addVertex(new ScreenVertex(   x,              y + size * 16,  r * modR,   g * modG,   b * modB,   uMin,   vMax).scaledTo(renderer.screen));
+				d.addVertex(new ScreenVertex(   x + size * w,   y + size * 16,  r * modR,   g * modG,   b * modB,   uMax,   vMax).scaledTo(renderer.screen));
+				d.addVertex(new ScreenVertex(   x + size * w,   y,              r * modR,   g * modG,   b * modB,   uMax,   vMin).scaledTo(renderer.screen));
 				d.addIndices(2, 3, 0, 0, 1, 2);
 			}
 
@@ -128,5 +128,29 @@ public class Font {
 
 		d.draw();
 		Texture.stop();
+	}
+
+	public int getStringLength(String text) {
+		int x = 0;
+
+		for (int i = 0; i < text.length(); i++) {
+			char c = text.charAt(i);
+			if (c == '\u00a7' && text.length() - i > 6) {
+				i += 6;
+				continue;
+			}
+
+			if (c > 255 || c == 0 || c == '\n') {
+				continue;
+			}
+
+			x += charWidths[c] + charSpacing;
+		}
+
+		if (x > 0) {
+			x -= charSpacing;
+		}
+
+		return x;
 	}
 }

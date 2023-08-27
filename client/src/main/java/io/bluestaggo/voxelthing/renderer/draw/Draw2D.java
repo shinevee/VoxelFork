@@ -50,6 +50,11 @@ public class Draw2D {
 		bindings.addIndices(i);
 	}
 
+	public void setup() {
+		quadShader.use();
+		quadShader.screenScale.set(renderer.screen.getScale());
+	}
+
 	public void draw() {
 		renderer.screenShader.use();
 		bindings.upload(true);

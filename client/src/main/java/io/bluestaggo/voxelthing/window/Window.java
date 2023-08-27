@@ -13,6 +13,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11C.*;
 import static org.lwjgl.opengl.GL33C.glViewport;
 
 public class Window {
@@ -28,7 +29,7 @@ public class Window {
 	private final GLFWMouseButtonCallback mouseButtonCallback;
 
 	private int width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT;
-	private double lastMouseX, lastMouseY;
+	private double mouseX, mouseY;
 	private double mouseDeltaX, mouseDeltaY;
 	private double deltaTime, lastTick;
 	private boolean cursorGrabbed;
@@ -72,6 +73,8 @@ public class Window {
 		}
 
 		lastTick = glfwGetTime();
+
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
 	public void close() {
@@ -94,19 +97,16 @@ public class Window {
 	}
 
 	private void onCursorPos(long handle, double x, double y) {
-		mouseDeltaX = x - lastMouseX;
-		mouseDeltaY = lastMouseY - y;
-		lastMouseX = x;
-		lastMouseY = y;
+		mouseDeltaX = x - mouseX;
+		mouseDeltaY = mouseY - y;
+		mouseX = x;
+		mouseY = y;
 	}
 
 	private void onKey(long handle, int key, int scancode, int action, int mods) {
 		if (key < 0 || key >= keyStates.length) return;
 
 		keyStates[key].setPressed(action > 0);
-		if (key == GLFW_KEY_ESCAPE) {
-			close();
-		}
 	}
 
 	private void onMouseButton(long handle, int button, int action, int mods) {
@@ -142,6 +142,14 @@ public class Window {
 
 	public int getHeight() {
 		return height;
+	}
+
+	public double getMouseX() {
+		return mouseX;
+	}
+
+	public double getMouseY() {
+		return mouseY;
 	}
 
 	public double getMouseDeltaX() {

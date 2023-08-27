@@ -1,5 +1,6 @@
 package io.bluestaggo.voxelthing;
 
+import io.bluestaggo.voxelthing.gui.BlockInventory;
 import io.bluestaggo.voxelthing.gui.DebugGui;
 import io.bluestaggo.voxelthing.gui.GuiScreen;
 import io.bluestaggo.voxelthing.gui.IngameGui;
@@ -9,6 +10,7 @@ import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.BlockRaycast;
 import io.bluestaggo.voxelthing.world.ClientWorld;
 import io.bluestaggo.voxelthing.world.World;
+import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.entity.IPlayerController;
 import io.bluestaggo.voxelthing.world.entity.Player;
 
@@ -16,6 +18,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL33C.glClearColor;
@@ -30,11 +34,11 @@ public class Game {
 
 		try (InputStream stream = Game.class.getResourceAsStream("/version.txt")) {
 			if (stream == null) {
-				throw new IOException("Failed to get version!");
+				version = "dev " + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "?";
+			} else {
+				var reader = new BufferedReader(new InputStreamReader(stream));
+				version = reader.readLine();
 			}
-
-			var reader = new BufferedReader(new InputStreamReader(stream));
-			version = reader.readLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -63,8 +67,12 @@ public class Game {
 	public Player player;
 	public IPlayerController playerController;
 
+	public Block[] palette = new Block[9];
+	public int heldItem;
+
 	private final GuiScreen debugGui;
 	private final GuiScreen inGameGui;
+	private GuiScreen currentGui;
 
 	private BlockRaycast blockRaycast;
 
@@ -114,12 +122,20 @@ public class Game {
 	private void update(double delta) {
 		tickTime += delta;
 
-		inGameGui.handleInput();
+		GuiScreen gui = currentGui != null ? currentGui : inGameGui;
+		if (gui == inGameGui) {
+			doControls();
+		}
+
+		gui.handleInput();
 		player.onGameUpdate();
 		player.noClip = window.isKeyDown(GLFW_KEY_Q);
 
 		if (tickTime >= TICK_RATE) {
 			tickTime %= TICK_RATE;
+			if (currentGui != null) {
+				currentGui.tick();
+			}
 			inGameGui.tick();
 			player.tick();
 		}
@@ -156,9 +172,11 @@ public class Game {
 		} else if (viewBobbing) {
 			py += Math.abs(player.getRenderWalk()) * 0.2f;
 			renderer.camera.setPosition(px, py, pz);
-			renderer.camera.moveRight((float) player.getRenderWalk() * -0.1f);
+			renderer.camera.moveRight((float) player.getRenderWalk() * 0.1f);
 		}
+	}
 
+	private void doControls() {
 		if (window.isKeyJustPressed(GLFW_KEY_F)) {
 			int dist = renderer.worldRenderer.renderDistance;
 			if (window.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
@@ -210,8 +228,12 @@ public class Game {
 			if (++currentSkin >= SKINS.length) currentSkin = 0;
 		}
 
-		if (window.isMouseJustPressed(GLFW_MOUSE_BUTTON_MIDDLE)) {
+		if (window.isKeyJustPressed(GLFW_KEY_ESCAPE)) {
 			window.toggleGrabCursor();
+		}
+
+		if (window.isKeyJustPressed(GLFW_KEY_E)) {
+			openGui(new BlockInventory(this));
 		}
 	}
 
@@ -222,8 +244,30 @@ public class Game {
 			if (debugMenu) {
 				debugGui.draw();
 			}
+
 			inGameGui.draw();
+
+			if (currentGui != null) {
+				currentGui.draw();
+			}
 		}
+	}
+
+	public void openGui(GuiScreen gui) {
+		currentGui = gui;
+		if (gui == null) {
+			window.grabCursor();
+		} else {
+			window.ungrabCursor();
+		}
+	}
+
+	public void closeGui() {
+		openGui(null);
+	}
+
+	public boolean isGuiOpen() {
+		return currentGui != null;
 	}
 
 	public String getSkin() {

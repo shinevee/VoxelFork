@@ -26,7 +26,7 @@ public class Screen {
 		float newHeight = window.getHeight();
 		autoScale = scale;
 
-		if (scale <= 0.0f) {
+		if (autoScale <= 0.0f) {
 			autoScale = 1.0f;
 			while (newWidth / (autoScale + 1) >= VIRTUAL_WIDTH && newHeight / (autoScale + 1) >= VIRTUAL_HEIGHT) {
 				autoScale++;
@@ -47,15 +47,23 @@ public class Screen {
 		return viewProj;
 	}
 
-	public float getWidth() {
-		return width;
+	public int getWidth() {
+		return (int) Math.ceil(width);
 	}
 
-	public float getHeight() {
-		return height;
+	public int getHeight() {
+		return (int) Math.ceil(height);
 	}
 
 	public float getScale() {
 		return autoScale;
+	}
+
+	public int getMouseX() {
+		return (int)(window.getMouseX() / autoScale);
+	}
+
+	public int getMouseY() {
+		return (int)(window.getMouseY() / autoScale);
 	}
 }

@@ -20,13 +20,13 @@ public abstract class GuiScreen {
 		}
 
 		for (int mouse : game.window.getMouseButtonsJustPressed()) {
-			onMouseClicked(mouse);
+			onMouseClicked(mouse, game.renderer.screen.getMouseX(), game.renderer.screen.getMouseY());
 		}
 	}
 
 	protected void onKeyPressed(int key) {
 	}
 
-	protected void onMouseClicked(int key) {
+	protected void onMouseClicked(int button, int mx, int my) {
 	}
 }
