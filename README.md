@@ -6,6 +6,8 @@ Nothing much here yet, huh? What will this be? Well, it is heading towards being
 - WASD: Fly around
 - Move mouse: Look around
 - Space: Jump
+- Double Space: Fly
+- Shift: Fly down
 - 1-9: Select block
 - Left click: Place block
 - Right click: Break block
@@ -22,6 +24,9 @@ Nothing much here yet, huh? What will this be? Well, it is heading towards being
 - Escape: Lock / unlock mouse
 - ]: Increase GUI scale
 - [: Decrease GUI scale
+
+## Play
+To play Voxel Thing, download a jar from [the latest release](https://github.com/BlueStaggo/VoxelThing/releases/latest) for your platform. From there, it is as simple as running the jar. Java 17 or later is required to run Voxel Thing.
 
 ## Compiling
 To compile the Voxel Thing client, simply run `./gradlew :client:build`. To create a jar with libraries for your current platform, run `./gradlew :client:shadowJar`. To switch to a different platform, change the `voxelthing.client.platform` option in [gradle.properties](/gradle.properties) to any platform that LWJGL supports or set it to `all` to allow all platforms in a single jar.
