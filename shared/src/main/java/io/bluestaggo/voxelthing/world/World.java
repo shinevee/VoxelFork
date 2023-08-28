@@ -23,7 +23,7 @@ public class World implements IBlockAccess {
 	public final Random random = new Random();
 	public final long seed = random.nextLong();
 
-	public final int chunkLoadRate = 10;
+	public static int chunkLoadRate = 10;
 	public final ExecutorService chunkLoadExecutor = new ThreadPoolExecutor(chunkLoadRate, chunkLoadRate, 0L,
 			TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 

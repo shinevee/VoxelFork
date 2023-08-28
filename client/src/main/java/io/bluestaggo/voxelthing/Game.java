@@ -5,6 +5,7 @@ import io.bluestaggo.voxelthing.gui.DebugGui;
 import io.bluestaggo.voxelthing.gui.GuiScreen;
 import io.bluestaggo.voxelthing.gui.IngameGui;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
+import io.bluestaggo.voxelthing.renderer.world.WorldRenderer;
 import io.bluestaggo.voxelthing.window.ClientPlayerController;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.BlockRaycast;
@@ -15,12 +16,14 @@ import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.entity.IPlayerController;
 import io.bluestaggo.voxelthing.world.entity.Player;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Properties;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL33C.glClearColor;
@@ -45,6 +48,32 @@ public class Game {
 		}
 
 		VERSION = version;
+
+		var options = new Properties();
+
+		try {
+			Path dbgOptPath = Paths.get(System.getenv("APPDATA"), "VoxelThing/dbg-opt.txt");
+			try (InputStream istream = Files.newInputStream(dbgOptPath, StandardOpenOption.READ)) {
+				options.load(istream);
+			} catch (IOException ignored) {
+				options.setProperty("chunk-load-threads", "10");
+				options.setProperty("chunk-render-threads", "1");
+				try {
+					Files.createDirectories(dbgOptPath.getParent());
+					try (OutputStream ostream = Files.newOutputStream(dbgOptPath, StandardOpenOption.CREATE)) {
+						options.store(ostream, "Voxel Thing options (version " + VERSION + ")");
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (NullPointerException e) {
+			options.setProperty("chunk-load-threads", "10");
+			options.setProperty("chunk-render-threads", "1");
+		}
+
+		World.chunkLoadRate = Integer.parseInt(options.getProperty("chunk-load-threads"));
+		WorldRenderer.chunkUpdateRate = Integer.parseInt(options.getProperty("chunk-render-threads"));
 	}
 
 	private static final String[] SKINS = {

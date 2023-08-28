@@ -32,7 +32,7 @@ public class WorldRenderer {
 
 	public int renderDistance = 16;
 
-	public final int chunkUpdateRate = 10;
+	public static int chunkUpdateRate = 1;
 	public final ExecutorService chunkRenderExecutor = new ThreadPoolExecutor(chunkUpdateRate, chunkUpdateRate, 0L,
 			TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 
