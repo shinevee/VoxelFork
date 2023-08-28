@@ -42,4 +42,9 @@ public class ClientPlayerController implements IPlayerController {
 	public boolean doJump() {
 		return game.window.isKeyDown(GLFW_KEY_SPACE);
 	}
+
+	@Override
+	public boolean doCrouch() {
+		return game.window.isKeyDown(GLFW_KEY_LEFT_SHIFT);
+	}
 }

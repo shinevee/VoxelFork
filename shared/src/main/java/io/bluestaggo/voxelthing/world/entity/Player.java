@@ -14,7 +14,12 @@ public class Player extends Entity {
 	private double prevWalkDir;
 	private double walkDir;
 
+	private int jumpTimer = 0;
+	private boolean wasJumpPressed;
+	private boolean jumpPressed;
+
 	public double accel = 0.2;
+	public double flightAccel = 0.4;
 	public double friction = 0.6;
 	public double jumpHeight = 0.5;
 
@@ -31,10 +36,25 @@ public class Player extends Entity {
 		rotYaw += controller.moveYaw();
 		rotPitch += controller.movePitch();
 		rotPitch = MathUtil.clamp(rotPitch, -89.0f, 89.0f);
+		jumpPressed |= controller.doJump();
 	}
 
 	protected void update() {
 		super.update();
+
+		if (jumpTimer > 0) {
+			jumpTimer--;
+		}
+
+		if (!hasGravity) {
+			velY *= friction;
+			if (controller.doJump()) {
+				velY = jumpHeight;
+			}
+			if (controller.doCrouch()) {
+				velY = -jumpHeight;
+			}
+		}
 
 		double yawRad = Math.toRadians(rotYaw);
 		double forward = controller.moveForward();
@@ -45,6 +65,12 @@ public class Player extends Entity {
 			forward /= dist;
 			side /= dist;
 		}
+
+		double accel = this.accel;
+		if (!hasGravity) {
+			accel = flightAccel;
+		}
+
 		forward *= accel;
 		side *= accel;
 
@@ -59,21 +85,39 @@ public class Player extends Entity {
 		}
 
 		prevWalkAmount = walkAmount;
-		walkAmount += walkAdd * 1.5;
 		prevRenderWalk = renderWalk;
-		renderWalk = Math.sin(walkAmount) * Math.min(walkAdd * 10.0, 1.0);
+		if (hasGravity) {
+			walkAmount += walkAdd * 1.5;
+			renderWalk = Math.sin(walkAmount) * Math.min(walkAdd * 10.0, 1.0);
+
+			if (onGround && walkAmount - prevWalkAmount < 0.01) {
+				walkAmount = 0.0;
+			}
+		} else {
+			walkAmount = 0.0;
+			renderWalk = 0.0;
+		}
+
 		prevWalkDir = walkDir;
 		if (walkAdd > 0.1) {
 			walkDir = Math.toDegrees(new Vector2d(velX, velZ).angle(new Vector2d(-1.0f, 0.0f)));
 		}
 
-		if (onGround && walkAmount - prevWalkAmount < 0.01) {
-			walkAmount = 0.0;
-		}
-
 		if (onGround && controller.doJump()) {
 			velY = jumpHeight;
 		}
+
+		if (jumpPressed && !wasJumpPressed) {
+			if (jumpTimer > 0) {
+				hasGravity = !hasGravity;
+				jumpTimer = 0;
+			} else {
+				jumpTimer = 10;
+			}
+		}
+
+		wasJumpPressed = jumpPressed;
+		jumpPressed = false;
 	}
 
 	public double getRenderWalk() {

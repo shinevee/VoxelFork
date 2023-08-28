@@ -6,4 +6,5 @@ public interface IPlayerController {
 	double moveYaw();
 	double movePitch();
 	boolean doJump();
+	boolean doCrouch();
 }

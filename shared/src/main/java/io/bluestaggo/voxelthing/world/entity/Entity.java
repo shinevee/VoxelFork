@@ -38,6 +38,7 @@ public class Entity {
 	private boolean wasOnGround;
 	public boolean onGround;
 	public boolean noClip;
+	protected boolean hasGravity = true;
 
 	public Entity(World world) {
 		this.world = world;
@@ -60,7 +61,7 @@ public class Entity {
 	}
 
 	protected void update() {
-		if (velY > -4.0) {
+		if (hasGravity && velY > -4.0) {
 			velY -= 0.1;
 		}
 	}
