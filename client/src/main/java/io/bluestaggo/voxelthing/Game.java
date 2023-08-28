@@ -8,6 +8,7 @@ import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.window.ClientPlayerController;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.BlockRaycast;
+import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.ClientWorld;
 import io.bluestaggo.voxelthing.world.World;
 import io.bluestaggo.voxelthing.world.block.Block;
@@ -87,17 +88,14 @@ public class Game {
 		window = new Window();
 		window.grabCursor();
 
-		playerController = new ClientPlayerController(this);
-
 		renderer = new MainRenderer(this);
-
-		world = new ClientWorld(this);
-		player = new Player(world, playerController);
 
 		debugGui = new DebugGui(this);
 		inGameGui = new IngameGui(this);
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+		startWorld();
 	}
 
 	public static Game getInstance() {
@@ -115,64 +113,98 @@ public class Game {
 	}
 
 	private void close() {
+		world.close();
 		renderer.unload();
 		window.destroy();
 	}
 
+	public void startWorld() {
+		if (world != null) {
+			world.close();
+		}
+
+		world = new ClientWorld(this);
+		playerController = new ClientPlayerController(this);
+		player = new Player(world, playerController);
+	}
+
+	public boolean isInWorld() {
+		return world != null && player != null;
+	}
+
 	private void update(double delta) {
+		if (!isInWorld() && window.isKeyJustPressed(GLFW_KEY_ENTER)) {
+			startWorld();
+		}
+
 		tickTime += delta;
 
-		GuiScreen gui = currentGui != null ? currentGui : inGameGui;
+		GuiScreen gui = currentGui != null ? currentGui : isInWorld() ? inGameGui : null;
 		if (gui == inGameGui) {
 			doControls();
 		}
 
-		gui.handleInput();
-		player.onGameUpdate();
-		player.noClip = window.isKeyDown(GLFW_KEY_Q);
+		if (gui != null) {
+			gui.handleInput();
+		}
+
+		if (isInWorld()) {
+			int cx = player.getBlockX() >> Chunk.SIZE_POW2;
+			int cy = player.getBlockY() >> Chunk.SIZE_POW2;
+			int cz = player.getBlockZ() >> Chunk.SIZE_POW2;
+
+			world.loadSurroundingChunks(cx, cy, cz, renderer.worldRenderer.renderDistance);
+
+			player.onGameUpdate();
+			player.noClip = window.isKeyDown(GLFW_KEY_Q);
+		}
 
 		if (tickTime >= TICK_RATE) {
 			tickTime %= TICK_RATE;
 			if (currentGui != null) {
 				currentGui.tick();
 			}
-			inGameGui.tick();
-			player.tick();
+
+			if (isInWorld()) {
+				inGameGui.tick();
+				player.tick();
+			}
 		}
 
 		partialTick = tickTime / TICK_RATE;
-		if (world != null) {
+
+		if (isInWorld()) {
 			world.partialTick = partialTick;
-		}
 
-		float px = (float) player.getPartialX();
-		float py = (float) player.getPartialY();
-		float pz = (float) player.getPartialZ();
-		float yaw = (float) player.rotYaw;
-		float pitch = (float) player.rotPitch;
+			float px = (float) player.getPartialX();
+			float py = (float) player.getPartialY();
+			float pz = (float) player.getPartialZ();
+			float yaw = (float) player.rotYaw;
+			float pitch = (float) player.rotPitch;
 
-		py += player.height - 0.3;
-		if (viewBobbing) {
-			if (thirdPerson) {
-				py -= player.getPartialVelY() * 0.2;
+			py += player.height - 0.3;
+			if (viewBobbing) {
+				if (thirdPerson) {
+					py -= player.getPartialVelY() * 0.2;
+				}
+				pitch += player.getPartialVelY() * 2.5f;
 			}
-			pitch += player.getPartialVelY() * 2.5f;
-		}
 
-		renderer.camera.setPosition(px, py, pz);
-		renderer.camera.setRotation(yaw, pitch);
-
-		if (world != null) {
-			blockRaycast = renderer.camera.getRaycast(5.0f);
-			world.doRaycast(blockRaycast);
-		}
-
-		if (thirdPerson) {
-			renderer.camera.moveForward(-4.0f);
-		} else if (viewBobbing) {
-			py += Math.abs(player.getRenderWalk()) * 0.2f;
 			renderer.camera.setPosition(px, py, pz);
-			renderer.camera.moveRight((float) player.getRenderWalk() * 0.1f);
+			renderer.camera.setRotation(yaw, pitch);
+
+			if (world != null) {
+				blockRaycast = renderer.camera.getRaycast(5.0f);
+				world.doRaycast(blockRaycast);
+			}
+
+			if (thirdPerson) {
+				renderer.camera.moveForward(-4.0f);
+			} else if (viewBobbing) {
+				py += Math.abs(player.getRenderWalk()) * 0.2f;
+				renderer.camera.setPosition(px, py, pz);
+				renderer.camera.moveRight((float) player.getRenderWalk() * 0.1f);
+			}
 		}
 	}
 
@@ -245,7 +277,11 @@ public class Game {
 				debugGui.draw();
 			}
 
-			inGameGui.draw();
+			if (isInWorld()) {
+				inGameGui.draw();
+			} else {
+				renderer.fonts.outlined.printCentered("Press ENTER to play", renderer.screen.getWidth() / 2.0f, renderer.screen.getHeight() / 2.0f);
+			}
 
 			if (currentGui != null) {
 				currentGui.draw();

@@ -116,10 +116,42 @@ public class Font {
 				float uMax = uMin + w / 256.0f;
 				float vMax = vMin + 1.0f / 16.0f;
 
-				d.addVertex(new ScreenVertex(   x,              y,              r * modR,   g * modG,   b * modB,   uMin,   vMin).scaledTo(renderer.screen));
-				d.addVertex(new ScreenVertex(   x,              y + size * 16,  r * modR,   g * modG,   b * modB,   uMin,   vMax).scaledTo(renderer.screen));
-				d.addVertex(new ScreenVertex(   x + size * w,   y + size * 16,  r * modR,   g * modG,   b * modB,   uMax,   vMax).scaledTo(renderer.screen));
-				d.addVertex(new ScreenVertex(   x + size * w,   y,              r * modR,   g * modG,   b * modB,   uMax,   vMin).scaledTo(renderer.screen));
+				d.addVertex(
+						renderer.screen.fixScaling(x),
+						renderer.screen.fixScaling(y),
+						r * modR,
+						g * modG,
+						b * modB,
+						uMin,
+						vMin
+				);
+				d.addVertex(
+						renderer.screen.fixScaling(x),
+						renderer.screen.fixScaling(y + size * 16),
+						r * modR,
+						g * modG,
+						b * modB,
+						uMin,
+						vMax
+				);
+				d.addVertex(
+						renderer.screen.fixScaling(x + size * w),
+						renderer.screen.fixScaling(y + size * 16),
+						r * modR,
+						g * modG,
+						b * modB,
+						uMax,
+						vMax
+				);
+				d.addVertex(
+						renderer.screen.fixScaling(x + size * w),
+						renderer.screen.fixScaling(y),
+						r * modR,
+						g * modG,
+						b * modB,
+						uMax,
+						vMin
+				);
 				d.addIndices(2, 3, 0, 0, 1, 2);
 			}
 
@@ -128,6 +160,18 @@ public class Font {
 
 		d.draw();
 		Texture.stop();
+	}
+
+	public void printCentered(String text, float x, float y) {
+		printCentered(text, x, y, 1.0f, 1.0f, 1.0f);
+	}
+
+	public void printCentered(String text, float x, float y, float r, float g, float b) {
+		printCentered(text, x, y, r, g, b, 1.0f);
+	}
+
+	public void printCentered(String text, float x, float y, float r, float g, float b, float size) {
+		print(text, x - getStringLength(text) / 2.0f, y, r, g, b, size);
 	}
 
 	public int getStringLength(String text) {

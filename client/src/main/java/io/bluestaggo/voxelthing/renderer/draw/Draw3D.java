@@ -3,17 +3,16 @@ package io.bluestaggo.voxelthing.renderer.draw;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.shader.BillboardShader;
 import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
-import io.bluestaggo.voxelthing.renderer.vertices.FloatBindings;
-import io.bluestaggo.voxelthing.renderer.vertices.FloatVertexType;
-import io.bluestaggo.voxelthing.renderer.world.WorldVertex;
+import io.bluestaggo.voxelthing.renderer.vertices.VertexLayout;
+import io.bluestaggo.voxelthing.renderer.vertices.VertexType;
 
 import java.io.IOException;
 
 public class Draw3D {
 	private final MainRenderer renderer;
 
-	private final Bindings<WorldVertex> bindings = new Bindings<>(WorldVertex.LAYOUT);
-	private final FloatBindings billboard = new FloatBindings(FloatVertexType.VECTOR3F);
+	private final Bindings bindings = new Bindings(VertexLayout.WORLD);
+	private final Bindings billboard = new Bindings(VertexType.VECTOR3F);
 
 	private final BillboardShader billboardShader;
 
@@ -34,8 +33,8 @@ public class Draw3D {
 		billboard.upload(false);
 	}
 
-	public void addVertex(WorldVertex vertex) {
-		bindings.addVertex(vertex);
+	public void addVertex(float x, float y, float z, float r, float g, float b, float u, float v) {
+		bindings.addVertices(x, y, z, r, g, b, u, v);
 	}
 
 	public void draw() {

@@ -2,7 +2,8 @@ package io.bluestaggo.voxelthing.renderer.world;
 
 import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
-import io.bluestaggo.voxelthing.renderer.vertices.FloatBindings;
+import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
+import io.bluestaggo.voxelthing.renderer.vertices.VertexLayout;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.ChunkCache;
@@ -15,10 +16,11 @@ public class ChunkRenderer {
 	private final World world;
 	private int x, y, z;
 	private boolean needsUpdate;
+	private boolean needsUpload;
 	private boolean empty;
 	private double firstAppearance;
 
-	private final FloatBindings bindings = new FloatBindings(WorldVertex.FLOAT_LAYOUT);
+	private final Bindings bindings = new Bindings(VertexLayout.WORLD);
 
 	public ChunkRenderer(MainRenderer renderer, World world, int x, int y, int z) {
 		this.renderer = renderer;
@@ -31,6 +33,7 @@ public class ChunkRenderer {
 		this.y = y;
 		this.z = z;
 		needsUpdate = true;
+		needsUpload = false;
 		empty = true;
 	}
 
@@ -50,35 +53,45 @@ public class ChunkRenderer {
 		return empty;
 	}
 
-	public void render() {
+	public synchronized void render() {
 		boolean wasEmpty = empty;
 
-		if (needsUpdate) {
+		if (needsUpdate && !needsUpload) {
 			empty = true;
-			Chunk chunk = world.getOrLoadChunkAt(x, y, z);
+			Chunk chunk = world.getChunkAt(x, y, z);
 
 			if (chunk == null || chunk.isEmpty()) {
 				needsUpdate = false;
 				return;
 			}
 
-			IBlockAccess cache = new ChunkCache(world, x, y, z);
-			for (int xx = 0; xx < Chunk.LENGTH; xx++) {
-				for (int yy = 0; yy < Chunk.LENGTH; yy++) {
-					for (int zz = 0; zz < Chunk.LENGTH; zz++) {
-						 empty &= !renderer.blockRenderer.render(bindings, cache, chunk, xx, yy, zz);
+			synchronized (chunk.lock) {
+				IBlockAccess cache = new ChunkCache(world, x, y, z);
+				for (int xx = 0; xx < Chunk.LENGTH; xx++) {
+					for (int yy = 0; yy < Chunk.LENGTH; yy++) {
+						for (int zz = 0; zz < Chunk.LENGTH; zz++) {
+							 empty &= !renderer.blockRenderer.render(bindings, cache, chunk, xx, yy, zz);
+						}
 					}
 				}
-			}
 
-			if (!empty) {
-				bindings.upload(true);
+				if (!empty) {
+					needsUpload = true;
 
-				if (wasEmpty) {
-					firstAppearance = Window.getTimeElapsed();
+					if (wasEmpty) {
+						firstAppearance = Window.getTimeElapsed();
+					}
 				}
+
+				needsUpdate = false;
 			}
-			needsUpdate = false;
+		}
+	}
+
+	public synchronized void upload() {
+		if (needsUpload) {
+			bindings.upload(true);
+			needsUpload = false;
 		}
 	}
 
@@ -94,6 +107,10 @@ public class ChunkRenderer {
 
 	public boolean needsUpdate() {
 		return needsUpdate;
+	}
+
+	public boolean needsUpload() {
+		return needsUpload;
 	}
 
 	public boolean inFrustum(FrustumIntersection frustum) {

@@ -1,35 +1,42 @@
 package io.bluestaggo.voxelthing.renderer.vertices;
 
+import io.bluestaggo.voxelthing.util.FloatList;
 import io.bluestaggo.voxelthing.util.IntList;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.lwjgl.opengl.GL33C.*;
 
-public class Bindings<V> {
-	private final VertexLayout<V> layout;
+public class Bindings {
+	private final VertexLayout layout;
 	private final int vao;
-	private final int[] vbos;
+	private final int vbo;
 	private final int ebo;
 	private int nextIndexSize;
 	private int vertexCount;
 	private int indexSize;
 
-	private final List<V> nextData = new ArrayList<>();
+	private final FloatList nextData = new FloatList();
 	private final IntList nextIndices = new IntList();
 
-	public Bindings(VertexLayout<V> layout) {
+	public Bindings(VertexLayout layout) {
 		this.layout = layout;
 		this.vao = glGenVertexArrays();
-		this.vbos = layout.genBuffers(vao);
+		this.vbo = layout.genBuffer(vao);
 		this.ebo = glGenBuffers();
 	}
 
-	public void addVertex(V vertex) {
+	public Bindings(VertexType... vertexTypes) {
+		this(new VertexLayout(vertexTypes));
+	}
+
+	public void addVertex(float vertex) {
 		nextData.add(vertex);
+	}
+
+	public void addVertices(float... vertices) {
+		nextData.addAll(vertices);
 	}
 
 	public void addIndex(int index) {
@@ -46,7 +53,7 @@ public class Bindings<V> {
 		}
 	}
 
-	public void upload(boolean dynamic) {
+	public synchronized void upload(boolean dynamic) {
 		setData(nextData, nextIndices, dynamic);
 		clear();
 	}
@@ -66,9 +73,9 @@ public class Bindings<V> {
 		return indexSize;
 	}
 
-	public void setData(List<V> data, IntList indices, boolean dynamic) {
+	public void setData(FloatList data, IntList indices, boolean dynamic) {
 		glBindVertexArray(vao);
-		layout.bufferData(vbos, data, dynamic);
+		layout.bufferData(vbo, data, dynamic);
 		vertexCount = indices.size();
 		if (vertexCount == 0) vertexCount = data.size();
 
@@ -93,6 +100,7 @@ public class Bindings<V> {
 
 	public void unload() {
 		glDeleteVertexArrays(vao);
-		glDeleteBuffers(vbos);
+		glDeleteBuffers(vbo);
+		glDeleteBuffers(ebo);
 	}
 }

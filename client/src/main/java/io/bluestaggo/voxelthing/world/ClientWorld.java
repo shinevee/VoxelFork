@@ -10,6 +10,7 @@ public class ClientWorld extends World {
 		super();
 		this.game = game;
 		game.renderer.worldRenderer.setWorld(this);
+		game.renderer.worldRenderer.loadRenderers();
 	}
 
 	@Override

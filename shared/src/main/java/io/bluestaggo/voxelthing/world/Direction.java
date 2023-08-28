@@ -8,6 +8,8 @@ public enum Direction {
 	BOTTOM(0, -1, 0),
 	TOP(0, 1, 0);
 
+	public static final Direction[] ALL = values();
+
 	public final int X, Y, Z;
 
 	Direction(int x, int y, int z) {

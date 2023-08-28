@@ -87,7 +87,9 @@ public class MainRenderer {
 		glClearColor(skyColor.x, skyColor.y, skyColor.z, skyColor.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		render3D();
+		if (game.world != null) {
+			render3D();
+		}
 		render2D();
 	}
 
@@ -97,6 +99,8 @@ public class MainRenderer {
 		Matrix4f view = camera.getView();
 		Matrix4f proj = camera.getProj();
 		Matrix4f viewProj = proj.mul(view, new Matrix4f());
+
+		worldRenderer.render();
 
 		try (var state = new GLState()) {
 			state.enable(GL_CULL_FACE);

@@ -24,7 +24,12 @@ public class DebugGui extends GuiScreen {
 				"Speed", (int)(game.window.getDeltaTime() * 1000.0D) + "ms",
 				"Memory", (totalMB - freeMB) + " / " + maxMB + " MB",
 				"Render Distance", String.valueOf(game.renderer.worldRenderer.renderDistance),
-				"GUI Scale", String.valueOf(screen.scale <= 0.0f ? "auto" : screen.scale)
+				"GUI Scale", String.valueOf(screen.scale <= 0.0f ? "auto" : screen.scale),
+				"Position", game.isInWorld()
+						? formatDouble(game.player.posX)
+						+ ", " + formatDouble(game.player.posY)
+						+ ", " + formatDouble(game.player.posZ)
+						: "N/A"
 		};
 
 		StringBuilder debugBuilder = new StringBuilder();
@@ -44,5 +49,9 @@ public class DebugGui extends GuiScreen {
 		}
 
 		fonts.shadowed.print(debugBuilder.toString(), 5, 15);
+	}
+
+	private static double formatDouble(double d) {
+		return Math.floor(d * 100.0) / 100.0;
 	}
 }

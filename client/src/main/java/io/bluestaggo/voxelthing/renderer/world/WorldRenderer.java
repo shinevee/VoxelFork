@@ -12,12 +12,16 @@ import org.joml.Vector3f;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static org.lwjgl.opengl.GL33C.*;
 
 public class WorldRenderer {
 	private final MainRenderer renderer;
-	private final Bindings<WorldVertex> background;
+	private final Bindings background;
 
 	private World world;
 	private ChunkRenderer[] chunkRenderers;
@@ -27,6 +31,10 @@ public class WorldRenderer {
 	private int renderRange;
 
 	public int renderDistance = 16;
+
+	public final int chunkUpdateRate = 10;
+	public final ExecutorService chunkRenderExecutor = new ThreadPoolExecutor(chunkUpdateRate, chunkUpdateRate, 0L,
+			TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 
 	public WorldRenderer(MainRenderer renderer) {
 		this.renderer = renderer;
@@ -47,6 +55,10 @@ public class WorldRenderer {
 	}
 
 	public void loadRenderers() {
+		if (world == null) {
+			return;
+		}
+
 		minX = minY = minZ = -renderDistance;
 		maxX = maxY = maxZ = renderDistance;
 		renderRange = renderDistance * 2 + 1;
@@ -70,22 +82,32 @@ public class WorldRenderer {
 		moveRenderers();
 	}
 
-	public void draw() {
+	public void render() {
 		int updates = 0;
-		int maxUpdates = 1;
 
+		FrustumIntersection frustum = this.renderer.camera.getFrustum();
+
+		for (ChunkRenderer chunkRenderer : sortedChunkRenderers) {
+			if (!chunkRenderer.inFrustum(frustum)) continue;
+
+			boolean neededUpdate = chunkRenderer.needsUpdate();
+			chunkRenderExecutor.execute(chunkRenderer::render);
+			if (neededUpdate && !chunkRenderer.isEmpty()) {
+				if (++updates >= chunkUpdateRate) {
+					break;
+				}
+			}
+		}
+	}
+
+	public void draw() {
 		FrustumIntersection frustum = this.renderer.camera.getFrustum();
 		double currentTime = Window.getTimeElapsed();
 
 		for (ChunkRenderer chunkRenderer : sortedChunkRenderers) {
 			if (!chunkRenderer.inFrustum(frustum)) continue;
-
-			if (updates < maxUpdates) {
-				boolean neededUpdate = chunkRenderer.needsUpdate();
-				chunkRenderer.render();
-				if (neededUpdate && !chunkRenderer.isEmpty()) {
-					updates++;
-				}
+			if (chunkRenderer.needsUpload()) {
+				chunkRenderer.upload();
 			}
 
 			renderer.worldShader.fade.set((float)chunkRenderer.getFadeAmount(currentTime));
@@ -105,6 +127,10 @@ public class WorldRenderer {
 	}
 
 	public void moveRenderers() {
+		if (world == null) {
+			return;
+		}
+
 		Vector3f cameraPos = renderer.camera.getPosition();
 		int x = (int)Math.floor(cameraPos.x / Chunk.LENGTH);
 		int y = (int)Math.floor(cameraPos.y / Chunk.LENGTH);
@@ -192,6 +218,7 @@ public class WorldRenderer {
 	}
 
 	public void unload() {
+		chunkRenderExecutor.shutdown();
 		background.unload();
 
 		if (chunkRenderers != null) {

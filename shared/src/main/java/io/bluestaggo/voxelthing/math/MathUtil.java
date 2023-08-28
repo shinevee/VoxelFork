@@ -1,7 +1,12 @@
 package io.bluestaggo.voxelthing.math;
 
+import org.joml.Vector3i;
+
+import java.util.*;
+
 public final class MathUtil {
 	public static final float PI_F = (float)Math.PI;
+	private static final Map<Integer, List<Vector3i>> SPHERE_POINT_LISTS = new HashMap<>();
 
 	private MathUtil() {
 		throw new AssertionError("No io.bluestaggo.voxelthing.util.MathUtil instances for you!");
@@ -71,6 +76,29 @@ public final class MathUtil {
 
 	public static float squareOut(float x) {
 		return 1.0f - (1.0f - x) * (1.0f - x);
+	}
+
+	public static List<Vector3i> getSpherePoints(int radius) {
+		if (SPHERE_POINT_LISTS.containsKey(radius)) {
+			return SPHERE_POINT_LISTS.get(radius);
+		}
+
+		int diameter = radius * 2 + 1;
+
+		List<Vector3i> points = new ArrayList<>();
+		for (int x = -diameter; x <= diameter; x++) {
+			for (int y = -diameter; y <= diameter; y++) {
+				for (int z = -diameter; z <= diameter; z++) {
+//					if (x * x + y * y + z * z <= radius * radius) {
+						points.add(new Vector3i(x, y, z));
+//					}
+				}
+			}
+		}
+
+		points.sort(Comparator.comparingLong(Vector3i::lengthSquared));
+		SPHERE_POINT_LISTS.put(radius, points);
+		return points;
 	}
 
 	public static double sinPi(double x) {

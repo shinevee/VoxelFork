@@ -1,15 +1,15 @@
 package io.bluestaggo.voxelthing.renderer.util;
 
 import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
-import io.bluestaggo.voxelthing.renderer.world.WorldVertex;
+import io.bluestaggo.voxelthing.renderer.vertices.VertexLayout;
 
 public final class WorldPrimitives {
 	private WorldPrimitives() {
 		throw new AssertionError("No io.bluestaggo.voxelthing.renderer.util.WorldPrimitives instances for you!");
 	}
 
-	public static Bindings<WorldVertex> generateSphere(Bindings<WorldVertex> bindings, float radius, int rings, int sectors) {
-		if (bindings == null) bindings = new Bindings<>(WorldVertex.LAYOUT);
+	public static Bindings generateSphere(Bindings bindings, float radius, int rings, int sectors) {
+		if (bindings == null) bindings = new Bindings(VertexLayout.WORLD);
 
 		bindings.clear();
 		double sectorStep = 2.0F * Math.PI / sectors;
@@ -26,7 +26,7 @@ public final class WorldPrimitives {
 				float y = (float)(xy * Math.sin(sectorAngle));
 				float u = (float)j / sectors;
 				float v = (float)i / sectors;
-				bindings.addVertex(new WorldVertex(x, y, z, 1.0f, 1.0f, 1.0f, u, v));
+				bindings.addVertices(x, y, z, 1.0f, 1.0f, 1.0f, u, v);
 			}
 		}
 

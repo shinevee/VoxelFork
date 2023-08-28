@@ -1,19 +1,18 @@
 package io.bluestaggo.voxelthing.renderer.draw;
 
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
-import io.bluestaggo.voxelthing.renderer.screen.ScreenVertex;
 import io.bluestaggo.voxelthing.renderer.shader.QuadShader;
 import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
-import io.bluestaggo.voxelthing.renderer.vertices.FloatBindings;
-import io.bluestaggo.voxelthing.renderer.vertices.FloatVertexType;
+import io.bluestaggo.voxelthing.renderer.vertices.VertexLayout;
+import io.bluestaggo.voxelthing.renderer.vertices.VertexType;
 
 import java.io.IOException;
 
 public class Draw2D {
 	private final MainRenderer renderer;
 
-	private final Bindings<ScreenVertex> bindings = new Bindings<>(ScreenVertex.LAYOUT);
-	private final FloatBindings quad = new FloatBindings(FloatVertexType.VECTOR2F);
+	private final Bindings bindings = new Bindings(VertexLayout.SCREEN);
+	private final Bindings quad = new Bindings(VertexType.VECTOR2F);
 
 	private final QuadShader quadShader;
 
@@ -38,8 +37,8 @@ public class Draw2D {
 		renderer.screenShader.hasTex.set(enabled);
 	}
 
-	public void addVertex(ScreenVertex vertex) {
-		bindings.addVertex(vertex);
+	public void addVertex(float x, float y, float r, float g, float b, float u, float v) {
+		bindings.addVertices(x, y, r, g, b, u, v);
 	}
 
 	public void addIndex(int i) {

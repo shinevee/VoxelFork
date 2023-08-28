@@ -135,6 +135,18 @@ public class Entity {
 		return (float) getPartialZ();
 	}
 
+	public int getBlockX() {
+		return (int) Math.floor(posX);
+	}
+
+	public int getBlockY() {
+		return (int) Math.floor(posY);
+	}
+
+	public int getBlockZ() {
+		return (int) Math.floor(posZ);
+	}
+
 	public double getPartialVelX() {
 		return MathUtil.lerp(prevVelX, velX, world.partialTick);
 	}

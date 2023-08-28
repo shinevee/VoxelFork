@@ -1,6 +1,6 @@
 package io.bluestaggo.voxelthing.renderer.world;
 
-import io.bluestaggo.voxelthing.renderer.vertices.FloatBindings;
+import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
 import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.IBlockAccess;
@@ -20,14 +20,14 @@ public class BlockRenderer {
 
 	@FunctionalInterface
 	private interface SideRenderer {
-		void render(FloatBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z);
+		void render(Bindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z);
 	}
 
 	private float getShade(int amount) {
 		return 1.0f - SHADE_FACTOR * amount;
 	}
 
-	public boolean render(FloatBindings bindings, IBlockAccess blockAccess, Chunk chunk, int x, int y, int z) {
+	public boolean render(Bindings bindings, IBlockAccess blockAccess, Chunk chunk, int x, int y, int z) {
 		Block block = chunk.getBlock(x, y, z);
 		if (block == null) {
 			return false;
@@ -36,7 +36,7 @@ public class BlockRenderer {
 		int xx = x + Chunk.LENGTH * chunk.x;
 		int yy = y + Chunk.LENGTH * chunk.y;
 		int zz = z + Chunk.LENGTH * chunk.z;
-		for (Direction dir : Direction.values()) {
+		for (Direction dir : Direction.ALL) {
 			if (block.isFaceDrawn(blockAccess, xx + dir.X, yy + dir.Y, zz + dir.Z, dir)) {
 				SIDE_RENDERERS[dir.ordinal()].render(bindings, blockAccess, block, xx, yy, zz);
 			}
@@ -45,7 +45,7 @@ public class BlockRenderer {
 		return true;
 	}
 
-	private void renderNorthFace(FloatBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
+	private void renderNorthFace(Bindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
 		Vector2i texture = block.getTexture().get(Direction.NORTH, blockAccess, x, y, z);
 		float texX = texture.x * Block.TEXTURE_WIDTH;
 		float texY = texture.y * Block.TEXTURE_WIDTH;
@@ -60,7 +60,7 @@ public class BlockRenderer {
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
-	private void renderSouthFace(FloatBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
+	private void renderSouthFace(Bindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
 		Vector2i texture = block.getTexture().get(Direction.SOUTH, blockAccess, x, y, z);
 		float texX = texture.x * Block.TEXTURE_WIDTH;
 		float texY = texture.y * Block.TEXTURE_WIDTH;
@@ -75,7 +75,7 @@ public class BlockRenderer {
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
-	private void renderWestFace(FloatBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
+	private void renderWestFace(Bindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
 		Vector2i texture = block.getTexture().get(Direction.WEST, blockAccess, x, y, z);
 		float texX = texture.x * Block.TEXTURE_WIDTH;
 		float texY = texture.y * Block.TEXTURE_WIDTH;
@@ -90,7 +90,7 @@ public class BlockRenderer {
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
-	private void renderEastFace(FloatBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
+	private void renderEastFace(Bindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
 		Vector2i texture = block.getTexture().get(Direction.EAST, blockAccess, x, y, z);
 		float texX = texture.x * Block.TEXTURE_WIDTH;
 		float texY = texture.y * Block.TEXTURE_WIDTH;
@@ -105,7 +105,7 @@ public class BlockRenderer {
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
-	private void renderBottomFace(FloatBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
+	private void renderBottomFace(Bindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
 		Vector2i texture = block.getTexture().get(Direction.BOTTOM, blockAccess, x, y, z);
 		float texX = texture.x * Block.TEXTURE_WIDTH;
 		float texY = texture.y * Block.TEXTURE_WIDTH;
@@ -120,7 +120,7 @@ public class BlockRenderer {
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
-	private void renderTopFace(FloatBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
+	private void renderTopFace(Bindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
 		Vector2i texture = block.getTexture().get(Direction.TOP, blockAccess, x, y, z);
 		float texX = texture.x * Block.TEXTURE_WIDTH;
 		float texY = texture.y * Block.TEXTURE_WIDTH;

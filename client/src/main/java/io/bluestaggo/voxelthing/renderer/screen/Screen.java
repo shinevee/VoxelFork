@@ -66,4 +66,8 @@ public class Screen {
 	public int getMouseY() {
 		return (int)(window.getMouseY() / autoScale);
 	}
+
+	public float fixScaling(float x) {
+		return (int) (x * autoScale) / autoScale;
+	}
 }

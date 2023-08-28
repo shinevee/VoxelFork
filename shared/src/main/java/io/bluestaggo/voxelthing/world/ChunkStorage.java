@@ -8,6 +8,8 @@ public class ChunkStorage {
 	private final World world;
 	private final Chunk[] chunks = new Chunk[VOLUME];
 
+	public final Object lock = new Object();
+
 	public ChunkStorage(World world) {
 		this.world = world;
 	}

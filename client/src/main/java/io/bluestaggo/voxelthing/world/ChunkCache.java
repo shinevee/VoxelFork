@@ -18,7 +18,7 @@ public class ChunkCache implements IBlockAccess {
 			for (int yy = 0; yy < 3; yy++) {
 				for (int zz = 0; zz < 3; zz++) {
 					int i = MathUtil.index3D(xx, yy, zz, 3);
-					chunks[i] = world.getOrLoadChunkAt(x + xx - 1, y + yy - 1, z + zz - 1);
+					chunks[i] = world.getChunkAt(x + xx - 1, y + yy - 1, z + zz - 1);
 				}
 			}
 		}
@@ -29,11 +29,19 @@ public class ChunkCache implements IBlockAccess {
 		int iy = (y >> Chunk.SIZE_POW2) - (this.y - 1);
 		int iz = (z >> Chunk.SIZE_POW2) - (this.z - 1);
 
+		Chunk chunk;
+
 		if (ix < 0 || ix > 2 || iy < 0 || iy > 2 || iz < 0 || iz > 2) {
-			return world.getChunkAtBlock(x, y, z);
+			chunk = world.getChunkAtBlock(x, y, z);
+		} else {
+			chunk = chunks[MathUtil.index3D(ix, iy, iz, 3)];
 		}
 
-		return chunks[MathUtil.index3D(ix, iy, iz, 3)];
+		if (chunk == null) {
+			chunk = EmptyChunk.instance;
+		}
+
+		return chunk;
 	}
 
 	@Override

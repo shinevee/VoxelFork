@@ -13,24 +13,32 @@ public class GenerationInfo {
 	public final int chunkX, chunkZ;
 	private long randSeed;
 
+	private final long baseSeed;
+	private final long hillSeed;
+	private final long cliffSeed;
+	private final long cliffHeightSeed;
 	private final long caveSeed;
 
 	private final float[] height = new float[Chunk.AREA];
 	private final float[] caveInfo = new float[LERP_MAP_SIZE];
 	private int lastQueryLayer = Integer.MAX_VALUE;
 
+	public final Object lock = new Object();
+
 	public GenerationInfo(long salt, int cx, int cz) {
 		randSeed = salt;
 
-		long baseSeed = splitMix();
-		long hillSeed = splitMix();
-		long cliffSeed = splitMix();
-		long cliffHeightSeed = splitMix();
+		baseSeed = splitMix();
+		hillSeed = splitMix();
+		cliffSeed = splitMix();
+		cliffHeightSeed = splitMix();
 		caveSeed = splitMix();
 
 		chunkX = cx;
 		chunkZ = cz;
+	}
 
+	public void generate() {
 		final int baseOctaves = 4;
 		final double baseScale = 250.0;
 		final float baseHeightScale = 8.0f;
@@ -53,8 +61,8 @@ public class GenerationInfo {
 
 		for (int x = 0; x < Chunk.LENGTH; x++) {
 			for (int z = 0; z < Chunk.LENGTH; z++) {
-				int xx = (cx * Chunk.LENGTH + x);
-				int zz = (cz * Chunk.LENGTH + z);
+				int xx = (chunkX * Chunk.LENGTH + x);
+				int zz = (chunkZ * Chunk.LENGTH + z);
 
 				float baseHeight = OpenSimplex2Octaves.noise2(baseSeed, baseOctaves, xx / baseScale, zz / baseScale);
 				float hill = OpenSimplex2Octaves.noise2(hillSeed, hillOctaves, xx / hillScale, zz / hillScale);

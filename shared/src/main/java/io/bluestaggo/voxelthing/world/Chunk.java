@@ -15,6 +15,8 @@ public class Chunk implements IBlockAccess {
 	private short[] blocks;
 	private boolean empty = true;
 
+	public final Object lock = new Object();
+
 	public Chunk(World world, int x, int y, int z) {
 		this.world = world;
 		this.x = x;
