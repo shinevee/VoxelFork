@@ -6,6 +6,7 @@ import io.bluestaggo.voxelthing.util.PriorityRunnable;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.generation.GenCache;
 import io.bluestaggo.voxelthing.world.generation.GenerationInfo;
+import io.bluestaggo.voxelthing.world.storage.ChunkStorage;
 import org.joml.Vector3d;
 import org.joml.Vector3i;
 
@@ -108,39 +109,12 @@ public class World implements IBlockAccess {
 		);
 	}
 
-	@Override
-	public short getBlockId(int x, int y, int z) {
-		Chunk chunk = getChunkAtBlock(x, y, z);
-		if (chunk == null) {
-			return 0;
-		}
-		return chunk.getBlockId(
-				Math.floorMod(x, Chunk.LENGTH),
-				Math.floorMod(y, Chunk.LENGTH),
-				Math.floorMod(z, Chunk.LENGTH)
-		);
-	}
-
 	public void setBlock(int x, int y, int z, Block block) {
 		Chunk chunk = getChunkAtBlock(x, y, z);
 		if (chunk == null) {
 			return;
 		}
 		chunk.setBlock(
-				Math.floorMod(x, Chunk.LENGTH),
-				Math.floorMod(y, Chunk.LENGTH),
-				Math.floorMod(z, Chunk.LENGTH),
-				block
-		);
-		onBlockUpdate(x, y, z);
-	}
-
-	public void setBlockId(int x, int y, int z, short block) {
-		Chunk chunk = getChunkAtBlock(x, y, z);
-		if (chunk == null) {
-			return;
-		}
-		chunk.setBlockId(
 				Math.floorMod(x, Chunk.LENGTH),
 				Math.floorMod(y, Chunk.LENGTH),
 				Math.floorMod(z, Chunk.LENGTH),
@@ -286,6 +260,6 @@ public class World implements IBlockAccess {
 	}
 
 	public void close() {
-		chunkLoadExecutor.shutdown();
+		chunkLoadExecutor.shutdownNow();
 	}
 }

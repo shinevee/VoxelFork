@@ -16,6 +16,7 @@ import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.entity.IPlayerController;
 import io.bluestaggo.voxelthing.world.entity.Player;
 
+import javax.swing.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -132,17 +133,27 @@ public class Game {
 	}
 
 	public void run() {
-		while (!window.shouldClose()) {
-			update(window.getDeltaTime());
-			draw();
-			window.update();
+		try {
+			while (!window.shouldClose()) {
+				update(window.getDeltaTime());
+				draw();
+				window.update();
+			}
+		} catch (Throwable e) {
+			var stackTrace = new StringWriter();
+			var stackTracePrinter = new PrintWriter(stackTrace);
+			stackTracePrinter.println("An exception has occured and the program needs to quit!");
+			e.printStackTrace(stackTracePrinter);
+			JOptionPane.showMessageDialog(null, stackTrace, "Voxel Thing: Exception", JOptionPane.ERROR_MESSAGE);
 		}
 
 		close();
 	}
 
 	private void close() {
-		world.close();
+		if (world != null) {
+			world.close();
+		}
 		renderer.unload();
 		window.destroy();
 	}
@@ -356,7 +367,7 @@ public class Game {
 	}
 
 	public static void main(String[] args) {
-		System.setProperty("java.awt.headless", "true");
+//		System.setProperty("java.awt.headless", "true");
 		new Game().run();
 	}
 }

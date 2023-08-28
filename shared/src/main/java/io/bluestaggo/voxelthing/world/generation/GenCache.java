@@ -1,7 +1,7 @@
 package io.bluestaggo.voxelthing.world.generation;
 
-import io.bluestaggo.voxelthing.world.ChunkStorage;
 import io.bluestaggo.voxelthing.world.World;
+import io.bluestaggo.voxelthing.world.storage.ChunkStorage;
 
 public class GenCache {
 	public static final int RADIUS_POW2 = ChunkStorage.RADIUS_POW2;

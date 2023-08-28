@@ -228,7 +228,7 @@ public class WorldRenderer {
 	}
 
 	public void unload() {
-		chunkRenderExecutor.shutdown();
+		chunkRenderExecutor.shutdownNow();
 		background.unload();
 
 		if (chunkRenderers != null) {

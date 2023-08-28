@@ -1,4 +1,7 @@
-package io.bluestaggo.voxelthing.world;
+package io.bluestaggo.voxelthing.world.storage;
+
+import io.bluestaggo.voxelthing.world.Chunk;
+import io.bluestaggo.voxelthing.world.World;
 
 public class ChunkStorage {
 	public static final int RADIUS_POW2 = 5;

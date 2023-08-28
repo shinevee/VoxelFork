@@ -1,6 +1,7 @@
 package io.bluestaggo.voxelthing.world;
 
 import io.bluestaggo.voxelthing.world.block.Block;
+import io.bluestaggo.voxelthing.world.storage.NibbleBlockStorage;
 
 public class Chunk implements IBlockAccess {
 	public static final int SIZE_POW2 = 5;
@@ -12,7 +13,7 @@ public class Chunk implements IBlockAccess {
 	public final World world;
 	public final int x, y, z;
 
-	private short[] blocks;
+	private BlockStorage blockStorage = new NibbleBlockStorage();
 	private boolean empty = true;
 
 	public final Object lock = new Object();
@@ -22,10 +23,6 @@ public class Chunk implements IBlockAccess {
 		this.x = x;
 		this.y = y;
 		this.z = z;
-	}
-
-	public static int arrayCoords(int x, int y, int z) {
-		return (x << SIZE_POW2 | z) << SIZE_POW2 | y;
 	}
 
 	public int toGlobalX(int x) {
@@ -41,40 +38,23 @@ public class Chunk implements IBlockAccess {
 	}
 
 	@Override
-	public short getBlockId(int x, int y, int z) {
-		if (!containsLocal(x, y, z)) {
-			return this.world.getBlockId(toGlobalX(x), toGlobalY(y), toGlobalZ(z));
-		}
-
-		if (blocks == null) {
-			return 0;
-		}
-
-		return blocks[arrayCoords(x, y, z)];
-	}
-
-	@Override
 	public Block getBlock(int x, int y, int z) {
-		return Block.fromId(getBlockId(x, y, z));
-	}
-
-	public void setBlockId(int x, int y, int z, short id) {
-		if (blocks == null) {
-			if (id > 0) {
-				blocks = new short[VOLUME];
-			} else {
-				return;
-			}
+		if (!containsLocal(x, y, z)) {
+			return this.world.getBlock(toGlobalX(x), toGlobalY(y), toGlobalZ(z));
 		}
 
-		blocks[arrayCoords(x, y, z)] = id;
-		if (id > 0) {
-			empty = false;
-		}
+		return blockStorage.getBlock(x, y, z);
 	}
 
 	public void setBlock(int x, int y, int z, Block block) {
-		setBlockId(x, y, z, block != null ? block.id : 0);
+		if (blockStorage.needsExpansion(block)) {
+			blockStorage = blockStorage.expand();
+		}
+		blockStorage.setBlock(x, y, z, block);
+
+		if (block != null) {
+			empty = false;
+		}
 	}
 
 	public boolean isEmpty() {

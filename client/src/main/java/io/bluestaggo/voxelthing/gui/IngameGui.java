@@ -196,7 +196,7 @@ public class IngameGui extends GuiScreen {
 			Direction face = raycast.getHitFace();
 
 			if (button == 0) {
-				game.world.setBlockId(x, y, z, (short) 0);
+				game.world.setBlock(x, y, z, null);
 			} else if (button == 1) {
 				Block placedBlock = getPlacedBlock();
 				if (placedBlock != null) {
@@ -204,7 +204,7 @@ public class IngameGui extends GuiScreen {
 					y += face.Y;
 					z += face.Z;
 
-					if (game.world.getBlockId(x, y, z) == 0) {
+					if (game.world.isAir(x, y, z)) {
 						game.world.setBlock(x, y, z, placedBlock);
 						swingTick = 10;
 					}

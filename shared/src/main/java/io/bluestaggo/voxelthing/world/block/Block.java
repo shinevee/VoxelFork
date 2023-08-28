@@ -1,5 +1,6 @@
 package io.bluestaggo.voxelthing.world.block;
 
+import io.bluestaggo.voxelthing.Identifier;
 import io.bluestaggo.voxelthing.math.AABB;
 import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.IBlockAccess;
@@ -9,7 +10,6 @@ import io.bluestaggo.voxelthing.world.block.texture.ColumnTexture;
 import io.bluestaggo.voxelthing.world.block.texture.GrassTexture;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -19,50 +19,46 @@ public class Block {
 	public static final int TEXTURE_ROWS = TEXTURE_RES / 16;
 	public static final float TEXTURE_WIDTH = 1.0f / TEXTURE_ROWS;
 
-	private static short nextId = 0;
-	private static Block[] blocks = new Block[256];
 	private static final List<Block> REGISTERED_BLOCKS_MUTABLE = new ArrayList<>();
 	public static final List<Block> REGISTERED_BLOCKS = Collections.unmodifiableList(REGISTERED_BLOCKS_MUTABLE);
 
-	public static final Block STONE = new Block().withTex(1, 0);
-	public static final Block GRASS = new Block().withTex(new GrassTexture(0, 1, 0, 0, 0, 2));
-	public static final Block DIRT = new Block().withTex(0, 2);
-	public static final Block COBBLESTONE = new Block().withTex(1, 1);
-	public static final Block BRICKS = new Block().withTex(3, 2);
-	public static final Block PLANKS = new Block().withTex(3, 0);
-	public static final Block LOG = new Block().withTex(new ColumnTexture(3, 1, 4, 1));
-	public static final Block LEAVES = new Block().withTex(4, 0).transparency(BlockTransparency.THICK);
-	public static final Block GLASS = new Block().withTex(4, 2).transparency(BlockTransparency.FULL);
-	public static final Block SAND = new Block().withTex(2, 0);
-	public static final Block GRAVEL = new Block().withTex(2, 1);
-	public static final Block STONE_BRICKS = new Block().withTex(2, 2);
-	public static final Block POLISHED_STONE = new Block().withTex(1, 2);
+	public static final Block STONE = new Block("stone").withTex(1, 0);
+	public static final Block GRASS = new Block("grass").withTex(new GrassTexture(0, 1, 0, 0, 0, 2));
+	public static final Block DIRT = new Block("dirt").withTex(0, 2);
+	public static final Block COBBLESTONE = new Block("cobblestone").withTex(1, 1);
+	public static final Block BRICKS = new Block("bricks").withTex(3, 2);
+	public static final Block PLANKS = new Block("planks").withTex(3, 0);
+	public static final Block LOG = new Block("log").withTex(new ColumnTexture(3, 1, 4, 1));
+	public static final Block LEAVES = new Block("leaves").withTex(4, 0).transparency(BlockTransparency.THICK);
+	public static final Block GLASS = new Block("glass").withTex(4, 2).transparency(BlockTransparency.FULL);
+	public static final Block SAND = new Block("sand").withTex(2, 0);
+	public static final Block GRAVEL = new Block("gravel").withTex(2, 1);
+	public static final Block STONE_BRICKS = new Block("stone_bricks").withTex(2, 2);
+	public static final Block POLISHED_STONE = new Block("polished_stone").withTex(1, 2);
 	public static final Block[] WOOL = IntStream.range(0, 16)
-			.mapToObj(i -> new Block().withTex(i % 4, i / 4 + 3))
+			.mapToObj(i -> new Block("wool_" + i).withTex(i % 4, i / 4 + 3))
 			.toArray(Block[]::new);
 
-	public final short id;
+	public final Identifier id;
 	protected BlockTexture texture;
 	protected BlockTransparency transparency = BlockTransparency.NONE;
 
-	public Block() {
-		id = ++nextId;
-		if (id == 0) {
-			throw new IllegalStateException("Block ID limit of 65535 exceeded!");
-		}
-		if (id >= blocks.length) {
-			blocks = Arrays.copyOf(blocks, blocks.length + 256);
-		}
+	public Block(String id) {
+		this(new Identifier(id));
+	}
 
-		blocks[id] = this;
+	public Block(String namespace, String name) {
+		this(new Identifier(namespace, name));
+	}
+
+	public Block(Identifier id) {
+		this.id = id;
 		REGISTERED_BLOCKS_MUTABLE.add(this);
 	}
 
-	public static Block fromId(short id) {
-		if (id < 0 || id >= blocks.length) {
-			return null;
-		}
-		return blocks[id & 0xFFFF];
+	@Override
+	public String toString() {
+		return id.toString();
 	}
 
 	protected Block withTex(int x, int y) {

@@ -10,17 +10,8 @@ public class EmptyChunk extends Chunk {
 	}
 
 	@Override
-	public short getBlockId(int x, int y, int z) {
-		return 0;
-	}
-
-	@Override
 	public Block getBlock(int x, int y, int z) {
 		return null;
-	}
-
-	@Override
-	public void setBlockId(int x, int y, int z, short id) {
 	}
 
 	@Override

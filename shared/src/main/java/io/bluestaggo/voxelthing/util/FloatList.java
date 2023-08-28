@@ -6,7 +6,6 @@ import java.util.Objects;
 
 public class FloatList {
 	private static final int DEFAULT_CAPACITY = 16;
-	private static final int LARGE_CAPACITY = 256;
 	private static final int SOFT_MAX_ARRAY_LENGTH = Integer.MAX_VALUE - 8;
 
 	private float[] data;
@@ -40,17 +39,17 @@ public class FloatList {
 		size += e.length;
 	}
 
+	public void set(int i, float e) {
+		data[i] = e;
+	}
+
 	public float get(int index) {
 		Objects.checkIndex(index, size);
 		return data[index];
 	}
 
 	public void clear() {
-		if (data.length >= LARGE_CAPACITY) {
-			data = new float[DEFAULT_CAPACITY];
-		} else {
-			Arrays.fill(data, 0.0f);
-		}
+		data = new float[DEFAULT_CAPACITY];
 		size = 0;
 	}
 

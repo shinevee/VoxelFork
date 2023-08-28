@@ -48,9 +48,4 @@ public class ChunkCache implements IBlockAccess {
 	public Block getBlock(int x, int y, int z) {
 		return getChunkAtBlock(x, y, z).getBlock(x & Chunk.LENGTH_MASK, y & Chunk.LENGTH_MASK, z & Chunk.LENGTH_MASK);
 	}
-
-	@Override
-	public short getBlockId(int x, int y, int z) {
-		return getChunkAtBlock(x, y, z).getBlockId(x & Chunk.LENGTH_MASK, y & Chunk.LENGTH_MASK, z & Chunk.LENGTH_MASK);
-	}
 }

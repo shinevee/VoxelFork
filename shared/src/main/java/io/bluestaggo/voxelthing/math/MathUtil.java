@@ -83,15 +83,11 @@ public final class MathUtil {
 			return SPHERE_POINT_LISTS.get(radius);
 		}
 
-		int diameter = radius * 2 + 1;
-
 		List<Vector3i> points = new ArrayList<>();
-		for (int x = -diameter; x <= diameter; x++) {
-			for (int y = -diameter; y <= diameter; y++) {
-				for (int z = -diameter; z <= diameter; z++) {
-//					if (x * x + y * y + z * z <= radius * radius) {
-						points.add(new Vector3i(x, y, z));
-//					}
+		for (int x = -radius; x <= radius; x++) {
+			for (int y = -radius; y <= radius; y++) {
+				for (int z = -radius; z <= radius; z++) {
+					points.add(new Vector3i(x, y, z));
 				}
 			}
 		}

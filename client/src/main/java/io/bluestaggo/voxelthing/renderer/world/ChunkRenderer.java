@@ -67,6 +67,7 @@ public class ChunkRenderer {
 			if (chunk == null || chunk.isEmpty()) {
 				empty = true;
 				isRendering = false;
+				needsUpdate = true;
 				return;
 			}
 
