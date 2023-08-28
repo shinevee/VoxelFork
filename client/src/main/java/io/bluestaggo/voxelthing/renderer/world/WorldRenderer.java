@@ -4,6 +4,7 @@ import io.bluestaggo.voxelthing.renderer.GLState;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.util.WorldPrimitives;
 import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
+import io.bluestaggo.voxelthing.util.PriorityRunnable;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.World;
@@ -13,7 +14,7 @@ import org.joml.Vector3f;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -34,7 +35,7 @@ public class WorldRenderer {
 
 	public static int chunkUpdateRate = 1;
 	public final ExecutorService chunkRenderExecutor = new ThreadPoolExecutor(chunkUpdateRate, chunkUpdateRate, 0L,
-			TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+			TimeUnit.MILLISECONDS, new PriorityBlockingQueue<>());
 
 	public WorldRenderer(MainRenderer renderer) {
 		this.renderer = renderer;
@@ -87,12 +88,21 @@ public class WorldRenderer {
 
 		FrustumIntersection frustum = this.renderer.camera.getFrustum();
 
-		for (ChunkRenderer chunkRenderer : sortedChunkRenderers) {
-			if (!chunkRenderer.inFrustum(frustum)) continue;
+		Vector3f pos = this.renderer.camera.getPosition();
+		int camx = (int) Math.floor(pos.x / Chunk.LENGTH);
+		int camy = (int) Math.floor(pos.y / Chunk.LENGTH);
+		int camz = (int) Math.floor(pos.z / Chunk.LENGTH);
 
-			boolean neededUpdate = chunkRenderer.needsUpdate();
-			chunkRenderExecutor.execute(chunkRenderer::render);
-			if (neededUpdate && !chunkRenderer.isEmpty()) {
+		for (ChunkRenderer chunkRenderer : sortedChunkRenderers) {
+			if (!chunkRenderer.inFrustum(frustum) || chunkRenderer.isRendering() || !chunkRenderer.needsUpdate()) continue;
+
+			int cx = camx - chunkRenderer.getX();
+			int cy = camy - chunkRenderer.getY();
+			int cz = camz - chunkRenderer.getZ();
+			int priority = cx * cx + cy * cy + cz * cz;
+
+			chunkRenderExecutor.execute(new PriorityRunnable(priority, chunkRenderer::render));
+			if (!chunkRenderer.isEmpty()) {
 				if (++updates >= chunkUpdateRate) {
 					break;
 				}

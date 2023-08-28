@@ -2,6 +2,7 @@ package io.bluestaggo.voxelthing.world;
 
 import io.bluestaggo.voxelthing.math.AABB;
 import io.bluestaggo.voxelthing.math.MathUtil;
+import io.bluestaggo.voxelthing.util.PriorityRunnable;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.generation.GenCache;
 import io.bluestaggo.voxelthing.world.generation.GenerationInfo;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -25,7 +26,7 @@ public class World implements IBlockAccess {
 
 	public static int chunkLoadRate = 10;
 	public final ExecutorService chunkLoadExecutor = new ThreadPoolExecutor(chunkLoadRate, chunkLoadRate, 0L,
-			TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+			TimeUnit.MILLISECONDS, new PriorityBlockingQueue<>());
 
 	public double partialTick;
 
@@ -207,7 +208,7 @@ public class World implements IBlockAccess {
 			int z = point.z + cz;
 
 			if (!chunkExists(x, y, z)) {
-				chunkLoadExecutor.execute(() -> loadChunkAt(x, y, z));
+				chunkLoadExecutor.execute(new PriorityRunnable((int) point.lengthSquared(), () -> loadChunkAt(x, y, z)));
 				if (++loaded >= chunkLoadRate) {
 					return;
 				}

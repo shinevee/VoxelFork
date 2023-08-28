@@ -17,6 +17,7 @@ public class ChunkRenderer {
 	private int x, y, z;
 	private boolean needsUpdate;
 	private boolean needsUpload;
+	private boolean isRendering;
 	private boolean empty;
 	private double firstAppearance;
 
@@ -34,6 +35,7 @@ public class ChunkRenderer {
 		this.z = z;
 		needsUpdate = true;
 		needsUpload = false;
+		isRendering = false;
 		empty = true;
 	}
 
@@ -56,12 +58,15 @@ public class ChunkRenderer {
 	public synchronized void render() {
 		boolean wasEmpty = empty;
 
-		if (needsUpdate && !needsUpload) {
-			empty = true;
+		if (needsUpdate && !needsUpload && !isRendering) {
+			needsUpdate = false;
+			isRendering = true;
+			boolean maybeEmpty = true;
 			Chunk chunk = world.getChunkAt(x, y, z);
 
 			if (chunk == null || chunk.isEmpty()) {
-				needsUpdate = false;
+				empty = true;
+				isRendering = false;
 				return;
 			}
 
@@ -70,21 +75,23 @@ public class ChunkRenderer {
 				for (int xx = 0; xx < Chunk.LENGTH; xx++) {
 					for (int yy = 0; yy < Chunk.LENGTH; yy++) {
 						for (int zz = 0; zz < Chunk.LENGTH; zz++) {
-							 empty &= !renderer.blockRenderer.render(bindings, cache, chunk, xx, yy, zz);
+							 maybeEmpty &= !renderer.blockRenderer.render(bindings, cache, chunk, xx, yy, zz);
 						}
 					}
 				}
-
-				if (!empty) {
-					needsUpload = true;
-
-					if (wasEmpty) {
-						firstAppearance = Window.getTimeElapsed();
-					}
-				}
-
-				needsUpdate = false;
 			}
+
+			empty = maybeEmpty;
+
+			if (!empty) {
+				needsUpload = true;
+
+				if (wasEmpty) {
+					firstAppearance = Window.getTimeElapsed();
+				}
+			}
+
+			isRendering = false;
 		}
 	}
 
@@ -111,6 +118,10 @@ public class ChunkRenderer {
 
 	public boolean needsUpload() {
 		return needsUpload;
+	}
+
+	public boolean isRendering() {
+		return isRendering;
 	}
 
 	public boolean inFrustum(FrustumIntersection frustum) {
