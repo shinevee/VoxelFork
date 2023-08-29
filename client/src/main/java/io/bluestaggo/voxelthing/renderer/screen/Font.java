@@ -86,17 +86,20 @@ public class Font {
 
 		for (int i = 0; i < text.length(); i++) {
 			char c = text.charAt(i);
-			if (c == '\u00a7' && text.length() - i > 6) {
-				int cr = MathUtil.hexValue(text.charAt(++i));
-				cr = (cr << 4) + MathUtil.hexValue(text.charAt(++i));
-				int cg = MathUtil.hexValue(text.charAt(++i));
-				cg = (cg << 4) + MathUtil.hexValue(text.charAt(++i));
-				int cb = MathUtil.hexValue(text.charAt(++i));
-				cb = (cb << 4) + MathUtil.hexValue(text.charAt(++i));
-				modR = cr / 255.0f;
-				modG = cg / 255.0f;
-				modB = cb / 255.0f;
-				continue;
+			if (c == '\u00a7' && i < text.length() + 1) {
+				c = Character.toLowerCase(text.charAt(++i));
+				if (c == 'c' && text.length() - i > 6) {
+					int cr = MathUtil.hexValue(text.charAt(++i));
+					cr = (cr << 4) + MathUtil.hexValue(text.charAt(++i));
+					int cg = MathUtil.hexValue(text.charAt(++i));
+					cg = (cg << 4) + MathUtil.hexValue(text.charAt(++i));
+					int cb = MathUtil.hexValue(text.charAt(++i));
+					cb = (cb << 4) + MathUtil.hexValue(text.charAt(++i));
+					modR = cr / 255.0f;
+					modG = cg / 255.0f;
+					modB = cb / 255.0f;
+					continue;
+				}
 			}
 
 			if (c == '\n') {

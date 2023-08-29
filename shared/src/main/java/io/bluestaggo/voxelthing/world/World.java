@@ -26,6 +26,7 @@ public class World implements IBlockAccess {
 	public final long seed = random.nextLong();
 
 	public static int chunkLoadRate = 10;
+	public static boolean multithreading = true;
 	public final ExecutorService chunkLoadExecutor = new ThreadPoolExecutor(chunkLoadRate, chunkLoadRate, 0L,
 			TimeUnit.MILLISECONDS, new PriorityBlockingQueue<>());
 
@@ -182,7 +183,14 @@ public class World implements IBlockAccess {
 			int z = point.z + cz;
 
 			if (!chunkExists(x, y, z)) {
-				chunkLoadExecutor.execute(new PriorityRunnable((int) point.lengthSquared(), () -> loadChunkAt(x, y, z)));
+				Runnable task = () -> loadChunkAt(x, y, z);
+
+				if (multithreading) {
+					chunkLoadExecutor.execute(new PriorityRunnable((int) point.lengthSquared(), task));
+				} else {
+					task.run();
+				}
+
 				if (++loaded >= chunkLoadRate) {
 					return;
 				}

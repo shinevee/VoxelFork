@@ -34,6 +34,7 @@ public class WorldRenderer {
 	public int renderDistance = 16;
 
 	public static int chunkUpdateRate = 1;
+	public static boolean multithreading = true;
 	public final ExecutorService chunkRenderExecutor = new ThreadPoolExecutor(chunkUpdateRate, chunkUpdateRate, 0L,
 			TimeUnit.MILLISECONDS, new PriorityBlockingQueue<>());
 
@@ -101,7 +102,12 @@ public class WorldRenderer {
 			int cz = camz - chunkRenderer.getZ();
 			int priority = cx * cx + cy * cy + cz * cz;
 
-			chunkRenderExecutor.execute(new PriorityRunnable(priority, chunkRenderer::render));
+			if (multithreading) {
+				chunkRenderExecutor.execute(new PriorityRunnable(priority, chunkRenderer::render));
+			} else {
+				chunkRenderer.render();
+			}
+
 			if (!chunkRenderer.isEmpty()) {
 				if (++updates >= chunkUpdateRate) {
 					break;

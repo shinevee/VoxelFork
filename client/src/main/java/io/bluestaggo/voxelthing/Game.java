@@ -51,30 +51,35 @@ public class Game {
 		VERSION = version;
 
 		var options = new Properties();
+		options.setProperty("chunk-load-threads", "10");
+		options.setProperty("chunk-render-threads", "1");
+		options.setProperty("enable-multithreading", "true");
 
 		try {
 			Path dbgOptPath = Paths.get(System.getenv("APPDATA"), "VoxelThing/dbg-opt.txt");
 			try (InputStream istream = Files.newInputStream(dbgOptPath, StandardOpenOption.READ)) {
 				options.load(istream);
 			} catch (IOException ignored) {
-				options.setProperty("chunk-load-threads", "10");
-				options.setProperty("chunk-render-threads", "1");
-				try {
-					Files.createDirectories(dbgOptPath.getParent());
-					try (OutputStream ostream = Files.newOutputStream(dbgOptPath, StandardOpenOption.CREATE)) {
-						options.store(ostream, "Voxel Thing options (version " + VERSION + ")");
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
+			}
+
+			try {
+				Files.createDirectories(dbgOptPath.getParent());
+				try (OutputStream ostream = Files.newOutputStream(dbgOptPath, StandardOpenOption.CREATE)) {
+					options.store(ostream, "Voxel Thing options (version " + VERSION + ")");
 				}
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		} catch (NullPointerException e) {
-			options.setProperty("chunk-load-threads", "10");
-			options.setProperty("chunk-render-threads", "1");
+			e.printStackTrace();
 		}
 
+		boolean multithreading = options.getProperty("chunk-load-threads").equals("true");
+
 		World.chunkLoadRate = Integer.parseInt(options.getProperty("chunk-load-threads"));
+		World.multithreading = multithreading;
 		WorldRenderer.chunkUpdateRate = Integer.parseInt(options.getProperty("chunk-render-threads"));
+		WorldRenderer.multithreading = multithreading;
 	}
 
 	private static final String[] SKINS = {

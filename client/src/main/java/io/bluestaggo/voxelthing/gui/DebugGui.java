@@ -14,7 +14,7 @@ public class DebugGui extends GuiScreen {
 		FontManager fonts = game.renderer.fonts;
 		Screen screen = game.renderer.screen;
 
-		fonts.outlined.print("§00ffffVOXEL THING    §00ff00" + Game.VERSION, 5, 5, 1.0f, 1.0f, 1.0f);
+		fonts.outlined.print("§c00ffffVOXEL THING    §c00ff00" + Game.VERSION, 5, 5, 1.0f, 1.0f, 1.0f);
 
 		long freeMB = Runtime.getRuntime().freeMemory() / 1000000L;
 		long totalMB = Runtime.getRuntime().totalMemory() / 1000000L;
@@ -42,9 +42,9 @@ public class DebugGui extends GuiScreen {
 				debugBuilder.append('\n');
 			}
 
-			debugBuilder.append("§ffff7f");
+			debugBuilder.append("§cffff7f");
 			debugBuilder.append(label);
-			debugBuilder.append(": §ffffff");
+			debugBuilder.append(": §cffffff");
 			debugBuilder.append(value);
 		}
 
