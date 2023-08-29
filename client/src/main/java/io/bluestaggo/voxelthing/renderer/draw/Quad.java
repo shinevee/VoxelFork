@@ -22,7 +22,7 @@ public class Quad {
 		position.zero();
 		size.zero();
 		color.set(1.0f, 1.0f, 1.0f, 1.0f);
-		uv.set(0.0f, 1.0f, 1.0f, 0.0f);
+		uv.set(0.0f, 0.0f, 1.0f, 1.0f);
 		texture = null;
 		return this;
 	}
@@ -81,6 +81,8 @@ public class Quad {
 			if (size.x == 0.0f && size.y == 0.0f) {
 				size.set(texture.width, texture.height);
 			}
+		} else {
+			Texture.stop();
 		}
 
 		shader.viewProj.set(viewProj);

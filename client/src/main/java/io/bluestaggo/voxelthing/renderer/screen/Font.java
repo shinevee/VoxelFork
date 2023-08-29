@@ -16,9 +16,9 @@ public class Font {
 	private final String texturePath;
 
 	private final int[] charWidths = new int[256];
-	private final int lineHeight;
-	private final int charSpacing;
-	private final int spaceWidth;
+	public final int lineHeight;
+	public final int charSpacing;
+	public final int spaceWidth;
 
 	public Font(MainRenderer renderer, String texturePath) throws IOException {
 		this.renderer = renderer;
@@ -174,7 +174,7 @@ public class Font {
 	}
 
 	public void printCentered(String text, float x, float y, float r, float g, float b, float size) {
-		print(text, x - getStringLength(text) / 2.0f, y, r, g, b, size);
+		print(text, x - getStringLength(text) * size / 2.0f, y, r, g, b, size);
 	}
 
 	public int getStringLength(String text) {
@@ -182,9 +182,12 @@ public class Font {
 
 		for (int i = 0; i < text.length(); i++) {
 			char c = text.charAt(i);
-			if (c == '\u00a7' && text.length() - i > 6) {
-				i += 6;
-				continue;
+			if (c == '\u00a7' && i < text.length() + 1) {
+				c = Character.toLowerCase(text.charAt(++i));
+				if (c == 'c' && text.length() - i > 6) {
+					i += 6;
+					continue;
+				}
 			}
 
 			if (c > 255 || c == 0 || c == '\n') {

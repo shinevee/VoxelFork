@@ -1,9 +1,6 @@
 package io.bluestaggo.voxelthing;
 
-import io.bluestaggo.voxelthing.gui.BlockInventory;
-import io.bluestaggo.voxelthing.gui.DebugGui;
-import io.bluestaggo.voxelthing.gui.GuiScreen;
-import io.bluestaggo.voxelthing.gui.IngameGui;
+import io.bluestaggo.voxelthing.gui.*;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.world.WorldRenderer;
 import io.bluestaggo.voxelthing.window.ClientPlayerController;
@@ -53,6 +50,7 @@ public class Game {
 		var options = new Properties();
 		options.setProperty("chunk-load-threads", "10");
 		options.setProperty("chunk-render-threads", "1");
+		options.setProperty("max-chunk-uploads", "1");
 		options.setProperty("enable-multithreading", "true");
 
 		try {
@@ -79,6 +77,7 @@ public class Game {
 		World.chunkLoadRate = Integer.parseInt(options.getProperty("chunk-load-threads"));
 		World.multithreading = multithreading;
 		WorldRenderer.chunkUpdateRate = Integer.parseInt(options.getProperty("chunk-render-threads"));
+		WorldRenderer.chunkUploadRate = Integer.parseInt(options.getProperty("max-chunk-uploads"));
 		WorldRenderer.multithreading = multithreading;
 	}
 
@@ -130,7 +129,7 @@ public class Game {
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-		startWorld();
+		openGui(new MainMenu(this));
 	}
 
 	public static Game getInstance() {
@@ -178,13 +177,10 @@ public class Game {
 	}
 
 	private void update(double delta) {
-		if (!isInWorld() && window.isKeyJustPressed(GLFW_KEY_ENTER)) {
-			startWorld();
-		}
-
 		tickTime += delta;
 
 		GuiScreen gui = currentGui != null ? currentGui : isInWorld() ? inGameGui : null;
+
 		if (gui == inGameGui) {
 			doControls();
 		}
@@ -318,14 +314,11 @@ public class Game {
 		renderer.draw();
 
 		if (drawGui) {
-			if (debugMenu) {
-				debugGui.draw();
-			}
-
 			if (isInWorld()) {
+				if (debugMenu) {
+					debugGui.draw();
+				}
 				inGameGui.draw();
-			} else {
-				renderer.fonts.outlined.printCentered("Press ENTER to play", renderer.screen.getWidth() / 2.0f, renderer.screen.getHeight() / 2.0f);
 			}
 
 			if (currentGui != null) {
@@ -335,6 +328,10 @@ public class Game {
 	}
 
 	public void openGui(GuiScreen gui) {
+		if (gui == null && !isInWorld()) {
+			gui = new MainMenu(this);
+		}
+
 		currentGui = gui;
 		if (gui == null) {
 			window.grabCursor();
@@ -372,7 +369,6 @@ public class Game {
 	}
 
 	public static void main(String[] args) {
-//		System.setProperty("java.awt.headless", "true");
 		new Game().run();
 	}
 }

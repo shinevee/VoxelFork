@@ -61,6 +61,8 @@ public class IngameGui extends GuiScreen {
 
 	@Override
 	public void draw() {
+		super.draw();
+
 		if (!game.showThirdPerson()) {
 			drawCrosshair();
 			drawHand();
@@ -188,6 +190,8 @@ public class IngameGui extends GuiScreen {
 
 	@Override
 	protected void onMouseClicked(int button, int mx, int my) {
+		super.onMouseClicked(button, mx, my);
+
 		BlockRaycast raycast = game.getBlockRaycast();
 		if (raycast.blockHit()) {
 			int x = raycast.getHitX();

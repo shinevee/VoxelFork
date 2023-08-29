@@ -11,6 +11,7 @@ public class Screen {
 	private final Window window;
 	private final Matrix4f viewProj = new Matrix4f();
 
+	private boolean resized;
 	private float width = -1;
 	private float height = -1;
 	private float autoScale = 0.0f;
@@ -37,6 +38,7 @@ public class Screen {
 		newHeight /= autoScale;
 
 		if (width != newWidth || height != newHeight) {
+			resized = true;
 			width = newWidth;
 			height = newHeight;
 			viewProj.identity().ortho(0.0f, width, height, 0.0f, 0.0f, MAX_DEPTH);
@@ -69,5 +71,11 @@ public class Screen {
 
 	public float fixScaling(float x) {
 		return (int) (x * autoScale) / autoScale;
+	}
+
+	public boolean hasResized() {
+		boolean wasResized = resized;
+		resized = false;
+		return wasResized;
 	}
 }

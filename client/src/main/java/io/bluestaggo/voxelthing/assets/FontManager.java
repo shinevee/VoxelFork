@@ -18,14 +18,14 @@ public class FontManager {
 	public FontManager(MainRenderer renderer) {
 		this.renderer = renderer;
 
-		normal = getFont("/assets/font.png");
-		shadowed = getFont("/assets/font-shadowed.png");
-		outlined = getFont("/assets/font-outlined.png");
+		normal = getFont("/assets/gui/fonts/normal.png");
+		shadowed = getFont("/assets/gui/fonts/shadowed.png");
+		outlined = getFont("/assets/gui/fonts/outlined.png");
 	}
 
 	public Font getFont(String path) {
 		if (path == null) {
-			return getFont("/assets/font.png");
+			return getFont("/assets/gui/fonts/font.png");
 		}
 
 		if (!fonts.containsKey(path)) {

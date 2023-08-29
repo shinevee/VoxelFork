@@ -22,6 +22,8 @@ public class BlockInventory extends GuiScreen {
 
 	@Override
 	public void draw() {
+		super.draw();
+
 		MainRenderer r = game.renderer;
 
 		try (var state = new GLState()) {
@@ -101,6 +103,8 @@ public class BlockInventory extends GuiScreen {
 
 	@Override
 	protected void onMouseClicked(int button, int mx, int my) {
+		super.onMouseClicked(button, mx, my);
+
 		MainRenderer r = game.renderer;
 
 		Texture hotbarTexture = r.textures.getTexture("/assets/gui/hotbar.png");

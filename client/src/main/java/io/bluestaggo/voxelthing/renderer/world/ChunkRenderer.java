@@ -18,6 +18,7 @@ public class ChunkRenderer {
 	private boolean needsUpdate;
 	private boolean needsUpload;
 	private boolean isRendering;
+	private boolean wasEmpty;
 	private boolean empty;
 	private double firstAppearance;
 
@@ -56,7 +57,7 @@ public class ChunkRenderer {
 	}
 
 	public synchronized void render() {
-		boolean wasEmpty = empty;
+		wasEmpty = empty;
 
 		if (needsUpdate && !needsUpload && !isRendering) {
 			needsUpdate = false;
@@ -86,10 +87,6 @@ public class ChunkRenderer {
 
 			if (!empty) {
 				needsUpload = true;
-
-				if (wasEmpty) {
-					firstAppearance = Window.getTimeElapsed();
-				}
 			}
 
 			isRendering = false;
@@ -100,6 +97,10 @@ public class ChunkRenderer {
 		if (needsUpload) {
 			bindings.upload(true);
 			needsUpload = false;
+
+			if (wasEmpty) {
+				firstAppearance = Window.getTimeElapsed();
+			}
 		}
 	}
 

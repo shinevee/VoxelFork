@@ -14,7 +14,7 @@ import org.joml.Vector3f;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -34,9 +34,10 @@ public class WorldRenderer {
 	public int renderDistance = 16;
 
 	public static int chunkUpdateRate = 1;
+	public static int chunkUploadRate = 1;
 	public static boolean multithreading = true;
 	public final ExecutorService chunkRenderExecutor = new ThreadPoolExecutor(chunkUpdateRate, chunkUpdateRate, 0L,
-			TimeUnit.MILLISECONDS, new PriorityBlockingQueue<>());
+			TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 
 	public WorldRenderer(MainRenderer renderer) {
 		this.renderer = renderer;
@@ -117,12 +118,14 @@ public class WorldRenderer {
 	}
 
 	public void draw() {
+		int uploads = 0;
+
 		FrustumIntersection frustum = this.renderer.camera.getFrustum();
 		double currentTime = Window.getTimeElapsed();
 
 		for (ChunkRenderer chunkRenderer : sortedChunkRenderers) {
 			if (!chunkRenderer.inFrustum(frustum)) continue;
-			if (chunkRenderer.needsUpload()) {
+			if (chunkRenderer.needsUpload() && uploads++ < 1) {
 				chunkRenderer.upload();
 			}
 

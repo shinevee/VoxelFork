@@ -11,6 +11,8 @@ public class DebugGui extends GuiScreen {
 
 	@Override
 	public void draw() {
+		super.draw();
+
 		FontManager fonts = game.renderer.fonts;
 		Screen screen = game.renderer.screen;
 

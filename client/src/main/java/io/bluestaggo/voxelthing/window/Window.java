@@ -19,7 +19,7 @@ import static org.lwjgl.opengl.GL33C.glViewport;
 public class Window {
 	public static final int DEFAULT_WIDTH = 640;
 	public static final int DEFAULT_HEIGHT = 360;
-	public static final boolean LIMIT_FPS = false;
+	public static final boolean LIMIT_FPS = true;
 
 	private final long handle;
 	private final GLFWErrorCallback errorCallback;
