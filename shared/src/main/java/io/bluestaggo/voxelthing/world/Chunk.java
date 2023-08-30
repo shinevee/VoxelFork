@@ -5,6 +5,7 @@ import io.bluestaggo.voxelthing.Identifier;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.storage.NibbleBlockStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -104,7 +105,7 @@ public class Chunk implements IBlockAccess {
 		List<Block> palette = paletteItem.getList().stream()
 				.map(Identifier::deserialize)
 				.map(Block::fromId)
-				.toList();
+				.collect(Collectors.toCollection(ArrayList::new));
 
 		byte[] blocks = item.getMap().get("blocks").getByteArray();
 		byte blockArrayType = item.getMap().get("blockArrayType").getByte();

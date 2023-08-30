@@ -6,8 +6,10 @@ import io.bluestaggo.voxelthing.Identifier;
 import io.bluestaggo.voxelthing.renderer.world.WorldRenderer;
 import io.bluestaggo.voxelthing.world.block.Block;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ClientWorld extends World {
 	public final Game game;
@@ -31,10 +33,10 @@ public class ClientWorld extends World {
 			blocks[i] = (byte) (i % (Block.WOOL.length + 1));
 		}
 
-		List<StructureItem> palette = new java.util.ArrayList<>(Arrays.stream(Block.WOOL)
+		List<StructureItem> palette = Arrays.stream(Block.WOOL)
 				.map(Block::getId)
 				.map(Identifier::serialize)
-				.toList());
+				.collect(Collectors.toCollection(ArrayList::new));
 		palette.add(0, Block.ID_AIR.serialize());
 
 		CompoundItem item = new CompoundItem();

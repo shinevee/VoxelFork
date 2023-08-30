@@ -18,7 +18,7 @@ public class ChunkRenderer {
 	private boolean needsUpdate;
 	private boolean needsUpload;
 	private boolean isRendering;
-	private boolean wasEmpty;
+	private boolean doFlash;
 	private boolean empty;
 	private double firstAppearance;
 
@@ -57,7 +57,7 @@ public class ChunkRenderer {
 	}
 
 	public synchronized void render() {
-		wasEmpty = empty;
+		doFlash |= empty;
 
 		if (needsUpdate && !needsUpload && !isRendering) {
 			needsUpdate = false;
@@ -98,8 +98,9 @@ public class ChunkRenderer {
 			bindings.upload(true);
 			needsUpload = false;
 
-			if (wasEmpty) {
+			if (doFlash) {
 				firstAppearance = Window.getTimeElapsed();
+				doFlash = false;
 			}
 		}
 	}

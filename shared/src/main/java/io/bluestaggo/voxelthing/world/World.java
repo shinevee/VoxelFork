@@ -27,7 +27,7 @@ public class World implements IBlockAccess {
 	public static int chunkLoadRate = 10;
 	public final ExecutorService chunkLoadExecutor = MultithreadManager.strategy == MultithreadingStrategy.FULL
 			? new ThreadPoolExecutor(chunkLoadRate, chunkLoadRate, 0L,
-					TimeUnit.MILLISECONDS, new PriorityBlockingQueue<>())
+					TimeUnit.MILLISECONDS, new PriorityBlockingQueue<>(), new ThreadPoolExecutor.DiscardOldestPolicy())
 			: Executors.newSingleThreadExecutor();
 
 	public double partialTick;

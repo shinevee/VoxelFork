@@ -36,7 +36,7 @@ public class WorldRenderer {
 	public static int chunkUploadRate = 1;
 	public final ExecutorService chunkRenderExecutor = MultithreadManager.strategy == MultithreadingStrategy.FULL
 			? new ThreadPoolExecutor(chunkUpdateRate, chunkUpdateRate, 0L,
-					TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>())
+					TimeUnit.MILLISECONDS, new PriorityBlockingQueue<>(), new ThreadPoolExecutor.DiscardOldestPolicy())
 			: Executors.newSingleThreadExecutor();
 
 	public WorldRenderer(MainRenderer renderer) {

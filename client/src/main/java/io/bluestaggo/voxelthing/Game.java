@@ -1,7 +1,9 @@
 package io.bluestaggo.voxelthing;
 
+import io.bluestaggo.voxelthing.assets.Texture;
 import io.bluestaggo.voxelthing.gui.*;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
+import io.bluestaggo.voxelthing.renderer.draw.Quad;
 import io.bluestaggo.voxelthing.renderer.world.WorldRenderer;
 import io.bluestaggo.voxelthing.util.MultithreadManager;
 import io.bluestaggo.voxelthing.util.MultithreadingStrategy;
@@ -73,7 +75,7 @@ public class Game {
 			e.printStackTrace();
 		}
 
-		MultithreadManager.strategy = MultithreadingStrategy.fromString(options.getProperty("chunk-load-threads"));
+		MultithreadManager.strategy = MultithreadingStrategy.fromString(options.getProperty("multithreading"));
 		World.chunkLoadRate = Integer.parseInt(options.getProperty("chunk-load-threads"));
 		WorldRenderer.chunkUpdateRate = Integer.parseInt(options.getProperty("chunk-render-threads"));
 		WorldRenderer.chunkUploadRate = Integer.parseInt(options.getProperty("max-chunk-uploads"));
@@ -147,6 +149,7 @@ public class Game {
 			stackTracePrinter.println("An exception has occured and the program needs to quit!");
 			e.printStackTrace(stackTracePrinter);
 			JOptionPane.showMessageDialog(null, stackTrace, "Voxel Thing: Exception", JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
 		}
 
 		close();
@@ -317,6 +320,16 @@ public class Game {
 					debugGui.draw();
 				}
 				inGameGui.draw();
+			} else {
+				Texture bgTex = renderer.textures.getTexture("/assets/gui/background.png");
+
+				float width = renderer.screen.getWidth();
+				float height = renderer.screen.getHeight();
+
+				renderer.draw2D.drawQuad(Quad.shared()
+						.size(width, height)
+						.withTexture(bgTex)
+						.withUV(0.0f, 0.0f, width / bgTex.width, height / bgTex.height));
 			}
 
 			if (currentGui != null) {
