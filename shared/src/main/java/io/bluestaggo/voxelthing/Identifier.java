@@ -1,5 +1,9 @@
 package io.bluestaggo.voxelthing;
 
+import io.bluestaggo.pds.CompoundItem;
+import io.bluestaggo.pds.StringItem;
+import io.bluestaggo.pds.StructureItem;
+
 public class Identifier {
 	public final String namespace;
 	public final String name;
@@ -18,5 +22,12 @@ public class Identifier {
 	@Override
 	public String toString() {
 		return fullName;
+	}
+
+	public StructureItem serialize() {
+		var item = new CompoundItem();
+		item.map.put("namespace", new StringItem(namespace));
+		item.map.put("name", new StringItem(name));
+		return item;
 	}
 }

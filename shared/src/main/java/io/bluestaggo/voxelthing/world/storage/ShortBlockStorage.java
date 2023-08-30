@@ -5,22 +5,24 @@ import io.bluestaggo.voxelthing.world.BlockStorage;
 import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.block.Block;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 
-public class ByteBlockStorage extends BlockStorage {
-	private final byte[] blocks = new byte[Chunk.VOLUME];
+public class ShortBlockStorage extends BlockStorage {
+	private final short[] blocks = new short[Chunk.VOLUME];
 
-	public ByteBlockStorage() {
+	public ShortBlockStorage() {
 		super();
 	}
 
-	public ByteBlockStorage(List<Block> palette) {
+	public ShortBlockStorage(List<Block> palette) {
 		super(palette);
 	}
 
-	public ByteBlockStorage(NibbleBlockStorage storage) {
+	public ShortBlockStorage(ByteBlockStorage storage) {
 		super(storage);
-		storage.copyBytes(blocks);
+		ByteBuffer buffer = ByteBuffer.wrap(storage.getBytes());
+		buffer.asShortBuffer().get(blocks);
 	}
 
 	@Override
@@ -35,11 +37,13 @@ public class ByteBlockStorage extends BlockStorage {
 
 	@Override
 	protected int getMaxPaletteSize() {
-		return 256;
+		return 65536;
 	}
 
 	@Override
 	public byte[] getBytes() {
-		return blocks;
+		ByteBuffer buffer = ByteBuffer.allocate(blocks.length * 2);
+		buffer.asShortBuffer().put(blocks);
+		return buffer.array();
 	}
 }

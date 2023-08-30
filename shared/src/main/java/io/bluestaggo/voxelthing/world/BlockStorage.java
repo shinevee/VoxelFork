@@ -2,24 +2,37 @@ package io.bluestaggo.voxelthing.world;
 
 import io.bluestaggo.voxelthing.util.IntList;
 import io.bluestaggo.voxelthing.world.block.Block;
+import io.bluestaggo.voxelthing.world.storage.ByteBlockStorage;
+import io.bluestaggo.voxelthing.world.storage.NibbleBlockStorage;
+import io.bluestaggo.voxelthing.world.storage.ShortBlockStorage;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class BlockStorage {
-	private final List<Block> palette;
+	private static final List<Class<? extends BlockStorage>> REGISTERED_TYPES = List.of(
+			NibbleBlockStorage.class,
+			ByteBlockStorage.class,
+			ShortBlockStorage.class
+	);
+
+	private final List<Block> mutablePalette;
 	private final IntList blockCounts = new IntList();
+	public final List<Block> palette;
 
 	public BlockStorage() {
 		this(new ArrayList<>());
 	}
 
 	public BlockStorage(BlockStorage storage) {
-		this(storage.palette);
+		this(storage.mutablePalette);
 	}
 
 	public BlockStorage(List<Block> palette) {
-		this.palette = palette;
+		mutablePalette = palette;
+		this.palette = Collections.unmodifiableList(mutablePalette);
+
 		if (palette.size() == 0) {
 			palette.add(null);
 		}
@@ -32,25 +45,25 @@ public abstract class BlockStorage {
 	protected abstract int getBlockId(int x, int y, int z);
 
 	public Block getBlock(int x, int y, int z) {
-		return palette.get(getBlockId(x, y, z));
+		return mutablePalette.get(getBlockId(x, y, z));
 	}
 
 	protected abstract void setBlockId(int x, int y, int z, int id);
 
 	public void setBlock(int x, int y, int z, Block block) {
-		int index = palette.indexOf(block);
+		int index = mutablePalette.indexOf(block);
 		if (index == -1) {
 			if (needsExpansion(block)) {
 				throw new OutOfMemoryError("Cannot add \"" + block + "\" to palette: ran out of " + getMaxPaletteSize() + "spaces!");
 			}
 
-			index = palette.lastIndexOf(null);
+			index = mutablePalette.lastIndexOf(null);
 			if (index <= 0) {
-				index = palette.size();
-				palette.add(block);
+				index = mutablePalette.size();
+				mutablePalette.add(block);
 				blockCounts.add(0);
 			} else {
-				palette.set(index, block);
+				mutablePalette.set(index, block);
 				blockCounts.set(index, 0);
 			}
 		}
@@ -63,7 +76,7 @@ public abstract class BlockStorage {
 			if (oldId > 0) {
 				blockCounts.set(oldId, blockCounts.get(oldId) - 1);
 				if (blockCounts.get(oldId) <= 0) {
-					palette.set(oldId, null);
+					mutablePalette.set(oldId, null);
 				}
 			}
 		}
@@ -72,10 +85,16 @@ public abstract class BlockStorage {
 	protected abstract int getMaxPaletteSize();
 
 	public boolean needsExpansion(Block block) {
-		return palette.size() >= getMaxPaletteSize() && !palette.contains(block);
+		return mutablePalette.size() >= getMaxPaletteSize() && !mutablePalette.contains(block);
 	}
 
 	public BlockStorage expand() {
 		throw new OutOfMemoryError("Cannot expand to larger block storage!");
+	}
+
+	public abstract byte[] getBytes();
+
+	public int getType() {
+		return REGISTERED_TYPES.indexOf(getClass());
 	}
 }

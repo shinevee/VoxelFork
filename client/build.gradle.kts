@@ -72,6 +72,7 @@ dependencies {
     }
 
     implementation(project(":shared"))
+    implementation(project(":pds"))
 }
 
 application {

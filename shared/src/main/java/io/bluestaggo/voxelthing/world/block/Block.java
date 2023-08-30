@@ -22,6 +22,7 @@ public class Block {
 	private static final List<Block> REGISTERED_BLOCKS_MUTABLE = new ArrayList<>();
 	public static final List<Block> REGISTERED_BLOCKS = Collections.unmodifiableList(REGISTERED_BLOCKS_MUTABLE);
 
+	public static final Identifier ID_AIR = new Identifier("air");
 	public static final Block STONE = new Block("stone").withTex(1, 0);
 	public static final Block GRASS = new Block("grass").withTex(new GrassTexture(0, 1, 0, 0, 0, 2));
 	public static final Block DIRT = new Block("dirt").withTex(0, 2);

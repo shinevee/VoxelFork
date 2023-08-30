@@ -1,5 +1,6 @@
 package io.bluestaggo.voxelthing;
 
+import io.bluestaggo.pds.*;
 import io.bluestaggo.voxelthing.gui.*;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.world.WorldRenderer;
@@ -18,7 +19,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
@@ -55,15 +55,41 @@ public class Game {
 
 		try {
 			Path dbgOptPath = Paths.get(System.getenv("APPDATA"), "VoxelThing/dbg-opt.txt");
-			try (InputStream istream = Files.newInputStream(dbgOptPath, StandardOpenOption.READ)) {
+			Path dbgPdsPath = Paths.get(System.getenv("APPDATA"), "VoxelThing/dbg-pds.dat");
+			try (InputStream istream = Files.newInputStream(dbgOptPath)) {
 				options.load(istream);
 			} catch (IOException ignored) {
 			}
 
 			try {
 				Files.createDirectories(dbgOptPath.getParent());
-				try (OutputStream ostream = Files.newOutputStream(dbgOptPath, StandardOpenOption.CREATE)) {
+				try (OutputStream ostream = Files.newOutputStream(dbgOptPath)) {
 					options.store(ostream, "Voxel Thing options (version " + VERSION + ")");
+				}
+
+				try (OutputStream ostream = Files.newOutputStream(dbgPdsPath)) {
+					var dostream = new DataOutputStream(ostream);
+
+					CompoundItem item = new CompoundItem();
+					item.map.put("name", new StringItem("Staggo"));
+					item.map.put("tasks", new ListItem(
+							new StringItem("Add saving"),
+							new StringItem("Add clouds"),
+							new StringItem("Make 0.2")
+					));
+					item.map.put("happiness", new FloatItem(0.85f));
+
+					System.out.println("== BEFORE COMPILATION ==");
+					System.out.println(item);
+
+					StructureItem.writeItem(item, dostream);
+				}
+
+				try (InputStream istream = Files.newInputStream(dbgPdsPath)) {
+					var distream = new DataInputStream(istream);
+					StructureItem item = StructureItem.readItem(distream);
+					System.out.println("== AFTER COMPILATION ==");
+					System.out.println(item);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();

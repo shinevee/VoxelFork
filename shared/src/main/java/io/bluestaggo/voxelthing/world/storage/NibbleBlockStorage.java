@@ -50,7 +50,14 @@ public class NibbleBlockStorage extends BlockStorage {
 		return new ByteBlockStorage(this);
 	}
 
-	public byte[] getData() {
+	public void copyBytes(byte[] bytes) {
+		for (int i = 0; i < blocks.length; i++) {
+			bytes[i * 2] = (byte) ((blocks[i] & 0xF0) >> 4);
+			bytes[i * 2 + 1] = (byte) (blocks[i] & 0xF);
+		}
+	}
+
+	public byte[] getBytes() {
 		return blocks;
 	}
 }

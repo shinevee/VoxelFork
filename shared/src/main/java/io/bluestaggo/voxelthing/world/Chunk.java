@@ -1,7 +1,10 @@
 package io.bluestaggo.voxelthing.world;
 
+import io.bluestaggo.pds.*;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.storage.NibbleBlockStorage;
+
+import java.util.stream.Collectors;
 
 public class Chunk implements IBlockAccess {
 	public static final int SIZE_POW2 = 5;
@@ -72,5 +75,19 @@ public class Chunk implements IBlockAccess {
 		return x >= 0 && x < Chunk.LENGTH
 				&& y >= 0 && y < Chunk.LENGTH
 				&& z >= 0 && z < Chunk.LENGTH;
+	}
+
+	public StructureItem serialize() {
+		var item = new CompoundItem();
+
+		var paletteItem = new ListItem(blockStorage.palette.stream()
+				.map(b -> (b == null ? Block.ID_AIR : b.id).serialize())
+				.collect(Collectors.toList()));
+		item.map.put("palette", paletteItem);
+
+		item.map.put("blockArraySize", new ByteItem((byte) blockStorage.getType()));
+		item.map.put("blocks", new ByteArrayItem(blockStorage.getBytes()));
+
+		return item;
 	}
 }

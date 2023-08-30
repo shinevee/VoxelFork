@@ -1,5 +1,6 @@
 package io.bluestaggo.voxelthing.world;
 
+import io.bluestaggo.voxelthing.world.block.Block;
 import org.joml.Vector3d;
 
 public class BlockRaycast {
@@ -47,5 +48,17 @@ public class BlockRaycast {
 
 	public boolean blockHit() {
 		return hit;
+	}
+
+	public String getDebugText(World world) {
+		if (!hit) {
+			return Block.ID_AIR.toString();
+		}
+
+		Block block = world.getBlock(hitX, hitY, hitZ);
+		if (block == null) {
+			return Block.ID_AIR.toString();
+		}
+		return block.id.toString();
 	}
 }

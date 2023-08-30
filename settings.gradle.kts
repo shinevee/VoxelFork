@@ -8,4 +8,5 @@
  */
 
 rootProject.name = "VoxelThing"
-include("client", "shared")
+include("client", "shared") // Main Voxel Thing projects
+include("pds") // Voxel Thing libraries
