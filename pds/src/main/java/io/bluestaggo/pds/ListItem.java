@@ -22,6 +22,11 @@ public class ListItem extends StructureItem {
 	}
 
 	@Override
+	public List<StructureItem> getList() {
+		return list;
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder(list.size() + " items:");
 		for (StructureItem item : list) {

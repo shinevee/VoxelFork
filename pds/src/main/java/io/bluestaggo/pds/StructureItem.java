@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 public abstract class StructureItem {
 	private static final List<Class<? extends StructureItem>> REGISTERED_TYPES = List.of(
@@ -15,6 +16,9 @@ public abstract class StructureItem {
 			FloatItem.class,
 			DoubleItem.class,
 			ByteArrayItem.class,
+			ShortArrayItem.class,
+			IntArrayItem.class,
+			LongArrayItem.class,
 			StringItem.class,
 			ListItem.class,
 			CompoundItem.class
@@ -83,6 +87,30 @@ public abstract class StructureItem {
 
 	public double getDouble() {
 		throw new UnsupportedOperationException(getUnsupportedMessage("double"));
+	}
+
+	public byte[] getByteArray() {
+		throw new UnsupportedOperationException(getUnsupportedMessage("byte[]"));
+	}
+
+	public short[] getShortArray() {
+		throw new UnsupportedOperationException(getUnsupportedMessage("short[]"));
+	}
+
+	public int[] getIntArray() {
+		throw new UnsupportedOperationException(getUnsupportedMessage("int[]"));
+	}
+
+	public long[] getLongArray() {
+		throw new UnsupportedOperationException(getUnsupportedMessage("long[]"));
+	}
+
+	public List<StructureItem> getList() {
+		throw new UnsupportedOperationException(getUnsupportedMessage("List"));
+	}
+
+	public Map<String, StructureItem> getMap() {
+		throw new UnsupportedOperationException(getUnsupportedMessage("Map"));
 	}
 
 	public int getType() {

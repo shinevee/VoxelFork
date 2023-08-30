@@ -32,7 +32,7 @@ public class DebugGui extends GuiScreen {
 						+ ", " + formatDouble(game.player.posY)
 						+ ", " + formatDouble(game.player.posZ)
 						: "N/A",
-				"Looking At: ", game.getBlockRaycast().getDebugText(game.world)
+				"Looking At", game.getBlockRaycast().getDebugText(game.world)
 		};
 
 		StringBuilder debugBuilder = new StringBuilder();

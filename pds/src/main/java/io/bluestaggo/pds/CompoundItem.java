@@ -18,6 +18,11 @@ public class CompoundItem extends StructureItem {
 	}
 
 	@Override
+	public Map<String, StructureItem> getMap() {
+		return map;
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder(map.size() + " items:");
 		for (var item : map.entrySet()) {

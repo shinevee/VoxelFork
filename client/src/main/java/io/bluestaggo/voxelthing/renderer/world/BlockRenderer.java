@@ -28,6 +28,10 @@ public class BlockRenderer {
 	}
 
 	public synchronized boolean render(Bindings bindings, IBlockAccess blockAccess, Chunk chunk, int x, int y, int z) {
+		if (chunk.x == 0 && chunk.y == 0 && chunk.z == 0) {
+			blockAccess.isAir(x, y, z);
+		}
+
 		Block block = chunk.getBlock(x, y, z);
 		if (block == null) {
 			return false;

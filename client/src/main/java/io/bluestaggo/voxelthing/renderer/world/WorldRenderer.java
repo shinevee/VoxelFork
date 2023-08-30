@@ -4,6 +4,8 @@ import io.bluestaggo.voxelthing.renderer.GLState;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.util.WorldPrimitives;
 import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
+import io.bluestaggo.voxelthing.util.MultithreadManager;
+import io.bluestaggo.voxelthing.util.MultithreadingStrategy;
 import io.bluestaggo.voxelthing.util.PriorityRunnable;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.Chunk;
@@ -13,10 +15,7 @@ import org.joml.Vector3f;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import static org.lwjgl.opengl.GL33C.*;
 
@@ -35,9 +34,10 @@ public class WorldRenderer {
 
 	public static int chunkUpdateRate = 1;
 	public static int chunkUploadRate = 1;
-	public static boolean multithreading = true;
-	public final ExecutorService chunkRenderExecutor = new ThreadPoolExecutor(chunkUpdateRate, chunkUpdateRate, 0L,
-			TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+	public final ExecutorService chunkRenderExecutor = MultithreadManager.strategy == MultithreadingStrategy.FULL
+			? new ThreadPoolExecutor(chunkUpdateRate, chunkUpdateRate, 0L,
+					TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>())
+			: Executors.newSingleThreadExecutor();
 
 	public WorldRenderer(MainRenderer renderer) {
 		this.renderer = renderer;
@@ -103,7 +103,7 @@ public class WorldRenderer {
 			int cz = camz - chunkRenderer.getZ();
 			int priority = cx * cx + cy * cy + cz * cz;
 
-			if (multithreading) {
+			if (MultithreadManager.strategy != MultithreadingStrategy.OFF) {
 				chunkRenderExecutor.execute(new PriorityRunnable(priority, chunkRenderer::render));
 			} else {
 				chunkRenderer.render();

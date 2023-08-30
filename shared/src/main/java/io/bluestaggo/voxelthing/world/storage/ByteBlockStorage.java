@@ -8,18 +8,27 @@ import io.bluestaggo.voxelthing.world.block.Block;
 import java.util.List;
 
 public class ByteBlockStorage extends BlockStorage {
-	private final byte[] blocks = new byte[Chunk.VOLUME];
+	private final byte[] blocks;
 
 	public ByteBlockStorage() {
 		super();
+		blocks = new byte[Chunk.VOLUME];
 	}
 
 	public ByteBlockStorage(List<Block> palette) {
 		super(palette);
+		blocks = new byte[Chunk.VOLUME];
+	}
+
+	public ByteBlockStorage(List<Block> palette, byte[] bytes) {
+		super(palette);
+		blocks = bytes;
+		updateBlockCounts();
 	}
 
 	public ByteBlockStorage(NibbleBlockStorage storage) {
 		super(storage);
+		blocks = new byte[Chunk.VOLUME];
 		storage.copyBytes(blocks);
 	}
 

@@ -1,9 +1,11 @@
 package io.bluestaggo.voxelthing.world;
 
 import io.bluestaggo.pds.*;
+import io.bluestaggo.voxelthing.Identifier;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.storage.NibbleBlockStorage;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class Chunk implements IBlockAccess {
@@ -16,16 +18,22 @@ public class Chunk implements IBlockAccess {
 	public final World world;
 	public final int x, y, z;
 
-	private BlockStorage blockStorage = new NibbleBlockStorage();
+	private BlockStorage blockStorage;
 	private boolean empty = true;
 
 	public final Object lock = new Object();
 
 	public Chunk(World world, int x, int y, int z) {
+		this(world, x, y, z, new NibbleBlockStorage());
+	}
+
+	public Chunk(World world, int x, int y, int z, BlockStorage blockStorage) {
 		this.world = world;
 		this.x = x;
 		this.y = y;
 		this.z = z;
+		this.blockStorage = blockStorage;
+		empty = blockStorage.isEmpty();
 	}
 
 	public int toGlobalX(int x) {
@@ -83,11 +91,26 @@ public class Chunk implements IBlockAccess {
 		var paletteItem = new ListItem(blockStorage.palette.stream()
 				.map(b -> (b == null ? Block.ID_AIR : b.id).serialize())
 				.collect(Collectors.toList()));
-		item.map.put("palette", paletteItem);
+		item.map.put("blockPalette", paletteItem);
 
-		item.map.put("blockArraySize", new ByteItem((byte) blockStorage.getType()));
+		item.map.put("blockArrayType", new ByteItem(blockStorage.getType()));
 		item.map.put("blocks", new ByteArrayItem(blockStorage.getBytes()));
 
 		return item;
+	}
+
+	public static Chunk deserialize(World world, int x, int y, int z, StructureItem item) {
+		var paletteItem = item.getMap().get("blockPalette");
+		List<Block> palette = paletteItem.getList().stream()
+				.map(Identifier::deserialize)
+				.map(Block::fromId)
+				.toList();
+
+		byte[] blocks = item.getMap().get("blocks").getByteArray();
+		byte blockArrayType = item.getMap().get("blockArrayType").getByte();
+
+		BlockStorage storage = BlockStorage.decode(blockArrayType, palette, blocks);
+
+		return new Chunk(world, x, y, z, storage);
 	}
 }

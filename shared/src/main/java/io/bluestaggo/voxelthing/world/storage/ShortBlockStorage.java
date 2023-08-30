@@ -19,6 +19,13 @@ public class ShortBlockStorage extends BlockStorage {
 		super(palette);
 	}
 
+	public ShortBlockStorage(List<Block> palette, byte[] bytes) {
+		super(palette);
+		ByteBuffer buffer = ByteBuffer.wrap(bytes);
+		buffer.asShortBuffer().get(blocks);
+		updateBlockCounts();
+	}
+
 	public ShortBlockStorage(ByteBlockStorage storage) {
 		super(storage);
 		ByteBuffer buffer = ByteBuffer.wrap(storage.getBytes());

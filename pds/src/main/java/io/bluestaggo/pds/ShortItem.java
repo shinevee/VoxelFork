@@ -11,6 +11,10 @@ public class ShortItem extends StructureItem {
 	public ShortItem() {
 	}
 
+	public ShortItem(int value) {
+		this((short) value);
+	}
+
 	public ShortItem(short value) {
 		this.value = value;
 	}

@@ -1,9 +1,10 @@
 package io.bluestaggo.voxelthing;
 
-import io.bluestaggo.pds.*;
 import io.bluestaggo.voxelthing.gui.*;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.world.WorldRenderer;
+import io.bluestaggo.voxelthing.util.MultithreadManager;
+import io.bluestaggo.voxelthing.util.MultithreadingStrategy;
 import io.bluestaggo.voxelthing.window.ClientPlayerController;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.BlockRaycast;
@@ -51,11 +52,10 @@ public class Game {
 		options.setProperty("chunk-load-threads", "10");
 		options.setProperty("chunk-render-threads", "1");
 		options.setProperty("max-chunk-uploads", "1");
-		options.setProperty("enable-multithreading", "true");
+		options.setProperty("multithreading", "full");
 
 		try {
 			Path dbgOptPath = Paths.get(System.getenv("APPDATA"), "VoxelThing/dbg-opt.txt");
-			Path dbgPdsPath = Paths.get(System.getenv("APPDATA"), "VoxelThing/dbg-pds.dat");
 			try (InputStream istream = Files.newInputStream(dbgOptPath)) {
 				options.load(istream);
 			} catch (IOException ignored) {
@@ -66,31 +66,6 @@ public class Game {
 				try (OutputStream ostream = Files.newOutputStream(dbgOptPath)) {
 					options.store(ostream, "Voxel Thing options (version " + VERSION + ")");
 				}
-
-				try (OutputStream ostream = Files.newOutputStream(dbgPdsPath)) {
-					var dostream = new DataOutputStream(ostream);
-
-					CompoundItem item = new CompoundItem();
-					item.map.put("name", new StringItem("Staggo"));
-					item.map.put("tasks", new ListItem(
-							new StringItem("Add saving"),
-							new StringItem("Add clouds"),
-							new StringItem("Make 0.2")
-					));
-					item.map.put("happiness", new FloatItem(0.85f));
-
-					System.out.println("== BEFORE COMPILATION ==");
-					System.out.println(item);
-
-					StructureItem.writeItem(item, dostream);
-				}
-
-				try (InputStream istream = Files.newInputStream(dbgPdsPath)) {
-					var distream = new DataInputStream(istream);
-					StructureItem item = StructureItem.readItem(distream);
-					System.out.println("== AFTER COMPILATION ==");
-					System.out.println(item);
-				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -98,13 +73,10 @@ public class Game {
 			e.printStackTrace();
 		}
 
-		boolean multithreading = options.getProperty("chunk-load-threads").equals("true");
-
+		MultithreadManager.strategy = MultithreadingStrategy.fromString(options.getProperty("chunk-load-threads"));
 		World.chunkLoadRate = Integer.parseInt(options.getProperty("chunk-load-threads"));
-		World.multithreading = multithreading;
 		WorldRenderer.chunkUpdateRate = Integer.parseInt(options.getProperty("chunk-render-threads"));
 		WorldRenderer.chunkUploadRate = Integer.parseInt(options.getProperty("max-chunk-uploads"));
-		WorldRenderer.multithreading = multithreading;
 	}
 
 	private static final String[] SKINS = {

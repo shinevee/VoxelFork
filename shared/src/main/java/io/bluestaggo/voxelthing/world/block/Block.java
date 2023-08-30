@@ -9,9 +9,7 @@ import io.bluestaggo.voxelthing.world.block.texture.BlockTexture;
 import io.bluestaggo.voxelthing.world.block.texture.ColumnTexture;
 import io.bluestaggo.voxelthing.world.block.texture.GrassTexture;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.IntStream;
 
 public class Block {
@@ -19,8 +17,29 @@ public class Block {
 	public static final int TEXTURE_ROWS = TEXTURE_RES / 16;
 	public static final float TEXTURE_WIDTH = 1.0f / TEXTURE_ROWS;
 
-	private static final List<Block> REGISTERED_BLOCKS_MUTABLE = new ArrayList<>();
-	public static final List<Block> REGISTERED_BLOCKS = Collections.unmodifiableList(REGISTERED_BLOCKS_MUTABLE);
+	private static final List<Block> REGISTERED_BLOCKS_ORDERED_MUTABLE = new ArrayList<>();
+	private static final Map<Identifier, Block> REGISTERED_BLOCKS_MUTABLE = new HashMap<>();
+	public static final List<Block> REGISTERED_BLOCKS_ORDERED = Collections.unmodifiableList(REGISTERED_BLOCKS_ORDERED_MUTABLE);
+	public static final Map<Identifier, Block> REGISTERED_BLOCKS = Collections.unmodifiableMap(REGISTERED_BLOCKS_MUTABLE);
+
+	public static final String[] WOOL_NAMES = {
+			"black",
+			"dark_gray",
+			"gray",
+			"light_gray",
+			"yellow",
+			"orange",
+			"green",
+			"teal",
+			"turquoise",
+			"cyan",
+			"blue",
+			"navy",
+			"red",
+			"purple",
+			"brown",
+			"white"
+	};
 
 	public static final Identifier ID_AIR = new Identifier("air");
 	public static final Block STONE = new Block("stone").withTex(1, 0);
@@ -36,13 +55,17 @@ public class Block {
 	public static final Block GRAVEL = new Block("gravel").withTex(2, 1);
 	public static final Block STONE_BRICKS = new Block("stone_bricks").withTex(2, 2);
 	public static final Block POLISHED_STONE = new Block("polished_stone").withTex(1, 2);
-	public static final Block[] WOOL = IntStream.range(0, 16)
-			.mapToObj(i -> new Block("wool_" + i).withTex(i % 4, i / 4 + 3))
+	public static final Block[] WOOL = IntStream.range(0, WOOL_NAMES.length)
+			.mapToObj(i -> new Block("wool_" + WOOL_NAMES[i]).withTex(i % 4, i / 4 + 3))
 			.toArray(Block[]::new);
 
 	public final Identifier id;
 	protected BlockTexture texture;
 	protected BlockTransparency transparency = BlockTransparency.NONE;
+
+	static {
+		REGISTERED_BLOCKS_MUTABLE.put(ID_AIR, null);
+	}
 
 	public Block(String id) {
 		this(new Identifier(id));
@@ -53,8 +76,24 @@ public class Block {
 	}
 
 	public Block(Identifier id) {
+		if (REGISTERED_BLOCKS.containsKey(id)) {
+			throw new IllegalArgumentException("Block \"" + id + "\" already exists");
+		}
+
 		this.id = id;
-		REGISTERED_BLOCKS_MUTABLE.add(this);
+		REGISTERED_BLOCKS_ORDERED_MUTABLE.add(this);
+		REGISTERED_BLOCKS_MUTABLE.put(id, this);
+	}
+
+	public static Block fromId(Identifier id) {
+		if (REGISTERED_BLOCKS_MUTABLE.containsKey(id)) {
+			return REGISTERED_BLOCKS_MUTABLE.get(id);
+		}
+		return null;
+	}
+
+	public final Identifier getId() {
+		return id;
 	}
 
 	@Override

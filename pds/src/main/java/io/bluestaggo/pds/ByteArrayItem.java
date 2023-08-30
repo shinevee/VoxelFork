@@ -15,6 +15,11 @@ public class ByteArrayItem extends StructureItem {
 	}
 
 	@Override
+	public byte[] getByteArray() {
+		return value;
+	}
+
+	@Override
 	public String toString() {
 		return "<" + value.length + " bytes>";
 	}

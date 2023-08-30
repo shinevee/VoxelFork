@@ -2,6 +2,8 @@ package io.bluestaggo.voxelthing.world;
 
 import io.bluestaggo.voxelthing.math.AABB;
 import io.bluestaggo.voxelthing.math.MathUtil;
+import io.bluestaggo.voxelthing.util.MultithreadManager;
+import io.bluestaggo.voxelthing.util.MultithreadingStrategy;
 import io.bluestaggo.voxelthing.util.PriorityRunnable;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.generation.GenCache;
@@ -13,22 +15,20 @@ import org.joml.Vector3i;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class World implements IBlockAccess {
-	private final ChunkStorage chunkStorage;
+	protected final ChunkStorage chunkStorage;
 	private final GenCache genCache;
 
 	public final Random random = new Random();
 	public final long seed = random.nextLong();
 
 	public static int chunkLoadRate = 10;
-	public static boolean multithreading = true;
-	public final ExecutorService chunkLoadExecutor = new ThreadPoolExecutor(chunkLoadRate, chunkLoadRate, 0L,
-			TimeUnit.MILLISECONDS, new PriorityBlockingQueue<>());
+	public final ExecutorService chunkLoadExecutor = MultithreadManager.strategy == MultithreadingStrategy.FULL
+			? new ThreadPoolExecutor(chunkLoadRate, chunkLoadRate, 0L,
+					TimeUnit.MILLISECONDS, new PriorityBlockingQueue<>())
+			: Executors.newSingleThreadExecutor();
 
 	public double partialTick;
 
@@ -185,7 +185,7 @@ public class World implements IBlockAccess {
 			if (!chunkExists(x, y, z)) {
 				Runnable task = () -> loadChunkAt(x, y, z);
 
-				if (multithreading) {
+				if (MultithreadManager.strategy != MultithreadingStrategy.OFF) {
 					chunkLoadExecutor.execute(new PriorityRunnable((int) point.lengthSquared(), task));
 				} else {
 					task.run();

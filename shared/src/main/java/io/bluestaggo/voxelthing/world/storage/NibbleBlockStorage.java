@@ -18,6 +18,14 @@ public class NibbleBlockStorage extends BlockStorage {
 		super(palette);
 	}
 
+	public NibbleBlockStorage(List<Block> palette, byte[] bytes) {
+		super(palette);
+		for (int i = 0; i < bytes.length; i++) {
+			blocks[i] = (byte) ((bytes[i * 2] & 0xF) << 4 | bytes[i * 2 + 1] & 0xF);
+		}
+		updateBlockCounts();
+	}
+
 	@Override
 	protected int getBlockId(int x, int y, int z) {
 		int i = MathUtil.index3D(x, y, z, Chunk.LENGTH);

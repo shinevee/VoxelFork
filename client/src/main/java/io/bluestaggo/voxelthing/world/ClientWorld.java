@@ -1,7 +1,13 @@
 package io.bluestaggo.voxelthing.world;
 
+import io.bluestaggo.pds.*;
 import io.bluestaggo.voxelthing.Game;
+import io.bluestaggo.voxelthing.Identifier;
 import io.bluestaggo.voxelthing.renderer.world.WorldRenderer;
+import io.bluestaggo.voxelthing.world.block.Block;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class ClientWorld extends World {
 	public final Game game;
@@ -11,6 +17,35 @@ public class ClientWorld extends World {
 		this.game = game;
 		game.renderer.worldRenderer.setWorld(this);
 		game.renderer.worldRenderer.loadRenderers();
+	}
+
+	@Override
+	public synchronized void loadChunkAt(int cx, int cy, int cz) {
+		if (cx != 0 || cy != 0 || cz != 0) {
+			super.loadChunkAt(cx, cy, cz);
+			return;
+		}
+
+		byte[] blocks = new byte[Chunk.VOLUME];
+		for (int i = 0; i < blocks.length; i++) {
+			blocks[i] = (byte) (i % (Block.WOOL.length + 1));
+		}
+
+		List<StructureItem> palette = new java.util.ArrayList<>(Arrays.stream(Block.WOOL)
+				.map(Block::getId)
+				.map(Identifier::serialize)
+				.toList());
+		palette.add(0, Block.ID_AIR.serialize());
+
+		CompoundItem item = new CompoundItem();
+		item.map.put("blockPalette", new ListItem(palette));
+		item.map.put("blockArrayType", new ByteItem(1));
+		item.map.put("blocks", new ByteArrayItem(blocks));
+
+		synchronized (chunkStorage.lock) {
+			chunkStorage.deserializeChunkAt(cx, cy, cz, item);
+			onChunkAdded(cx, cy, cz);
+		}
 	}
 
 	@Override

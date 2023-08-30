@@ -40,6 +40,10 @@ public class IntList {
 	}
 
 	public void set(int i, int e) {
+		while (i >= size) {
+			add(0);
+		}
+
 		data[i] = e;
 	}
 

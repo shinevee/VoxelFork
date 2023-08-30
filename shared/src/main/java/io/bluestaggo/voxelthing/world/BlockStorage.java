@@ -37,8 +37,8 @@ public abstract class BlockStorage {
 			palette.add(null);
 		}
 
-		if (blockCounts.size() == 0) {
-			blockCounts.add(0);
+		for (int i = 0; i < palette.size(); i++) {
+			blockCounts.set(i, 0);
 		}
 	}
 
@@ -96,5 +96,45 @@ public abstract class BlockStorage {
 
 	public int getType() {
 		return REGISTERED_TYPES.indexOf(getClass());
+	}
+
+	protected void updateBlockCounts() {
+		for (int i = 0; i < palette.size(); i++) {
+			blockCounts.set(i, 0);
+		}
+
+		for (int x = 0; x < Chunk.LENGTH; x++) {
+			for (int y = 0; y < Chunk.LENGTH; y++) {
+				for (int z = 0; z < Chunk.LENGTH; z++) {
+					int id = getBlockId(x, y, z);
+					if (id > 0) {
+						blockCounts.set(id, blockCounts.get(id) + 1);
+					}
+				}
+			}
+		}
+	}
+
+	public boolean isEmpty() {
+		for (int i = 1; i < blockCounts.size(); i++) {
+			if (blockCounts.get(i) != 0) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public static BlockStorage decode(byte type, List<Block> palette, byte[] bytes) {
+		try {
+			return REGISTERED_TYPES.get(type).getDeclaredConstructor(List.class, byte[].class).newInstance(palette, bytes);
+		} catch (NoSuchMethodException
+				| InstantiationException
+				| IllegalAccessException
+				| IllegalArgumentException
+				| java.lang.reflect.InvocationTargetException e) {
+			e.printStackTrace();
+			return new ByteBlockStorage(palette, bytes);
+		}
 	}
 }

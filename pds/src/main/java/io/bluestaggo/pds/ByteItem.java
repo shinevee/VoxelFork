@@ -11,6 +11,10 @@ public class ByteItem extends StructureItem {
 	public ByteItem() {
 	}
 
+	public ByteItem(int value) {
+		this((byte) value);
+	}
+
 	public ByteItem(byte value) {
 		this.value = value;
 	}
