@@ -20,9 +20,7 @@ public class Chunk implements IBlockAccess {
 	public final int x, y, z;
 
 	private BlockStorage blockStorage;
-	private boolean empty = true;
-
-	public final Object lock = new Object();
+	private boolean empty;
 
 	public Chunk(World world, int x, int y, int z) {
 		this(world, x, y, z, new NibbleBlockStorage());

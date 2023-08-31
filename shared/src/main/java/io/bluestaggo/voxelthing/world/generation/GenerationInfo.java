@@ -23,7 +23,7 @@ public class GenerationInfo {
 	private final float[] caveInfo = new float[LERP_MAP_SIZE];
 	private int lastQueryLayer = Integer.MAX_VALUE;
 
-	public final Object lock = new Object();
+	private boolean hasGenerated;
 
 	public GenerationInfo(long salt, int cx, int cz) {
 		randSeed = salt;
@@ -39,6 +39,11 @@ public class GenerationInfo {
 	}
 
 	public void generate() {
+		if (hasGenerated) {
+			return;
+		}
+		hasGenerated = true;
+
 		final int baseOctaves = 4;
 		final double baseScale = 250.0;
 		final float baseHeightScale = 8.0f;

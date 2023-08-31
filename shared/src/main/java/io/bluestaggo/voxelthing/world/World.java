@@ -2,9 +2,6 @@ package io.bluestaggo.voxelthing.world;
 
 import io.bluestaggo.voxelthing.math.AABB;
 import io.bluestaggo.voxelthing.math.MathUtil;
-import io.bluestaggo.voxelthing.util.MultithreadManager;
-import io.bluestaggo.voxelthing.util.MultithreadingStrategy;
-import io.bluestaggo.voxelthing.util.PriorityRunnable;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.generation.GenCache;
 import io.bluestaggo.voxelthing.world.generation.GenerationInfo;
@@ -15,7 +12,6 @@ import org.joml.Vector3i;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.*;
 
 public class World implements IBlockAccess {
 	protected final ChunkStorage chunkStorage;
@@ -23,12 +19,6 @@ public class World implements IBlockAccess {
 
 	public final Random random = new Random();
 	public final long seed = random.nextLong();
-
-	public static int chunkLoadRate = 10;
-	public final ExecutorService chunkLoadExecutor = MultithreadManager.strategy == MultithreadingStrategy.FULL
-			? new ThreadPoolExecutor(chunkLoadRate, chunkLoadRate, 0L,
-					TimeUnit.MILLISECONDS, new PriorityBlockingQueue<>(), new ThreadPoolExecutor.DiscardOldestPolicy())
-			: Executors.newSingleThreadExecutor();
 
 	public double partialTick;
 
@@ -88,15 +78,6 @@ public class World implements IBlockAccess {
 		return getChunkAtBlock(x, y, z) != null;
 	}
 
-	public boolean neighborChunkExists(int x, int y, int z) {
-		return chunkExists(x - 1, y, z)
-				|| chunkExists(x + 1, y, z)
-				|| chunkExists(x, y - 1, z)
-				|| chunkExists(x, y + 1, z)
-				|| chunkExists(x, y, z - 1)
-				|| chunkExists(x, y, z + 1);
-	}
-
 	@Override
 	public Block getBlock(int x, int y, int z) {
 		Chunk chunk = getChunkAtBlock(x, y, z);
@@ -124,52 +105,43 @@ public class World implements IBlockAccess {
 		onBlockUpdate(x, y, z);
 	}
 
-	public synchronized void loadChunkAt(int cx, int cy, int cz) {
-		Chunk chunk;
-		GenerationInfo genInfo;
-
-		synchronized (chunkStorage.lock) {
-			if (chunkStorage.getChunkAt(cx, cy, cz) != null) {
-				return;
-			}
-
-			chunk = chunkStorage.newChunkAt(cx, cy, cz);
-			genInfo = genCache.getGenerationAt(cx, cz);
+	public void loadChunkAt(int cx, int cy, int cz) {
+		if (chunkStorage.getChunkAt(cx, cy, cz) != null) {
+			return;
 		}
 
-		synchronized (genInfo.lock) {
-			genInfo.generate();
+		Chunk chunk = chunkStorage.newChunkAt(cx, cy, cz);
+		GenerationInfo genInfo = genCache.getGenerationAt(cx, cz);
 
-			for (int x = 0; x < Chunk.LENGTH; x++) {
-				for (int z = 0; z < Chunk.LENGTH; z++) {
-					float height = genInfo.getHeight(x, z);
+		genInfo.generate();
 
-					for (int y = 0; y < Chunk.LENGTH; y++) {
-						int yy = cy * Chunk.LENGTH + y;
-						boolean cave = yy < height && genInfo.getCave(x, yy, z);
-						Block block = null;
+		for (int x = 0; x < Chunk.LENGTH; x++) {
+			for (int z = 0; z < Chunk.LENGTH; z++) {
+				float height = genInfo.getHeight(x, z);
 
-						if (!cave) {
-							if (yy < height - 4) {
-								block = Block.STONE;
-							} else if (yy < height - 1) {
-								block = Block.DIRT;
-							} else if (yy < height) {
-								block = Block.GRASS;
-							}
+				for (int y = 0; y < Chunk.LENGTH; y++) {
+					int yy = cy * Chunk.LENGTH + y;
+					boolean cave = yy < height && genInfo.getCave(x, yy, z);
+					Block block = null;
+
+					if (!cave) {
+						if (yy < height - 4) {
+							block = Block.STONE;
+						} else if (yy < height - 1) {
+							block = Block.DIRT;
+						} else if (yy < height) {
+							block = Block.GRASS;
 						}
+					}
 
-						if (block != null) {
-							chunk.setBlock(x, y, z, block);
-						}
+					if (block != null) {
+						chunk.setBlock(x, y, z, block);
 					}
 				}
 			}
 		}
 
-		synchronized (chunkStorage.lock) {
-			onChunkAdded(cx, cy, cz);
-		}
+		onChunkAdded(cx, cy, cz);
 	}
 
 	public void loadSurroundingChunks(int cx, int cy, int cz, int radius) {
@@ -183,15 +155,9 @@ public class World implements IBlockAccess {
 			int z = point.z + cz;
 
 			if (!chunkExists(x, y, z)) {
-				Runnable task = () -> loadChunkAt(x, y, z);
+				loadChunkAt(x, y, z);
 
-				if (MultithreadManager.strategy != MultithreadingStrategy.OFF) {
-					chunkLoadExecutor.execute(new PriorityRunnable((int) point.lengthSquared(), task));
-				} else {
-					task.run();
-				}
-
-				if (++loaded >= chunkLoadRate) {
+				if (++loaded >= 25) {
 					return;
 				}
 			}
@@ -268,6 +234,5 @@ public class World implements IBlockAccess {
 	}
 
 	public void close() {
-		chunkLoadExecutor.shutdownNow();
 	}
 }

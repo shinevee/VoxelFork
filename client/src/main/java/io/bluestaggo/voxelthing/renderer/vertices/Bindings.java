@@ -53,7 +53,7 @@ public class Bindings {
 		}
 	}
 
-	public synchronized void upload(boolean dynamic) {
+	public void upload(boolean dynamic) {
 		setData(nextData, nextIndices, dynamic);
 		clear();
 	}

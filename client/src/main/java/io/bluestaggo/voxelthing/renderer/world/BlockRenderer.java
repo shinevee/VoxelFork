@@ -27,11 +27,7 @@ public class BlockRenderer {
 		return 1.0f - SHADE_FACTOR * amount;
 	}
 
-	public synchronized boolean render(Bindings bindings, IBlockAccess blockAccess, Chunk chunk, int x, int y, int z) {
-		if (chunk.x == 0 && chunk.y == 0 && chunk.z == 0) {
-			blockAccess.isAir(x, y, z);
-		}
-
+	public boolean render(Bindings bindings, IBlockAccess blockAccess, Chunk chunk, int x, int y, int z) {
 		Block block = chunk.getBlock(x, y, z);
 		if (block == null) {
 			return false;

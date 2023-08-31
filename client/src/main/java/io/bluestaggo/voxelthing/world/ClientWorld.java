@@ -22,7 +22,7 @@ public class ClientWorld extends World {
 	}
 
 	@Override
-	public synchronized void loadChunkAt(int cx, int cy, int cz) {
+	public void loadChunkAt(int cx, int cy, int cz) {
 		if (cx != 0 || cy != 0 || cz != 0) {
 			super.loadChunkAt(cx, cy, cz);
 			return;
@@ -44,10 +44,8 @@ public class ClientWorld extends World {
 		item.map.put("blockArrayType", new ByteItem(1));
 		item.map.put("blocks", new ByteArrayItem(blocks));
 
-		synchronized (chunkStorage.lock) {
-			chunkStorage.deserializeChunkAt(cx, cy, cz, item);
-			onChunkAdded(cx, cy, cz);
-		}
+		chunkStorage.deserializeChunkAt(cx, cy, cz, item);
+		onChunkAdded(cx, cy, cz);
 	}
 
 	@Override

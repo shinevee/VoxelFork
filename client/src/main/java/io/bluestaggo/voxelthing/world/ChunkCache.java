@@ -18,7 +18,7 @@ public class ChunkCache implements IBlockAccess {
 			for (int yy = 0; yy < 3; yy++) {
 				for (int zz = 0; zz < 3; zz++) {
 					int i = MathUtil.index3D(xx, yy, zz, 3);
-					chunks[i] = world.getChunkAt(x + xx - 1, y + yy - 1, z + zz - 1);
+					chunks[i] = world.getOrLoadChunkAt(x + xx - 1, y + yy - 1, z + zz - 1);
 				}
 			}
 		}

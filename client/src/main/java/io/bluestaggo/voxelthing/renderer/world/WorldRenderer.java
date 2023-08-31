@@ -4,9 +4,6 @@ import io.bluestaggo.voxelthing.renderer.GLState;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.util.WorldPrimitives;
 import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
-import io.bluestaggo.voxelthing.util.MultithreadManager;
-import io.bluestaggo.voxelthing.util.MultithreadingStrategy;
-import io.bluestaggo.voxelthing.util.PriorityRunnable;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.World;
@@ -15,7 +12,6 @@ import org.joml.Vector3f;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.*;
 
 import static org.lwjgl.opengl.GL33C.*;
 
@@ -31,13 +27,6 @@ public class WorldRenderer {
 	private int renderRange;
 
 	public int renderDistance = 16;
-
-	public static int chunkUpdateRate = 1;
-	public static int chunkUploadRate = 1;
-	public final ExecutorService chunkRenderExecutor = MultithreadManager.strategy == MultithreadingStrategy.FULL
-			? new ThreadPoolExecutor(chunkUpdateRate, chunkUpdateRate, 0L,
-					TimeUnit.MILLISECONDS, new PriorityBlockingQueue<>(), new ThreadPoolExecutor.DiscardOldestPolicy())
-			: Executors.newSingleThreadExecutor();
 
 	public WorldRenderer(MainRenderer renderer) {
 		this.renderer = renderer;
@@ -58,10 +47,6 @@ public class WorldRenderer {
 	}
 
 	public void loadRenderers() {
-		if (world == null) {
-			return;
-		}
-
 		minX = minY = minZ = -renderDistance;
 		maxX = maxY = maxZ = renderDistance;
 		renderRange = renderDistance * 2 + 1;
@@ -85,48 +70,22 @@ public class WorldRenderer {
 		moveRenderers();
 	}
 
-	public void render() {
-		int updates = 0;
-
-		FrustumIntersection frustum = this.renderer.camera.getFrustum();
-
-		Vector3f pos = this.renderer.camera.getPosition();
-		int camx = (int) Math.floor(pos.x / Chunk.LENGTH);
-		int camy = (int) Math.floor(pos.y / Chunk.LENGTH);
-		int camz = (int) Math.floor(pos.z / Chunk.LENGTH);
-
-		for (ChunkRenderer chunkRenderer : sortedChunkRenderers) {
-			if (!chunkRenderer.inFrustum(frustum) || chunkRenderer.isRendering() || !chunkRenderer.needsUpdate()) continue;
-
-			int cx = camx - chunkRenderer.getX();
-			int cy = camy - chunkRenderer.getY();
-			int cz = camz - chunkRenderer.getZ();
-			int priority = cx * cx + cy * cy + cz * cz;
-
-			if (MultithreadManager.strategy != MultithreadingStrategy.OFF) {
-				chunkRenderExecutor.execute(new PriorityRunnable(priority, chunkRenderer::render));
-			} else {
-				chunkRenderer.render();
-			}
-
-			if (!chunkRenderer.isEmpty()) {
-				if (++updates >= chunkUpdateRate) {
-					break;
-				}
-			}
-		}
-	}
-
 	public void draw() {
-		int uploads = 0;
+		int updates = 0;
+		int maxUpdates = 1;
 
 		FrustumIntersection frustum = this.renderer.camera.getFrustum();
 		double currentTime = Window.getTimeElapsed();
 
 		for (ChunkRenderer chunkRenderer : sortedChunkRenderers) {
 			if (!chunkRenderer.inFrustum(frustum)) continue;
-			if (chunkRenderer.needsUpload() && uploads++ < 1) {
-				chunkRenderer.upload();
+
+			if (updates < maxUpdates) {
+				boolean neededUpdate = chunkRenderer.needsUpdate();
+				chunkRenderer.render();
+				if (neededUpdate) {
+					updates++;
+				}
 			}
 
 			renderer.worldShader.fade.set((float)chunkRenderer.getFadeAmount(currentTime));
@@ -146,10 +105,6 @@ public class WorldRenderer {
 	}
 
 	public void moveRenderers() {
-		if (world == null) {
-			return;
-		}
-
 		Vector3f cameraPos = renderer.camera.getPosition();
 		int x = (int)Math.floor(cameraPos.x / Chunk.LENGTH);
 		int y = (int)Math.floor(cameraPos.y / Chunk.LENGTH);
@@ -237,7 +192,6 @@ public class WorldRenderer {
 	}
 
 	public void unload() {
-		chunkRenderExecutor.shutdownNow();
 		background.unload();
 
 		if (chunkRenderers != null) {

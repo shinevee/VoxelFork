@@ -4,6 +4,7 @@ import io.bluestaggo.voxelthing.Game;
 import io.bluestaggo.voxelthing.gui.control.GuiControl;
 import io.bluestaggo.voxelthing.gui.control.LabeledButton;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
+import io.bluestaggo.voxelthing.renderer.draw.Quad;
 import io.bluestaggo.voxelthing.window.Window;
 
 import java.io.BufferedReader;
@@ -55,10 +56,10 @@ public class MainMenu extends GuiScreen {
 	public void draw() {
 		MainRenderer r = game.renderer;
 
-//		r.draw2D.drawQuad(Quad.shared()
-//				.at(0, 0)
-//				.size(r.screen.getWidth(), r.screen.getHeight())
-//				.withTexture(r.textures.getTexture("/assets/gui/titlebg.png")));
+		r.draw2D.drawQuad(Quad.shared()
+				.at(0, 0)
+				.size(r.screen.getWidth(), r.screen.getHeight())
+				.withTexture(r.textures.getTexture("/assets/gui/titlebg.png")));
 
 		float hover = (float) Math.sin(Window.getTimeElapsed() * Math.PI);
 		r.fonts.outlined.printCentered("VOXEL THING",

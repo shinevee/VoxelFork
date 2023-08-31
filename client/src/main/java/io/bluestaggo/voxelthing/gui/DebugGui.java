@@ -23,7 +23,7 @@ public class DebugGui extends GuiScreen {
 		long maxMB = Runtime.getRuntime().maxMemory() / 1000000L;
 
 		String[] lines = {
-				"Speed", (int)(game.window.getDeltaTime() * 1000.0D) + "ms",
+				"FPS", game.window.getFps() + " (" + (int)(game.window.getDeltaTime() * 1000.0D) + "ms)",
 				"Memory", (totalMB - freeMB) + " / " + maxMB + " MB",
 				"Render Distance", String.valueOf(game.renderer.worldRenderer.renderDistance),
 				"GUI Scale", String.valueOf(screen.scale <= 0.0f ? "auto" : screen.scale),

@@ -4,13 +4,9 @@ import io.bluestaggo.voxelthing.assets.Texture;
 import io.bluestaggo.voxelthing.gui.*;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Quad;
-import io.bluestaggo.voxelthing.renderer.world.WorldRenderer;
-import io.bluestaggo.voxelthing.util.MultithreadManager;
-import io.bluestaggo.voxelthing.util.MultithreadingStrategy;
 import io.bluestaggo.voxelthing.window.ClientPlayerController;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.BlockRaycast;
-import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.ClientWorld;
 import io.bluestaggo.voxelthing.world.World;
 import io.bluestaggo.voxelthing.world.block.Block;
@@ -19,12 +15,8 @@ import io.bluestaggo.voxelthing.world.entity.Player;
 
 import javax.swing.*;
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Properties;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL33C.glClearColor;
@@ -49,36 +41,6 @@ public class Game {
 		}
 
 		VERSION = version;
-
-		var options = new Properties();
-		options.setProperty("chunk-load-threads", "10");
-		options.setProperty("chunk-render-threads", "1");
-		options.setProperty("max-chunk-uploads", "1");
-		options.setProperty("multithreading", "full");
-
-		try {
-			Path dbgOptPath = Paths.get(System.getenv("APPDATA"), "VoxelThing/dbg-opt.txt");
-			try (InputStream istream = Files.newInputStream(dbgOptPath)) {
-				options.load(istream);
-			} catch (IOException ignored) {
-			}
-
-			try {
-				Files.createDirectories(dbgOptPath.getParent());
-				try (OutputStream ostream = Files.newOutputStream(dbgOptPath)) {
-					options.store(ostream, "Voxel Thing options (version " + VERSION + ")");
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-		}
-
-		MultithreadManager.strategy = MultithreadingStrategy.fromString(options.getProperty("multithreading"));
-		World.chunkLoadRate = Integer.parseInt(options.getProperty("chunk-load-threads"));
-		WorldRenderer.chunkUpdateRate = Integer.parseInt(options.getProperty("chunk-render-threads"));
-		WorldRenderer.chunkUploadRate = Integer.parseInt(options.getProperty("max-chunk-uploads"));
 	}
 
 	private static final String[] SKINS = {
@@ -191,12 +153,6 @@ public class Game {
 		}
 
 		if (isInWorld()) {
-			int cx = player.getBlockX() >> Chunk.SIZE_POW2;
-			int cy = player.getBlockY() >> Chunk.SIZE_POW2;
-			int cz = player.getBlockZ() >> Chunk.SIZE_POW2;
-
-			world.loadSurroundingChunks(cx, cy, cz, renderer.worldRenderer.renderDistance);
-
 			player.onGameUpdate();
 			player.noClip = window.isKeyDown(GLFW_KEY_Q);
 		}

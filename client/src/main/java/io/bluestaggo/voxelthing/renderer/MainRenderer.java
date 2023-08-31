@@ -100,8 +100,6 @@ public class MainRenderer {
 		Matrix4f proj = camera.getProj();
 		Matrix4f viewProj = proj.mul(view, new Matrix4f());
 
-		worldRenderer.render();
-
 		try (var state = new GLState()) {
 			state.enable(GL_CULL_FACE);
 			state.enable(GL_DEPTH_TEST);

@@ -19,7 +19,7 @@ import static org.lwjgl.opengl.GL33C.glViewport;
 public class Window {
 	public static final int DEFAULT_WIDTH = 640;
 	public static final int DEFAULT_HEIGHT = 360;
-	public static final boolean LIMIT_FPS = true;
+	public static final boolean LIMIT_FPS = false;
 
 	private final long handle;
 	private final GLFWErrorCallback errorCallback;
@@ -29,9 +29,11 @@ public class Window {
 	private final GLFWMouseButtonCallback mouseButtonCallback;
 
 	private int width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT;
+	private double deltaTime, lastTick, fpsTimer;
+	private int fpsCounter, finalFps;
+
 	private double mouseX, mouseY;
 	private double mouseDeltaX, mouseDeltaY;
-	private double deltaTime, lastTick;
 	private boolean cursorGrabbed;
 
 	private final KeyState[] keyStates;
@@ -134,6 +136,14 @@ public class Window {
 		double currentTime = glfwGetTime();
 		deltaTime = currentTime - lastTick;
 		lastTick = currentTime;
+
+		fpsTimer += deltaTime;
+		fpsCounter++;
+		if (fpsTimer > 1.0) {
+			fpsTimer %= 1.0;
+			finalFps = fpsCounter;
+			fpsCounter = 0;
+		}
 	}
 
 	public int getWidth() {
@@ -142,6 +152,10 @@ public class Window {
 
 	public int getHeight() {
 		return height;
+	}
+
+	public int getFps() {
+		return finalFps;
 	}
 
 	public double getMouseX() {

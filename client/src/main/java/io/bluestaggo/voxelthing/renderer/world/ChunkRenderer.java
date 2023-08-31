@@ -16,9 +16,6 @@ public class ChunkRenderer {
 	private final World world;
 	private int x, y, z;
 	private boolean needsUpdate;
-	private boolean needsUpload;
-	private boolean isRendering;
-	private boolean doFlash;
 	private boolean empty;
 	private double firstAppearance;
 
@@ -35,8 +32,6 @@ public class ChunkRenderer {
 		this.y = y;
 		this.z = z;
 		needsUpdate = true;
-		needsUpload = false;
-		isRendering = false;
 		empty = true;
 	}
 
@@ -56,52 +51,35 @@ public class ChunkRenderer {
 		return empty;
 	}
 
-	public synchronized void render() {
-		doFlash |= empty;
+	public void render() {
+		boolean wasEmpty = empty;
 
-		if (needsUpdate && !needsUpload && !isRendering) {
-			needsUpdate = false;
-			isRendering = true;
-			boolean maybeEmpty = true;
-			Chunk chunk = world.getChunkAt(x, y, z);
+		if (needsUpdate) {
+			empty = true;
+			Chunk chunk = world.getOrLoadChunkAt(x, y, z);
 
 			if (chunk == null || chunk.isEmpty()) {
-				empty = true;
-				isRendering = false;
-				needsUpdate = true;
+				needsUpdate = false;
 				return;
 			}
 
-			synchronized (chunk.lock) {
-				IBlockAccess cache = new ChunkCache(world, x, y, z);
-				for (int xx = 0; xx < Chunk.LENGTH; xx++) {
-					for (int yy = 0; yy < Chunk.LENGTH; yy++) {
-						for (int zz = 0; zz < Chunk.LENGTH; zz++) {
-							 maybeEmpty &= !renderer.blockRenderer.render(bindings, cache, chunk, xx, yy, zz);
-						}
+			IBlockAccess cache = new ChunkCache(world, x, y, z);
+			for (int xx = 0; xx < Chunk.LENGTH; xx++) {
+				for (int yy = 0; yy < Chunk.LENGTH; yy++) {
+					for (int zz = 0; zz < Chunk.LENGTH; zz++) {
+						 empty &= !renderer.blockRenderer.render(bindings, cache, chunk, xx, yy, zz);
 					}
 				}
 			}
 
-			empty = maybeEmpty;
-
 			if (!empty) {
-				needsUpload = true;
+				bindings.upload(true);
+
+				if (wasEmpty) {
+					firstAppearance = Window.getTimeElapsed();
+				}
 			}
-
-			isRendering = false;
-		}
-	}
-
-	public synchronized void upload() {
-		if (needsUpload) {
-			bindings.upload(true);
-			needsUpload = false;
-
-			if (doFlash) {
-				firstAppearance = Window.getTimeElapsed();
-				doFlash = false;
-			}
+			needsUpdate = false;
 		}
 	}
 
@@ -117,14 +95,6 @@ public class ChunkRenderer {
 
 	public boolean needsUpdate() {
 		return needsUpdate;
-	}
-
-	public boolean needsUpload() {
-		return needsUpload;
-	}
-
-	public boolean isRendering() {
-		return isRendering;
 	}
 
 	public boolean inFrustum(FrustumIntersection frustum) {
