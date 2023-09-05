@@ -1,3 +1,4 @@
+
 # TODO List
 
 Current goal: create a game akin to Minecraft Classic with building and destruction in an infinitely generated world.
@@ -15,12 +16,12 @@ Key:
 ## Gameplay
 - [x] Player entity with physics
 - [x] Block building and destruction
-- [ ] Block inventory
+- [x] Block inventory
 - [ ] Partial blocks (e.g. slabs)
-- [ ] World saving and loading
-- [ ] 🤔 Block ID flattening? 
+- [x] World saving and loading
+- [x] Block ID flattening? 
 
 ## Bugs
 - [ ] Fix raycasts
-- [ ] Fix player animation jitter
+- [x] Fix player animation jitter
 - [ ] Fix distance jitter

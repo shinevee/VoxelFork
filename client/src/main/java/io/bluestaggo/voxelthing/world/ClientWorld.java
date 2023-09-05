@@ -5,6 +5,7 @@ import io.bluestaggo.voxelthing.Game;
 import io.bluestaggo.voxelthing.Identifier;
 import io.bluestaggo.voxelthing.renderer.world.WorldRenderer;
 import io.bluestaggo.voxelthing.world.block.Block;
+import io.bluestaggo.voxelthing.world.storage.ISaveHandler;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,20 +15,14 @@ import java.util.stream.Collectors;
 public class ClientWorld extends World {
 	public final Game game;
 
-	public ClientWorld(Game game) {
-		super();
+	public ClientWorld(Game game, ISaveHandler saveHandler) {
+		super(saveHandler);
 		this.game = game;
 		game.renderer.worldRenderer.setWorld(this);
 		game.renderer.worldRenderer.loadRenderers();
 	}
 
-	@Override
-	public void loadChunkAt(int cx, int cy, int cz) {
-		if (cx != 0 || cy != 0 || cz != 0) {
-			super.loadChunkAt(cx, cy, cz);
-			return;
-		}
-
+	private void debugChunk(int cx, int cy, int cz) {
 		byte[] blocks = new byte[Chunk.VOLUME];
 		for (int i = 0; i < blocks.length; i++) {
 			blocks[i] = (byte) (i % (Block.WOOL.length + 1));

@@ -1,9 +1,11 @@
 package io.bluestaggo.voxelthing;
 
+import io.bluestaggo.pds.CompoundItem;
 import io.bluestaggo.voxelthing.assets.Texture;
 import io.bluestaggo.voxelthing.gui.*;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Quad;
+import io.bluestaggo.voxelthing.util.OperatingSystem;
 import io.bluestaggo.voxelthing.window.ClientPlayerController;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.BlockRaycast;
@@ -12,11 +14,16 @@ import io.bluestaggo.voxelthing.world.World;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.entity.IPlayerController;
 import io.bluestaggo.voxelthing.world.entity.Player;
+import io.bluestaggo.voxelthing.world.storage.FolderSaveHandler;
+import io.bluestaggo.voxelthing.world.storage.ISaveHandler;
 
 import javax.swing.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL33C.glClearColor;
@@ -57,6 +64,9 @@ public class Game {
 
 	private static Game instance;
 
+	public final Path saveDir;
+	public final Path worldDir;
+
 	public final Window window;
 	public final MainRenderer renderer;
 
@@ -81,6 +91,9 @@ public class Game {
 	public Game() {
 		instance = this;
 
+		saveDir = getSaveDir();
+		worldDir = saveDir.resolve("worlds");
+
 		window = new Window();
 		window.grabCursor();
 
@@ -96,6 +109,23 @@ public class Game {
 
 	public static Game getInstance() {
 		return instance;
+	}
+
+	private static Path getSaveDir() {
+		String home = System.getProperty("user.home", ".");
+		Path dir = switch (OperatingSystem.get()) {
+			case WINDOWS -> Path.of(Optional.ofNullable(System.getenv("APPDATA")).orElse(home), "VoxelThing");
+			case MACOS -> Path.of(home, "Library", "Application Support", "Voxel Thing");
+			default -> Path.of(home, ".voxelthing");
+		};
+
+		try {
+			Files.createDirectories(dir);
+		} catch (IOException e) {
+			throw new RuntimeException("Failed to create Voxel Thing data directory!", e);
+		}
+
+		return dir;
 	}
 
 	public void run() {
@@ -118,21 +148,44 @@ public class Game {
 	}
 
 	private void close() {
-		if (world != null) {
-			world.close();
-		}
+		exitWorld();
 		renderer.unload();
 		window.destroy();
 	}
 
 	public void startWorld() {
-		if (world != null) {
-			world.close();
+		startWorld(null);
+	}
+
+	public void startWorld(String name) {
+		exitWorld();
+
+		ISaveHandler saveHandler = null;
+		if (name != null) {
+			try {
+				saveHandler = new FolderSaveHandler(worldDir.resolve(name));
+			} catch (IOException e) {
+				System.out.println("Cannot save world \"" + name + "\"! Playing without saving.");
+				e.printStackTrace();
+			}
 		}
 
-		world = new ClientWorld(this);
+		world = new ClientWorld(this, saveHandler);
+		saveHandler = world.saveHandler;
 		playerController = new ClientPlayerController(this);
 		player = new Player(world, playerController);
+
+		CompoundItem playerData = saveHandler.loadPlayerData();
+		if (playerData != null) {
+			player.deserialize(playerData);
+		}
+	}
+
+	public void exitWorld() {
+		if (world != null) {
+			world.saveHandler.savePlayerData(player.serialize());
+			world.close();
+		}
 	}
 
 	public boolean isInWorld() {
@@ -185,7 +238,7 @@ public class Game {
 				if (thirdPerson) {
 					py -= player.getPartialVelY() * 0.2;
 				}
-				pitch += player.getPartialVelY() * 2.5f;
+				pitch += player.getFallAmount() * 5.0;
 			}
 
 			renderer.camera.setPosition(px, py, pz);

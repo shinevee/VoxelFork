@@ -1,5 +1,6 @@
 package io.bluestaggo.voxelthing.world.entity;
 
+import io.bluestaggo.pds.CompoundItem;
 import io.bluestaggo.voxelthing.math.AABB;
 import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.world.World;
@@ -95,7 +96,7 @@ public class Entity {
 
 			onGround = oldVelY < 0.0 && oldVelY < velY;
 		} else {
-			onGround = true;
+			onGround = false;
 		}
 
 		posX += velX;
@@ -186,5 +187,29 @@ public class Entity {
 
 	public String getTexture() {
 		return texture;
+	}
+
+	public CompoundItem serialize() {
+		var data = new CompoundItem();
+		data.setDouble("posX", posX);
+		data.setDouble("posY", posY);
+		data.setDouble("posZ", posZ);
+		data.setDouble("velX", velX);
+		data.setDouble("velY", velY);
+		data.setDouble("velZ", velZ);
+		data.setDouble("rotYaw", rotYaw);
+		data.setDouble("rotPitch", rotPitch);
+		return data;
+	}
+
+	public void deserialize(CompoundItem data) {
+		prevPosX = posX = data.getDouble("posX");
+		prevPosY = posY = data.getDouble("posY");
+		prevPosZ = posZ = data.getDouble("posZ");
+		prevVelX = velX = data.getDouble("velX");
+		prevVelY = velY = data.getDouble("velY");
+		prevVelZ = velZ = data.getDouble("velZ");
+		prevRotYaw = rotYaw = data.getDouble("rotYaw");
+		prevRotPitch = rotPitch = data.getDouble("rotPitch");
 	}
 }

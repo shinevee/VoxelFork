@@ -3,6 +3,7 @@ package io.bluestaggo.voxelthing.world;
 import io.bluestaggo.voxelthing.util.IntList;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.storage.ByteBlockStorage;
+import io.bluestaggo.voxelthing.world.storage.EmptyBlockStorage;
 import io.bluestaggo.voxelthing.world.storage.NibbleBlockStorage;
 import io.bluestaggo.voxelthing.world.storage.ShortBlockStorage;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 public abstract class BlockStorage {
 	private static final List<Class<? extends BlockStorage>> REGISTERED_TYPES = List.of(
+			EmptyBlockStorage.class,
 			NibbleBlockStorage.class,
 			ByteBlockStorage.class,
 			ShortBlockStorage.class
@@ -94,8 +96,8 @@ public abstract class BlockStorage {
 
 	public abstract byte[] getBytes();
 
-	public int getType() {
-		return REGISTERED_TYPES.indexOf(getClass());
+	public byte getType() {
+		return (byte) REGISTERED_TYPES.indexOf(getClass());
 	}
 
 	protected void updateBlockCounts() {

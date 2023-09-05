@@ -53,5 +53,10 @@ public class SaveSelect extends GuiScreen {
 			game.startWorld();
 			game.openGui(null);
 		}
+
+		if (control == playWorldButton) {
+			game.startWorld("world");
+			game.openGui(null);
+		}
 	}
 }

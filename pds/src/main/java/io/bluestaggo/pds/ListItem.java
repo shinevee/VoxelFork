@@ -48,7 +48,7 @@ public class ListItem extends StructureItem {
 	protected void write(DataOutputStream stream) throws IOException {
 		stream.writeInt(list.size());
 		for (StructureItem item : list) {
-			writeItem(item, stream);
+			item.writeItem(stream);
 		}
 	}
 }

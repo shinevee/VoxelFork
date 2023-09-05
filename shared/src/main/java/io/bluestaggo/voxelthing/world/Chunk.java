@@ -1,9 +1,10 @@
 package io.bluestaggo.voxelthing.world;
 
-import io.bluestaggo.pds.*;
+import io.bluestaggo.pds.CompoundItem;
+import io.bluestaggo.pds.ListItem;
 import io.bluestaggo.voxelthing.Identifier;
 import io.bluestaggo.voxelthing.world.block.Block;
-import io.bluestaggo.voxelthing.world.storage.NibbleBlockStorage;
+import io.bluestaggo.voxelthing.world.storage.EmptyBlockStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +22,10 @@ public class Chunk implements IBlockAccess {
 
 	private BlockStorage blockStorage;
 	private boolean empty;
+	private boolean hasChanged;
 
 	public Chunk(World world, int x, int y, int z) {
-		this(world, x, y, z, new NibbleBlockStorage());
+		this(world, x, y, z, new EmptyBlockStorage());
 	}
 
 	public Chunk(World world, int x, int y, int z, BlockStorage blockStorage) {
@@ -61,6 +63,7 @@ public class Chunk implements IBlockAccess {
 			blockStorage = blockStorage.expand();
 		}
 		blockStorage.setBlock(x, y, z, block);
+		hasChanged = true;
 
 		if (block != null) {
 			empty = false;
@@ -84,32 +87,46 @@ public class Chunk implements IBlockAccess {
 				&& z >= 0 && z < Chunk.LENGTH;
 	}
 
-	public StructureItem serialize() {
+	public CompoundItem serialize() {
 		var item = new CompoundItem();
 
 		var paletteItem = new ListItem(blockStorage.palette.stream()
 				.map(b -> (b == null ? Block.ID_AIR : b.id).serialize())
 				.collect(Collectors.toList()));
-		item.map.put("blockPalette", paletteItem);
+		item.setItem("blockPalette", paletteItem);
 
-		item.map.put("blockArrayType", new ByteItem(blockStorage.getType()));
-		item.map.put("blocks", new ByteArrayItem(blockStorage.getBytes()));
+		item.setByte("blockArrayType", blockStorage.getType());
+		item.setByteArray("blocks", blockStorage.getBytes());
 
 		return item;
 	}
 
-	public static Chunk deserialize(World world, int x, int y, int z, StructureItem item) {
-		var paletteItem = item.getMap().get("blockPalette");
+	public static Chunk deserialize(World world, int x, int y, int z, CompoundItem item) {
+		var paletteItem = item.getItem("blockPalette");
 		List<Block> palette = paletteItem.getList().stream()
 				.map(Identifier::deserialize)
 				.map(Block::fromId)
 				.collect(Collectors.toCollection(ArrayList::new));
 
-		byte[] blocks = item.getMap().get("blocks").getByteArray();
-		byte blockArrayType = item.getMap().get("blockArrayType").getByte();
+		byte[] blocks = item.getByteArray("blocks");
+		byte blockArrayType = item.getByte("blockArrayType");
 
 		BlockStorage storage = BlockStorage.decode(blockArrayType, palette, blocks);
 
 		return new Chunk(world, x, y, z, storage);
+	}
+
+	public void dontSave() {
+		hasChanged = false;
+	}
+
+	public void onUnload() {
+		save();
+	}
+
+	public void save() {
+		if (hasChanged) {
+			world.saveHandler.saveChunkData(x, y, z, serialize());
+		}
 	}
 }

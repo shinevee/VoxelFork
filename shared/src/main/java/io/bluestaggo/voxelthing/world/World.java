@@ -1,11 +1,14 @@
 package io.bluestaggo.voxelthing.world;
 
+import io.bluestaggo.pds.CompoundItem;
 import io.bluestaggo.voxelthing.math.AABB;
 import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.generation.GenCache;
 import io.bluestaggo.voxelthing.world.generation.GenerationInfo;
 import io.bluestaggo.voxelthing.world.storage.ChunkStorage;
+import io.bluestaggo.voxelthing.world.storage.EmptySaveHandler;
+import io.bluestaggo.voxelthing.world.storage.ISaveHandler;
 import org.joml.Vector3d;
 import org.joml.Vector3i;
 
@@ -16,45 +19,31 @@ import java.util.Random;
 public class World implements IBlockAccess {
 	protected final ChunkStorage chunkStorage;
 	private final GenCache genCache;
+	public final ISaveHandler saveHandler;
 
 	public final Random random = new Random();
-	public final long seed = random.nextLong();
+	public final WorldInfo info = new WorldInfo();
 
 	public double partialTick;
 
 	public World() {
-		chunkStorage = new ChunkStorage(this);
-		genCache = new GenCache(this);
+		this(null);
 	}
 
-	protected void debugChunk() {
-		int range = 1 << ChunkStorage.RADIUS_POW2 >> 1;
-		for (int x = -range; x <= range; x++) {
-			for (int z = -range; z <= range; z++) {
-				Chunk chunk = chunkStorage.newChunkAt(x, 0, z);
+	public World(ISaveHandler saveHandler) {
+		if (saveHandler == null) {
+			saveHandler = new EmptySaveHandler();
+		}
 
-				for (int xx = 0; xx < 32; xx++) {
-					for (int zz = 0; zz < 32; zz++) {
-						for (int yy = 0; yy < 32; yy++) {
-							Block block = Block.STONE;
-							if ((x + z) % 2 == 0) {
-								block = Block.BRICKS;
-							} else {
-								if (yy >= 4) {
-									block = Block.DIRT;
-								}
-								if (yy == 31) {
-									block = Block.GRASS;
-								}
-								if (random.nextInt(2) == 0) {
-									block = null;
-								}
-							}
-							chunk.setBlock(xx, yy, zz, block);
-						}
-					}
-				}
-			}
+		chunkStorage = new ChunkStorage(this);
+		genCache = new GenCache(this);
+		this.saveHandler = saveHandler;
+
+		info.seed = random.nextLong();
+
+		CompoundItem data = saveHandler.loadWorldData();
+		if (data != null) {
+			info.deserialize(data);
 		}
 	}
 
@@ -110,6 +99,12 @@ public class World implements IBlockAccess {
 			return;
 		}
 
+		CompoundItem data = saveHandler.loadChunkData(cx, cy, cz);
+		if (data != null) {
+			chunkStorage.deserializeChunkAt(cx, cy, cz, data);
+			return;
+		}
+
 		Chunk chunk = chunkStorage.newChunkAt(cx, cy, cz);
 		GenerationInfo genInfo = genCache.getGenerationAt(cx, cz);
 
@@ -141,6 +136,7 @@ public class World implements IBlockAccess {
 			}
 		}
 
+		chunk.dontSave();
 		onChunkAdded(cx, cy, cz);
 	}
 
@@ -234,5 +230,7 @@ public class World implements IBlockAccess {
 	}
 
 	public void close() {
+		saveHandler.saveWorldData(info.serialize());
+		chunkStorage.unloadAllChunks();
 	}
 }

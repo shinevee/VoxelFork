@@ -13,6 +13,8 @@ public class Player extends Entity {
 	private double renderWalk;
 	private double prevWalkDir;
 	private double walkDir;
+	private double prevFallAmount;
+	private double fallAmount;
 
 	private int jumpTimer = 0;
 	private boolean wasJumpPressed;
@@ -103,9 +105,15 @@ public class Player extends Entity {
 			walkDir = Math.toDegrees(new Vector2d(velX, velZ).angle(new Vector2d(-1.0f, 0.0f)));
 		}
 
-		if (onGround && controller.doJump()) {
+		if ((onGround || noClip) && controller.doJump()) {
 			velY = jumpHeight;
 		}
+
+		prevFallAmount = fallAmount;
+		if (onGround) {
+			fallAmount = 0.0;
+		}
+		fallAmount += (velY - fallAmount) * 0.5;
 
 		if (jumpPressed && !wasJumpPressed) {
 			if (jumpTimer > 0) {
@@ -126,6 +134,10 @@ public class Player extends Entity {
 
 	public float getRenderWalkDir() {
 		return (float) world.scaleToTick(prevWalkDir, walkDir);
+	}
+
+	public double getFallAmount() {
+		return world.scaleToTick(prevFallAmount, fallAmount);
 	}
 
 	@Override

@@ -27,7 +27,7 @@ public class GenCache {
 			return entry;
 		}
 
-		entry = new GenerationInfo(world.seed, x, z);
+		entry = new GenerationInfo(world.info.seed, x, z);
 		cache[cacheCoords(x, z)] = entry;
 		return entry;
 	}

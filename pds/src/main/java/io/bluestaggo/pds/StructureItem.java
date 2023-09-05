@@ -1,9 +1,9 @@
 package io.bluestaggo.pds;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -142,8 +142,22 @@ public abstract class StructureItem {
 		}
 	}
 
-	public static void writeItem(StructureItem item, DataOutputStream stream) throws IOException {
-		stream.write(item.getType());
-		item.write(stream);
+	public void writeItem(DataOutputStream stream) throws IOException {
+		stream.write(getType());
+		write(stream);
+	}
+
+	public static StructureItem readItemFromPath(Path path) throws IOException {
+		try (InputStream istream = Files.newInputStream(path)) {
+			var distream = new DataInputStream(istream);
+			return readItem(distream);
+		}
+	}
+
+	public void writeItemToPath(Path path) throws IOException {
+		try (OutputStream ostream = Files.newOutputStream(path)) {
+			var dostream = new DataOutputStream(ostream);
+			writeItem(dostream);
+		}
 	}
 }

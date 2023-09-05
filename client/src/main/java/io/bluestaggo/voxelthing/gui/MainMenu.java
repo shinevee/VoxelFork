@@ -83,8 +83,6 @@ public class MainMenu extends GuiScreen {
 	@Override
 	public void onControlClicked(GuiControl control, int button) {
 		if (control == playButton) {
-//			game.startWorld();
-//			game.openGui(null);
 			game.openGui(new SaveSelect(game));
 		}
 	}

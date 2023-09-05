@@ -8,21 +8,24 @@ import io.bluestaggo.voxelthing.world.block.Block;
 import java.util.List;
 
 public class NibbleBlockStorage extends BlockStorage {
-	private final byte[] blocks = new byte[Chunk.VOLUME / 2];
+	private final byte[] blocks;
 
 	public NibbleBlockStorage() {
 		super();
+		blocks = new byte[Chunk.VOLUME / 2];
 	}
 
 	public NibbleBlockStorage(List<Block> palette) {
 		super(palette);
+		blocks = new byte[Chunk.VOLUME / 2];
 	}
 
 	public NibbleBlockStorage(List<Block> palette, byte[] bytes) {
 		super(palette);
-		for (int i = 0; i < bytes.length; i++) {
-			blocks[i] = (byte) ((bytes[i * 2] & 0xF) << 4 | bytes[i * 2 + 1] & 0xF);
-		}
+		blocks = bytes;
+//		for (int i = 0; i < bytes.length; i++) {
+//			blocks[i] = (byte) ((bytes[i * 2] & 0xF) << 4 | bytes[i * 2 + 1] & 0xF);
+//		}
 		updateBlockCounts();
 	}
 

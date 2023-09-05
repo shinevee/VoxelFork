@@ -99,7 +99,7 @@ public class IngameGui extends GuiScreen {
 		if (game.viewBobbingEnabled()) {
 			bobX += (float) (game.player.getRenderWalk() * -0.05) * handSize;
 			bobY += (float) ((Math.abs(game.player.getRenderWalk()) * 0.05)
-					+ Math.max(game.player.getPartialVelY() * 0.1, -0.25)) * handSize;
+					+ Math.max(game.player.getFallAmount() * 0.1, -0.25)) * handSize;
 		}
 
 		r.draw2D.drawQuad(Quad.shared()

@@ -1,6 +1,6 @@
 package io.bluestaggo.voxelthing.world.storage;
 
-import io.bluestaggo.pds.StructureItem;
+import io.bluestaggo.pds.CompoundItem;
 import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.World;
 
@@ -38,21 +38,37 @@ public class ChunkStorage {
 			return chunk;
 		}
 
-		chunks[storageCoords(x, y, z)] = null;
+		chunk = chunks[storageCoords(x, y, z)];
+		if (chunk != null) {
+			chunk.onUnload();
+			chunks[storageCoords(x, y, z)] = null;
+		}
 		chunk = new Chunk(world, x, y, z);
 		chunks[storageCoords(x, y, z)] = chunk;
 		return chunk;
 	}
 
-	public Chunk deserializeChunkAt(int x, int y, int z, StructureItem item) {
+	public Chunk deserializeChunkAt(int x, int y, int z, CompoundItem item) {
 		Chunk chunk = getChunkAt(x, y, z);
 		if (chunk != null) {
 			return chunk;
 		}
 
-		chunks[storageCoords(x, y, z)] = null;
+		chunk = chunks[storageCoords(x, y, z)];
+		if (chunk != null) {
+			chunk.onUnload();
+			chunks[storageCoords(x, y, z)] = null;
+		}
 		chunk = Chunk.deserialize(world, x, y, z, item);
 		chunks[storageCoords(x, y, z)] = chunk;
 		return chunk;
+	}
+
+	public void unloadAllChunks() {
+		for (Chunk chunk : chunks) {
+			if (chunk != null) {
+				chunk.onUnload();
+			}
+		}
 	}
 }
