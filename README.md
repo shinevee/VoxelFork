@@ -33,3 +33,9 @@ To compile the Voxel Thing client, simply run `./gradlew :client:build`. To crea
 
 ## Contribution
 Feel free to contribute to Voxel Thing! Pull requests from forks can be made, as long as they don't change the game too much like adding in completely new blocks or items. Pull requests for objective improvements such as improved performance, documentation fixes and code cleanup are welcome.
+
+## Credits
+![STAGGO: Lead developer](doc/credits/staggo.png)
+![FLOOF: Densigner](doc/credits/floof.png)
+
+[//]: # (![TALON: Just a cool guy ig]&#40;doc/credits/talon.png&#41;)
