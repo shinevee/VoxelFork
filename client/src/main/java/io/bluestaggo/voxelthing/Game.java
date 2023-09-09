@@ -85,6 +85,7 @@ public class Game {
 
 	public float mouseSensitivity = 0.25f;
 
+	private double tickCount;
 	private double tickTime;
 	private double partialTick;
 
@@ -193,6 +194,7 @@ public class Game {
 	}
 
 	private void update(double delta) {
+		tickCount += delta;
 		tickTime += delta;
 
 		GuiScreen gui = currentGui != null ? currentGui : isInWorld() ? inGameGui : null;
@@ -374,6 +376,10 @@ public class Game {
 
 	public boolean showThirdPerson() {
 		return thirdPerson;
+	}
+
+	public double getTickCount() {
+		return tickCount;
 	}
 
 	public double getPartialTick() {
