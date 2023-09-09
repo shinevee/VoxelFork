@@ -104,6 +104,16 @@ public class WorldRenderer {
 		}
 	}
 
+	public void drawClouds(double ticks) {
+		try (GLState state = new GLState()) {
+			state.enable(GL_BLEND);
+			state.disable(GL_CULL_FACE);
+			renderer.draw3D.drawClouds(ticks);
+			state.enable(GL_CULL_FACE);
+			state.disable(GL_BLEND);
+		}
+	}
+
 	public void moveRenderers() {
 		Vector3f cameraPos = renderer.camera.getPosition();
 		int x = (int)Math.floor(cameraPos.x / Chunk.LENGTH);

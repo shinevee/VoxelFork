@@ -117,6 +117,7 @@ public class MainRenderer {
 			textures.getMipmappedTexture("/assets/blocks.png").use();
 			useSkyTexture(1);
 			worldRenderer.draw();
+			worldRenderer.drawClouds(game.getTickCount());
 
 			state.disable(GL_CULL_FACE);
 
