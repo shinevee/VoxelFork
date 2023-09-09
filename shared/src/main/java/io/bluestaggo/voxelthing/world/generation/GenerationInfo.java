@@ -110,12 +110,9 @@ public class GenerationInfo {
 		final float cheeseDensitySpread = 100.0f;
 		final float cheeseDensitySurface = -0.5f;
 
-		int shiftPow2 = Chunk.SIZE_POW2 - 3;
-		int shiftMask = 3;
-		int shiftDiv = 4;
-		int xx = x >> shiftPow2;
-		int yy = (y & Chunk.LENGTH_MASK) >> shiftPow2;
-		int zz = z >> shiftPow2;
+		int xx = x / 4;
+		int yy = (y & Chunk.LENGTH_MASK) / 4;
+		int zz = z / 4;
 
 		float c000 = caveInfo[MathUtil.index3D(xx, yy, zz, LERP_MAP_LENGTH)];
 		float c001 = caveInfo[MathUtil.index3D(xx, yy, zz + 1, LERP_MAP_LENGTH)];
@@ -125,8 +122,7 @@ public class GenerationInfo {
 		float c101 = caveInfo[MathUtil.index3D(xx + 1, yy, zz + 1, LERP_MAP_LENGTH)];
 		float c110 = caveInfo[MathUtil.index3D(xx + 1, yy + 1, zz, LERP_MAP_LENGTH)];
 		float c111 = caveInfo[MathUtil.index3D(xx + 1, yy + 1, zz + 1, LERP_MAP_LENGTH)];
-		float caveInfo = MathUtil.trilinear(c000, c001, c010, c011, c100, c101, c110, c111,
-					(x & shiftMask) / (float) shiftDiv, (y & shiftMask) / (float) shiftDiv, (z & shiftMask) / (float) shiftDiv);
+		float caveInfo = MathUtil.trilinear(c000, c001, c010, c011, c100, c101, c110, c111, (x & 3) / 4.0f, (y & 3) / 4.0f, (z & 3) / 4.0f);
 		float cheeseThreshold = MathUtil.clamp(-y / cheeseDensitySpread + cheeseDensitySurface, cheeseMinDensity, cheeseMaxDensity);
 		return caveInfo < cheeseThreshold;
 	}
@@ -142,9 +138,9 @@ public class GenerationInfo {
 		for (int x = 0; x < LERP_MAP_LENGTH; x++) {
 			for (int y = 0; y < LERP_MAP_LENGTH; y++) {
 				for (int z = 0; z < LERP_MAP_LENGTH; z++) {
-					int xx = (x << (Chunk.SIZE_POW2 - 3)) + (chunkX << Chunk.SIZE_POW2);
-					int yy = (y << (Chunk.SIZE_POW2 - 3)) + (layer << Chunk.SIZE_POW2);
-					int zz = (z << (Chunk.SIZE_POW2 - 3)) + (chunkZ << Chunk.SIZE_POW2);
+					int xx = (x << 2) + (chunkX << Chunk.SIZE_POW2);
+					int yy = (y << 2) + (layer << Chunk.SIZE_POW2);
+					int zz = (z << 2) + (chunkZ << Chunk.SIZE_POW2);
 
 					float cheese = OpenSimplex2Octaves.noise3_ImproveXZ(caveSeed, cheeseOctaves, xx / cheeseScaleXZ, yy / cheeseScaleY, zz / cheeseScaleXZ);
 					caveInfo[MathUtil.index3D(x, y, z, LERP_MAP_LENGTH)] = cheese;
