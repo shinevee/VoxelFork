@@ -16,7 +16,11 @@ public class ClientWorld extends World {
 	public final Game game;
 
 	public ClientWorld(Game game, ISaveHandler saveHandler) {
-		super(saveHandler);
+		this(game, saveHandler, null);
+	}
+
+	public ClientWorld(Game game, ISaveHandler saveHandler, WorldInfo worldInfo) {
+		super(saveHandler, worldInfo);
 		this.game = game;
 		game.renderer.worldRenderer.setWorld(this);
 		game.renderer.worldRenderer.loadRenderers();

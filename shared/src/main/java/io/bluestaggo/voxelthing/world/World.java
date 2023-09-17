@@ -22,15 +22,29 @@ public class World implements IBlockAccess {
 	public final ISaveHandler saveHandler;
 
 	public final Random random = new Random();
-	public final WorldInfo info = new WorldInfo();
+	public final WorldInfo info;
 
 	public double partialTick;
 
 	public World() {
-		this(null);
+		this(null, null);
 	}
 
 	public World(ISaveHandler saveHandler) {
+		this(saveHandler, null);
+	}
+
+	public World(ISaveHandler saveHandler, WorldInfo info) {
+		if (info == null) {
+			this.info = new WorldInfo();
+			CompoundItem data = saveHandler.loadData("world");
+			if (data != null) {
+				this.info.deserialize(data);
+			}
+		} else {
+			this.info = info;
+		}
+
 		if (saveHandler == null) {
 			saveHandler = new EmptySaveHandler();
 		}
@@ -38,13 +52,6 @@ public class World implements IBlockAccess {
 		chunkStorage = new ChunkStorage(this);
 		genCache = new GenCache(this);
 		this.saveHandler = saveHandler;
-
-		info.seed = random.nextLong();
-
-		CompoundItem data = saveHandler.loadWorldData();
-		if (data != null) {
-			info.deserialize(data);
-		}
 	}
 
 	public Chunk getChunkAt(int x, int y, int z) {
@@ -230,7 +237,7 @@ public class World implements IBlockAccess {
 	}
 
 	public void close() {
-		saveHandler.saveWorldData(info.serialize());
+		saveHandler.saveData("world", info.serialize());
 		chunkStorage.unloadAllChunks();
 	}
 }

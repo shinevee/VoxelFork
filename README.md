@@ -21,7 +21,7 @@ Nothing much here yet, huh? What will this be? Well, it is heading towards being
 - F4: Toggle view bobbing
 - F5: Third person
 - F6: Change skin
-- Escape: Lock / unlock mouse
+- Escape: Exit and save world
 - ]: Increase GUI scale
 - [: Decrease GUI scale
 

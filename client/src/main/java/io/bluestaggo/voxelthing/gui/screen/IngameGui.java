@@ -1,4 +1,4 @@
-package io.bluestaggo.voxelthing.gui;
+package io.bluestaggo.voxelthing.gui.screen;
 
 import io.bluestaggo.voxelthing.Game;
 import io.bluestaggo.voxelthing.assets.Texture;
@@ -75,7 +75,7 @@ public class IngameGui extends GuiScreen {
 		MainRenderer r = game.renderer;
 		Texture crosshairTexture = r.textures.getTexture("/assets/gui/crosshair.png");
 		r.draw2D.drawQuad(Quad.shared()
-				.at((int)(r.screen.getWidth() - crosshairTexture.width) / 2, (int)(r.screen.getHeight() - crosshairTexture.height) / 2)
+				.at((r.screen.getWidth() - crosshairTexture.width) / 2, (r.screen.getHeight() - crosshairTexture.height) / 2)
 				.withTexture(crosshairTexture));
 	}
 

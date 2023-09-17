@@ -2,7 +2,7 @@ package io.bluestaggo.voxelthing;
 
 import io.bluestaggo.pds.CompoundItem;
 import io.bluestaggo.voxelthing.assets.Texture;
-import io.bluestaggo.voxelthing.gui.*;
+import io.bluestaggo.voxelthing.gui.screen.*;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Quad;
 import io.bluestaggo.voxelthing.util.OperatingSystem;
@@ -11,6 +11,7 @@ import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.BlockRaycast;
 import io.bluestaggo.voxelthing.world.ClientWorld;
 import io.bluestaggo.voxelthing.world.World;
+import io.bluestaggo.voxelthing.world.WorldInfo;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.entity.IPlayerController;
 import io.bluestaggo.voxelthing.world.entity.Player;
@@ -85,7 +86,6 @@ public class Game {
 
 	public float mouseSensitivity = 0.25f;
 
-	private double tickCount;
 	private double tickTime;
 	private double partialTick;
 
@@ -155,12 +155,14 @@ public class Game {
 	}
 
 	public void startWorld() {
-		startWorld(null);
+		startWorld((ISaveHandler) null, null);
 	}
 
-	public void startWorld(String name) {
-		exitWorld();
+	public void startWorld(ISaveHandler saveHandler) {
+		startWorld(saveHandler, null);
+	}
 
+	public void startWorld(String name, WorldInfo worldInfo) {
 		ISaveHandler saveHandler = null;
 		if (name != null) {
 			try {
@@ -171,21 +173,32 @@ public class Game {
 			}
 		}
 
-		world = new ClientWorld(this, saveHandler);
+		startWorld(saveHandler, worldInfo);
+	}
+
+	public void startWorld(ISaveHandler saveHandler, WorldInfo worldInfo) {
+		exitWorld();
+
+		world = new ClientWorld(this, saveHandler, worldInfo);
 		saveHandler = world.saveHandler;
 		playerController = new ClientPlayerController(this);
 		player = new Player(world, playerController);
 
-		CompoundItem playerData = saveHandler.loadPlayerData();
+		CompoundItem playerData = saveHandler.loadData("player");
 		if (playerData != null) {
 			player.deserialize(playerData);
 		}
+
+		currentGui = null;
+		window.grabCursor();
 	}
 
 	public void exitWorld() {
 		if (world != null) {
-			world.saveHandler.savePlayerData(player.serialize());
+			world.saveHandler.saveData("player", player.serialize());
 			world.close();
+			player = null;
+			world = null;
 		}
 	}
 
@@ -194,10 +207,13 @@ public class Game {
 	}
 
 	private void update(double delta) {
-		tickCount += delta;
 		tickTime += delta;
 
 		GuiScreen gui = currentGui != null ? currentGui : isInWorld() ? inGameGui : null;
+		if (gui == null) {
+			gui = currentGui = new MainMenu(this);
+			window.ungrabCursor();
+		}
 
 		if (gui == inGameGui) {
 			doControls();
@@ -314,7 +330,7 @@ public class Game {
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_ESCAPE)) {
-			window.toggleGrabCursor();
+			exitWorld();
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_E)) {
@@ -340,7 +356,8 @@ public class Game {
 				renderer.draw2D.drawQuad(Quad.shared()
 						.size(width, height)
 						.withTexture(bgTex)
-						.withUV(0.0f, 0.0f, width / bgTex.width, height / bgTex.height));
+						.withUV(0.0f, 0.0f, width / bgTex.width, height / bgTex.height)
+				);
 			}
 
 			if (currentGui != null) {
@@ -350,8 +367,12 @@ public class Game {
 	}
 
 	public void openGui(GuiScreen gui) {
-		if (gui == null && !isInWorld()) {
-			gui = new MainMenu(this);
+		if (gui == null) {
+			if (currentGui.parent != null) {
+				gui = currentGui.parent;
+			} else if (!isInWorld()) {
+				gui = new MainMenu(this);
+			}
 		}
 
 		currentGui = gui;
@@ -376,10 +397,6 @@ public class Game {
 
 	public boolean showThirdPerson() {
 		return thirdPerson;
-	}
-
-	public double getTickCount() {
-		return tickCount;
 	}
 
 	public double getPartialTick() {

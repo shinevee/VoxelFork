@@ -1,4 +1,4 @@
-package io.bluestaggo.voxelthing.gui;
+package io.bluestaggo.voxelthing.gui.screen;
 
 import io.bluestaggo.voxelthing.Game;
 import io.bluestaggo.voxelthing.assets.FontManager;
@@ -32,7 +32,8 @@ public class DebugGui extends GuiScreen {
 						+ ", " + formatDouble(game.player.posY)
 						+ ", " + formatDouble(game.player.posZ)
 						: "N/A",
-				"Looking At", game.getBlockRaycast().getDebugText(game.world)
+				"Looking At", game.getBlockRaycast().getDebugText(game.world),
+				"Scroll", formatDouble(game.window.getScrollX()) + ", " + formatDouble(game.window.getScrollY())
 		};
 
 		StringBuilder debugBuilder = new StringBuilder();
@@ -54,7 +55,7 @@ public class DebugGui extends GuiScreen {
 		fonts.shadowed.print(debugBuilder.toString(), 5, 15);
 	}
 
-	private static double formatDouble(double d) {
-		return Math.floor(d * 100.0) / 100.0;
+	private static String formatDouble(double d) {
+		return Double.toString(Math.floor(d * 100.0) / 100.0);
 	}
 }

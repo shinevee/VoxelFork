@@ -19,7 +19,7 @@ Key:
 - [x] Block inventory
 - [ ] Partial blocks (e.g. slabs)
 - [x] World saving and loading
-- [x] Block ID flattening? 
+- [x] Block ID flattening
 
 ## Bugs
 - [ ] Fix raycasts
