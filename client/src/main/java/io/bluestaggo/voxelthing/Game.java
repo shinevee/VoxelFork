@@ -5,6 +5,7 @@ import io.bluestaggo.voxelthing.assets.Texture;
 import io.bluestaggo.voxelthing.gui.screen.*;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Quad;
+import io.bluestaggo.voxelthing.settings.Settings;
 import io.bluestaggo.voxelthing.util.OperatingSystem;
 import io.bluestaggo.voxelthing.window.ClientPlayerController;
 import io.bluestaggo.voxelthing.window.Window;
@@ -57,7 +58,7 @@ public class Game {
 			"floof",
 			"talon"
 	};
-	private int currentSkin = VERSION.contains("dev") || VERSION.equals("???") ? 1 : 0;
+	private int currentSkin = VERSION.contains("dev") ? 1 : 0;
 	private boolean thirdPerson;
 	private boolean debugMenu = true;
 	private boolean drawGui = true;
@@ -70,6 +71,7 @@ public class Game {
 
 	public final Window window;
 	public final MainRenderer renderer;
+	public final Settings settings;
 
 	public World world;
 	public Player player;
@@ -97,6 +99,9 @@ public class Game {
 
 		window = new Window();
 		window.grabCursor();
+
+		settings = new Settings();
+		settings.readFrom(saveDir.resolve("settings.dat"));
 
 		renderer = new MainRenderer(this);
 
@@ -252,11 +257,11 @@ public class Game {
 			float pitch = (float) player.rotPitch;
 
 			py += player.height - 0.3;
-			if (viewBobbing) {
+			if (settings.viewBobbing.get()) {
 				if (thirdPerson) {
 					py -= player.getPartialVelY() * 0.2;
 				}
-				pitch += player.getFallAmount() * 5.0;
+				pitch += player.getFallAmount() * 2.5;
 			}
 
 			renderer.camera.setPosition(px, py, pz);
@@ -269,26 +274,30 @@ public class Game {
 
 			if (thirdPerson) {
 				renderer.camera.moveForward(-4.0f);
-			} else if (viewBobbing) {
-				py += Math.abs(player.getRenderWalk()) * 0.2f;
+			} else if (settings.viewBobbing.get()) {
+				py += Math.abs(player.getRenderWalk()) * 0.1f;
 				renderer.camera.setPosition(px, py, pz);
-				renderer.camera.moveRight((float) player.getRenderWalk() * 0.1f);
+				renderer.camera.moveRight((float) player.getRenderWalk() * 0.05f);
 			}
 		}
 	}
 
 	private void doControls() {
 		if (window.isKeyJustPressed(GLFW_KEY_F)) {
-			int dist = renderer.worldRenderer.renderDistance;
+			int distHor = renderer.worldRenderer.renderDistanceHor;
+			int distVer = renderer.worldRenderer.renderDistanceVer;
 			if (window.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-				if (dist < 16) {
-					dist <<= 1;
+				if (distHor < 16) {
+					distHor <<= 1;
+					distVer <<= 1;
 				}
-			} else if (dist > 1) {
-				dist >>= 1;
+			} else if (distHor > 1) {
+				distHor >>= 1;
+				distVer >>= 1;
 			}
 
-			renderer.worldRenderer.renderDistance = dist;
+			renderer.worldRenderer.renderDistanceHor = distHor;
+			renderer.worldRenderer.renderDistanceVer = distVer;
 			renderer.worldRenderer.loadRenderers();
 		}
 
@@ -318,7 +327,7 @@ public class Game {
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_F4)) {
-			viewBobbing = !viewBobbing;
+			settings.viewBobbing.set(!settings.viewBobbing.get());
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_F5)) {
@@ -341,28 +350,28 @@ public class Game {
 	private void draw() {
 		renderer.draw();
 
-		if (drawGui) {
-			if (isInWorld()) {
+		if (isInWorld()) {
+			if (drawGui) {
 				if (debugMenu) {
 					debugGui.draw();
 				}
 				inGameGui.draw();
-			} else {
-				Texture bgTex = renderer.textures.getTexture("/assets/gui/background.png");
-
-				float width = renderer.screen.getWidth();
-				float height = renderer.screen.getHeight();
-
-				renderer.draw2D.drawQuad(Quad.shared()
-						.size(width, height)
-						.withTexture(bgTex)
-						.withUV(0.0f, 0.0f, width / bgTex.width, height / bgTex.height)
-				);
 			}
+		} else {
+			Texture bgTex = renderer.textures.getTexture("/assets/gui/background.png");
 
-			if (currentGui != null) {
-				currentGui.draw();
-			}
+			float width = renderer.screen.getWidth();
+			float height = renderer.screen.getHeight();
+
+			renderer.draw2D.drawQuad(Quad.shared()
+					.size(width, height)
+					.withTexture(bgTex)
+					.withUV(0.0f, 0.0f, width / bgTex.width, height / bgTex.height)
+			);
+		}
+
+		if (currentGui != null) {
+			currentGui.draw();
 		}
 	}
 
@@ -389,6 +398,10 @@ public class Game {
 
 	public boolean isGuiOpen() {
 		return currentGui != null;
+	}
+
+	public GuiScreen getCurrentGui() {
+		return currentGui;
 	}
 
 	public String getSkin() {

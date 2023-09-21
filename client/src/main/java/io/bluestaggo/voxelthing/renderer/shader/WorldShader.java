@@ -13,7 +13,8 @@ public class WorldShader extends Shader implements BaseFogShader {
 	public final ShaderUniform<Boolean> hasTex;
 	public final ShaderUniform<Integer> skyTex;
 	public final ShaderUniform<Vector3f> camPos;
-	public final ShaderUniform<Float> camFar;
+	public final ShaderUniform<Float> distHor;
+	public final ShaderUniform<Float> distVer;
 	public final ShaderUniform<Float> skyWidth;
 	public final ShaderUniform<Float> skyHeight;
 	public final ShaderUniform<Float> fade;
@@ -30,17 +31,19 @@ public class WorldShader extends Shader implements BaseFogShader {
 		skyWidth = getUniform1f("skyWidth");
 		skyHeight = getUniform1f("skyHeight");
 		camPos = getUniform3f("camPos");
-		camFar = getUniform1f("camFar");
+		distHor = getUniform1f("distHor");
+		distVer = getUniform1f("distVer");
 		fade = getUniform1f("fade");
 
 		stop();
 	}
 
 	@Override
-	public void setupFog(float skyWidth, float skyHeight, Vector3f camPos, float camFar) {
+	public void setupFog(float skyWidth, float skyHeight, Vector3f camPos, float renderDistanceHor, float renderDistanceVer) {
 		this.skyWidth.set(skyWidth);
 		this.skyHeight.set(skyHeight);
 		this.camPos.set(camPos);
-		this.camFar.set(camFar);
+		this.distHor.set(renderDistanceHor);
+		this.distVer.set(renderDistanceVer);
 	}
 }

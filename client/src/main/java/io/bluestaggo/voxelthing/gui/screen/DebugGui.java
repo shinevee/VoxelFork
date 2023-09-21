@@ -25,7 +25,7 @@ public class DebugGui extends GuiScreen {
 		String[] lines = {
 				"FPS", game.window.getFps() + " (" + (int)(game.window.getDeltaTime() * 1000.0D) + "ms)",
 				"Memory", (totalMB - freeMB) + " / " + maxMB + " MB",
-				"Render Distance", String.valueOf(game.renderer.worldRenderer.renderDistance),
+				"Render Distance", String.valueOf(game.renderer.worldRenderer.renderDistanceHor),
 				"GUI Scale", String.valueOf(screen.scale <= 0.0f ? "auto" : screen.scale),
 				"Position", game.isInWorld()
 						? formatDouble(game.player.posX)

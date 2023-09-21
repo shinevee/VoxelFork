@@ -1,8 +1,6 @@
 package io.bluestaggo.voxelthing.gui.control;
 
 import io.bluestaggo.voxelthing.gui.screen.GuiScreen;
-import io.bluestaggo.voxelthing.renderer.MainRenderer;
-import io.bluestaggo.voxelthing.renderer.draw.Quad;
 
 public class GuiControl {
 	protected final GuiScreen screen;
@@ -57,12 +55,12 @@ public class GuiControl {
 	}
 
 	public float getScaledWidth() {
-		float parentWidth = container != null ? container.width : screen.game.renderer.screen.getWidth();
+		float parentWidth = container != null ? container.getScaledWidth() : screen.game.renderer.screen.getWidth();
 		return width + parentWidth * alignWidth;
 	}
 
 	public float getScaledHeight() {
-		float parentHeight = container != null ? container.height : screen.game.renderer.screen.getHeight();
+		float parentHeight = container != null ? container.getScaledHeight() : screen.game.renderer.screen.getHeight();
 		return height + parentHeight * alignHeight;
 	}
 
@@ -71,11 +69,6 @@ public class GuiControl {
 	}
 
 	public void draw() {
-		MainRenderer r = screen.game.renderer;
-		r.draw2D.drawQuad(Quad.shared()
-				.at(getScaledX(), getScaledY())
-				.size(getScaledWidth(), getScaledHeight())
-		);
 	}
 
 	public boolean intersects(int x, int y) {

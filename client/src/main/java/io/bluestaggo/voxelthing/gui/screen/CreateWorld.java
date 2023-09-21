@@ -15,8 +15,8 @@ public class CreateWorld extends GuiScreen {
 	private final TextBox nameBox;
 	private final TextBox seedBox;
 
-	public CreateWorld(Game game, GuiScreen parent) {
-		super(game, parent);
+	public CreateWorld(Game game) {
+		super(game);
 
 		createButton = addControl(new LabeledButton(this)
 				.withText("Create")

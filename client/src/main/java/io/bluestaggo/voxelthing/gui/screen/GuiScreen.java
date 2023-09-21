@@ -15,12 +15,8 @@ public abstract class GuiScreen {
 	private GuiFocusable focusedControl;
 
 	public GuiScreen(Game game) {
-		this(game, null);
-	}
-
-	public GuiScreen(Game game, GuiScreen parent) {
 		this.game = game;
-		this.parent = parent;
+		this.parent = game.getCurrentGui();
 	}
 
 	public GuiControl addControl(GuiControl control) {
@@ -68,12 +64,18 @@ public abstract class GuiScreen {
 	}
 
 	protected void onMouseClicked(int button, int mx, int my) {
+		GuiFocusable oldFocused = focusedControl;
 		focusedControl = null;
+
 		for (GuiControl control : controls) {
 			control.checkMouseClicked(button, mx, my);
 			if (control instanceof GuiFocusable focusable && control.intersects(mx, my)) {
 				focusedControl = focusable;
 			}
+		}
+
+		if (focusedControl != oldFocused && oldFocused != null) {
+			onControlUnfocused(oldFocused);
 		}
 	}
 
@@ -85,6 +87,9 @@ public abstract class GuiScreen {
 
 	public void focusControl(GuiFocusable focusable) {
 		this.focusedControl = focusable;
+	}
+
+	protected void onControlUnfocused(GuiFocusable focusable) {
 	}
 
 	public boolean isFocused(GuiFocusable focusable) {

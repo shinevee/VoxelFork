@@ -14,6 +14,11 @@ public class TextBox extends GuiFocusable {
 		super(screen);
 	}
 
+	public TextBox withText(String text) {
+		this.text = text;
+		return this;
+	}
+
 	@Override
 	public void onKeyPressed(int key) {
 		if (key == GLFW_KEY_BACKSPACE && text.length() > 0) {

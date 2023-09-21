@@ -12,6 +12,7 @@ import io.bluestaggo.voxelthing.renderer.world.Camera;
 import io.bluestaggo.voxelthing.renderer.world.EntityRenderer;
 import io.bluestaggo.voxelthing.renderer.world.WorldRenderer;
 import io.bluestaggo.voxelthing.window.Window;
+import io.bluestaggo.voxelthing.world.Chunk;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -84,7 +85,8 @@ public class MainRenderer {
 			camera.getPosition(prevUpdatePos);
 		}
 
-		camera.setFar(worldRenderer.renderDistance * 32);
+		camera.setFar((float) Math.sqrt(worldRenderer.renderDistanceHor * worldRenderer.renderDistanceHor
+				+ worldRenderer.renderDistanceVer * worldRenderer.renderDistanceVer) * 32.0f);
 
 		glClearColor(skyColor.x, skyColor.y, skyColor.z, skyColor.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -158,16 +160,16 @@ public class MainRenderer {
 	private void setupCloudShader(Matrix4f viewPoj) {
 		cloudShader.use();
 		cloudShader.viewProj.set(viewPoj);
-		cloudShader.camPos.set(camera.getPosition());
-		cloudShader.camFar.set(camera.getFar());
 		cloudShader.ticks.set((float) Window.getTimeElapsed());
+		setupFogShader(cloudShader);
 	}
 
 	public void setupFogShader(BaseFogShader shader) {
 		shader.setupFog((float) game.window.getWidth(),
 				(float) game.window.getHeight(),
 				camera.getPosition(),
-				camera.getFar());
+				worldRenderer.renderDistanceHor * Chunk.LENGTH,
+				worldRenderer.renderDistanceVer * Chunk.LENGTH);
 	}
 
 	public void useSkyTexture(int i) {

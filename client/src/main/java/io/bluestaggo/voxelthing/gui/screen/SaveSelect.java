@@ -19,21 +19,28 @@ import java.util.stream.Stream;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 
 public class SaveSelect extends GuiScreen {
+	private final GuiControl backButton;
 	private final GuiControl newWorldButton;
 	private final ScrollContainer worldContainer;
 
 	public SaveSelect(Game game) {
 		super(game);
 
+		backButton = addControl(new LabeledButton(this)
+				.withText("Back")
+				.at(-105, -25)
+				.size(100, 20)
+				.alignedAt(0.5f, 1.0f)
+		);
 		newWorldButton = addControl(new LabeledButton(this)
 				.withText("New World")
-				.at(-50.0f, -25.0f)
-				.size(100.0f, 20.0f)
+				.at(5, -25)
+				.size(100, 20)
 				.alignedAt(0.5f, 1.0f)
 		);
 		worldContainer = (ScrollContainer) addControl(new ScrollContainer(this)
-				.at(0.0f, 30.0f)
-				.size(0.0f, -60.0f)
+				.at(0, 30)
+				.size(0, -60)
 				.alignedSize(1.0f, 1.0f)
 		);
 
@@ -49,20 +56,12 @@ public class SaveSelect extends GuiScreen {
 					})
 					.filter(Objects::nonNull)
 					.map(s -> new WorldButton(this, s)
-							.at(-75.0f, 0.0f)
-							.size(150.0f, 20.0f)
+							.at(-75, 0)
+							.size(150, 20)
 							.alignedAt(0.5f, 0.0f)
 					)
 					.forEach(worldContainer::addControl);
 		} catch (IOException e) {
-			System.out.println("Failed to load worlds!");
-			e.printStackTrace();
-			worldContainer.addControl(new LabeledButton(this)
-					.withText("Failed to load worlds!")
-					.at(-100.0f, 0.0f)
-					.size(200.0f, 20.0f)
-					.alignedAt(0.5f, 0.0f)
-			);
 		}
 	}
 
@@ -77,8 +76,8 @@ public class SaveSelect extends GuiScreen {
 		try (var state = new GLState()) {
 			state.enable(GL_BLEND);
 			r.draw2D.drawQuad(Quad.shared()
-					.at(0.0f, 30.0f)
-					.size(r.screen.getWidth(), r.screen.getHeight() - 60.0f)
+					.at(0, 30)
+					.size(r.screen.getWidth(), r.screen.getHeight() - 60)
 					.withColor(0.0f, 0.0f, 0.0f, 0.5f));
 
 			r.fonts.outlined.printCentered("SELECT WORLD", r.screen.getWidth() / 2.0f, 10.0f);
@@ -91,8 +90,10 @@ public class SaveSelect extends GuiScreen {
 	public void onControlClicked(GuiControl control, int button) {
 		if (control instanceof WorldButton world) {
 			game.startWorld(world.saveHandler);
+		} else if (control == backButton) {
+			game.closeGui();
 		} else if (control == newWorldButton) {
-			game.openGui(new CreateWorld(game, this));
+			game.openGui(new CreateWorld(game));
 		}
 	}
 

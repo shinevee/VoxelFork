@@ -4,17 +4,11 @@ import io.bluestaggo.voxelthing.gui.screen.GuiScreen;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Quad;
 
-public class LabeledButton extends GuiControl {
-	public String text;
+public class LabeledButton extends Label {
 	public boolean disabled;
 
 	public LabeledButton(GuiScreen screen) {
 		super(screen);
-	}
-
-	public LabeledButton withText(String text) {
-		this.text = text;
-		return this;
 	}
 
 	public LabeledButton disable() {
@@ -50,10 +44,7 @@ public class LabeledButton extends GuiControl {
 				.size(sw - 2.0f, sh - 2.0f)
 				.withColor(0.5f, 0.5f, 0.5f)
 		);
-		r.fonts.shadowed.printCentered(
-				text,
-				sx + sw / 2.0f,
-				sy + (sh - r.fonts.normal.lineHeight) / 2.0f
-		);
+
+		super.draw();
 	}
 }

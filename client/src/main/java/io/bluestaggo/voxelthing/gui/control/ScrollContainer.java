@@ -23,6 +23,12 @@ public class ScrollContainer extends GuiContainer {
 		return control;
 	}
 
+	public void addPadding(float height) {
+		addControl(new GuiControl(screen)
+				.size(0, height)
+		);
+	}
+
 	public void scroll(double amount) {
 		if (canScroll()) {
 			scrollAmount += amount;
@@ -46,13 +52,17 @@ public class ScrollContainer extends GuiContainer {
 		scroll(0.0);
 
 		MainRenderer r = screen.game.renderer;
+		float sx = getScaledX();
+		float sy = getScaledY();
+		float sw = getScaledWidth();
+		float sh = getScaledHeight();
 
 		try (var state = new GLState()) {
 			state.scissor(
-					(int) (r.screen.fixScaling(getScaledX()) * r.screen.getScale()),
-					(int) (r.screen.fixScaling(getScaledY()) * r.screen.getScale()),
-					(int) ((r.screen.fixScaling(getScaledX() + getScaledWidth()) - getScaledX()) * r.screen.getScale()),
-					(int) ((r.screen.fixScaling(getScaledY() + getScaledHeight()) - getScaledY()) * r.screen.getScale())
+					(int) ((r.screen.getWidth() - sx - sw) * r.screen.getScale()),
+					(int) ((r.screen.getHeight() - sy - sh) * r.screen.getScale()),
+					(int) (sw * r.screen.getScale()),
+					(int) (sh * r.screen.getScale())
 			);
 
 			for (GuiControl control : controls) {
@@ -63,11 +73,6 @@ public class ScrollContainer extends GuiContainer {
 				control.y += scrollAmount;
 			}
 		}
-
-		float sx = getScaledX();
-		float sy = getScaledY();
-		float sw = getScaledWidth();
-		float sh = getScaledHeight();
 
 		r.draw2D.drawQuad(Quad.shared()
 				.at(sx + sw - 4.0f, sy)

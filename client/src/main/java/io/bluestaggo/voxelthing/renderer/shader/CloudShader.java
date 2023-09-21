@@ -7,7 +7,7 @@ import org.joml.Vector4f;
 
 import java.io.IOException;
 
-public class CloudShader extends Shader {
+public class CloudShader extends Shader implements BaseFogShader {
     public final ShaderUniform<Matrix4f> viewProj;
     public final ShaderUniform<Vector3f> camPos;
     public final ShaderUniform<Vector4f> uvRange;
@@ -15,7 +15,8 @@ public class CloudShader extends Shader {
     public final ShaderUniform<Float> cloudHeight;
 
     public final ShaderUniform<Integer> tex;
-    public final ShaderUniform<Float> camFar;
+    public final ShaderUniform<Float> distHor;
+    public final ShaderUniform<Float> distVer;
 
     public CloudShader() throws IOException {
         super("/assets/shaders/cloud");
@@ -27,7 +28,15 @@ public class CloudShader extends Shader {
         cloudHeight = getUniform1f("cloudHeight");
 
         (tex = getUniform1i("tex")).set(0);
-        camFar = getUniform1f("camFar");
+        distHor = getUniform1f("distHor");
+        distVer = getUniform1f("distVer");
         stop();
+    }
+
+    @Override
+    public void setupFog(float skyWidth, float skyHeight, Vector3f camPos, float renderDistanceHor, float renderDistanceVer) {
+        this.camPos.set(camPos);
+        this.distHor.set(renderDistanceHor);
+        this.distVer.set(renderDistanceVer);
     }
 }

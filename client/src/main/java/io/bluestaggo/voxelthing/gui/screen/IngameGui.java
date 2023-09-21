@@ -75,7 +75,7 @@ public class IngameGui extends GuiScreen {
 		MainRenderer r = game.renderer;
 		Texture crosshairTexture = r.textures.getTexture("/assets/gui/crosshair.png");
 		r.draw2D.drawQuad(Quad.shared()
-				.at((r.screen.getWidth() - crosshairTexture.width) / 2, (r.screen.getHeight() - crosshairTexture.height) / 2)
+				.at((r.screen.getWidth() - crosshairTexture.width) / 2.0f, (r.screen.getHeight() - crosshairTexture.height) / 2.0f)
 				.withTexture(crosshairTexture));
 	}
 

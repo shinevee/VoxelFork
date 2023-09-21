@@ -14,15 +14,18 @@ uniform float skyWidth;
 uniform float skyHeight;
 // Fog
 uniform vec3 camPos;
-uniform float camFar;
+uniform float distHor;
+uniform float distVer;
 
 float doFog(float fog) {
-    return fog * 2.0 - 1.0;
+    fog = max(fog * 2.0 - 1.0, 0.0);
+    fog *= fog;
+    return fog;
 }
 
 void main() {
     if (texture(tex, uv).a == 0.0) discard;
-    float fog = clamp(distance(fPos, camPos) / camFar, 0.0, 1.0);
+    float fog = clamp(max(distance(fPos.xz, camPos.xz) / distHor, distance(fPos.y, camPos.y) / distVer), 0.0, 1.0);
     fog = clamp(doFog(fog), 0.0, 1.0);
 
     vec4 worldColor = color;

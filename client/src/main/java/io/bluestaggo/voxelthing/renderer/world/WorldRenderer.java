@@ -25,9 +25,11 @@ public class WorldRenderer {
 	private List<ChunkRenderer> sortedChunkRenderers;
 	private int minX, minY, minZ;
 	private int maxX, maxY, maxZ;
-	private int renderRange;
 
-	public int renderDistance = 16;
+	public int renderDistanceHor = 16;
+	public int renderDistanceVer = 8;
+	private int renderRangeHor;
+	private int renderRangeVer;
 
 	public WorldRenderer(MainRenderer renderer) {
 		this.renderer = renderer;
@@ -37,10 +39,10 @@ public class WorldRenderer {
 	}
 
 	public int chunkRendererCoord(int x, int y, int z) {
-		x = Math.floorMod(x + renderDistance, renderRange);
-		y = Math.floorMod(y + renderDistance, renderRange);
-		z = Math.floorMod(z + renderDistance, renderRange);
-		return (x * renderRange + z) * renderRange + y;
+		x = Math.floorMod(x + renderDistanceHor, renderRangeHor);
+		y = Math.floorMod(y + renderDistanceVer, renderRangeVer);
+		z = Math.floorMod(z + renderDistanceHor, renderRangeHor);
+		return (x * renderRangeHor + z) * renderRangeVer + y;
 	}
 
 	public void setWorld(World world) {
@@ -49,9 +51,12 @@ public class WorldRenderer {
 	}
 
 	public void loadRenderers() {
-		minX = minY = minZ = -renderDistance;
-		maxX = maxY = maxZ = renderDistance;
-		renderRange = renderDistance * 2 + 1;
+		minX = minZ = -renderDistanceHor;
+		maxX = maxZ = renderDistanceHor;
+		minY = -renderDistanceVer;
+		maxY = renderDistanceVer;
+		renderRangeHor = renderDistanceHor * 2 + 1;
+		renderRangeVer = renderDistanceVer * 2 + 1;
 
 		if (chunkRenderers != null) {
 			for (ChunkRenderer chunkRenderer : chunkRenderers) {
@@ -59,10 +64,10 @@ public class WorldRenderer {
 			}
 		}
 
-		chunkRenderers = new ChunkRenderer[renderRange * renderRange * renderRange];
-		for (int x = -renderDistance; x <= renderDistance; x++) {
-			for (int z = -renderDistance; z <= renderDistance; z++) {
-				for (int y = -renderDistance; y <= renderDistance; y++) {
+		chunkRenderers = new ChunkRenderer[renderRangeHor * renderRangeVer * renderRangeHor];
+		for (int x = -renderDistanceHor; x <= renderDistanceHor; x++) {
+			for (int z = -renderDistanceHor; z <= renderDistanceHor; z++) {
+				for (int y = -renderDistanceVer; y <= renderDistanceVer; y++) {
 					int i = chunkRendererCoord(x, y, z);
 					chunkRenderers[i] = new ChunkRenderer(renderer, world, x, y, z);
 				}
@@ -122,19 +127,19 @@ public class WorldRenderer {
 		int y = (int)Math.floor(cameraPos.y / Chunk.LENGTH);
 		int z = (int)Math.floor(cameraPos.z / Chunk.LENGTH);
 
-		minX = x - renderDistance;
-		minY = y - renderDistance;
-		minZ = z - renderDistance;
-		maxX = x + renderDistance;
-		maxY = y + renderDistance;
-		maxZ = z + renderDistance;
+		minX = x - renderDistanceHor;
+		minY = y - renderDistanceVer;
+		minZ = z - renderDistanceHor;
+		maxX = x + renderDistanceHor;
+		maxY = y + renderDistanceVer;
+		maxZ = z + renderDistanceHor;
 
-		for (int ax = 0; ax < renderRange; ax++) {
-			for (int ay = 0; ay < renderRange; ay++) {
-				for (int az = 0; az < renderRange; az++) {
-					int cx = ax + x - renderDistance;
-					int cy = ay + y - renderDistance;
-					int cz = az + z - renderDistance;
+		for (int ax = 0; ax < renderRangeHor; ax++) {
+			for (int ay = 0; ay < renderRangeVer; ay++) {
+				for (int az = 0; az < renderRangeHor; az++) {
+					int cx = ax + x - renderDistanceHor;
+					int cy = ay + y - renderDistanceVer;
+					int cz = az + z - renderDistanceHor;
 
 					ChunkRenderer renderer = chunkRenderers[chunkRendererCoord(cx, cy, cz)];
 					if (renderer.getX() != cx || renderer.getY() != cy || renderer.getZ() != cz) {
