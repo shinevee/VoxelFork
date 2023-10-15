@@ -5,14 +5,14 @@ import io.bluestaggo.voxelthing.gui.screen.GuiScreen;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuiContainer extends GuiControl {
-	protected final List<GuiControl> controls = new ArrayList<>();
+public class Container extends Control {
+	protected final List<Control> controls = new ArrayList<>();
 
-	public GuiContainer(GuiScreen screen) {
+	public Container(GuiScreen screen) {
 		super(screen);
 	}
 
-	public GuiControl addControl(GuiControl control) {
+	public Control addControl(Control control) {
 		controls.add(control);
 		control.container = this;
 		return control;
@@ -20,14 +20,14 @@ public class GuiContainer extends GuiControl {
 
 	@Override
 	public void draw() {
-		for (GuiControl control : controls) {
+		for (Control control : controls) {
 			control.draw();
 		}
 	}
 
 	@Override
 	public void checkMouseClicked(int button, int mx, int my) {
-		for (GuiControl control : controls) {
+		for (Control control : controls) {
 			control.checkMouseClicked(button, mx, my);
 		}
 	}

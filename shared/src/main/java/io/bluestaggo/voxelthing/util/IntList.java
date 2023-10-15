@@ -6,6 +6,7 @@ import java.util.Objects;
 
 public class IntList {
 	private static final int DEFAULT_CAPACITY = 16;
+	private static final int CAPACITY_MAX_THRESHOLD = 256;
 	private static final int SOFT_MAX_ARRAY_LENGTH = Integer.MAX_VALUE - 8;
 
 	private int[] data;
@@ -66,7 +67,11 @@ public class IntList {
 	}
 
 	public void clear() {
-		data = new int[DEFAULT_CAPACITY];
+		if (data.length < CAPACITY_MAX_THRESHOLD) {
+			Arrays.fill(data, 0);
+		} else {
+			data = new int[DEFAULT_CAPACITY];
+		}
 		size = 0;
 	}
 

@@ -8,9 +8,9 @@ import io.bluestaggo.voxelthing.renderer.draw.Quad;
 import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.block.Block;
 import org.joml.Vector2i;
+import org.lwjgl.opengl.GL33C;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
 
 public class BlockInventory extends GuiScreen {
 	private static final int ROWS = 10;
@@ -28,7 +28,7 @@ public class BlockInventory extends GuiScreen {
 
 		try (var state = new GLState()) {
 			Texture.stop();
-			state.enable(GL_BLEND);
+			state.enable(GL33C.GL_BLEND);
 			r.draw2D.drawQuad(Quad.shared()
 					.at(0, 0)
 					.size(r.screen.getWidth(), r.screen.getHeight())
@@ -84,6 +84,8 @@ public class BlockInventory extends GuiScreen {
 
 	@Override
 	protected void onKeyPressed(int key) {
+		super.onKeyPressed(key);
+
 		if (key == GLFW_KEY_E) {
 			game.closeGui();
 		}

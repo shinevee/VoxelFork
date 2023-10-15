@@ -1,21 +1,21 @@
 package io.bluestaggo.voxelthing.gui.screen;
 
 import io.bluestaggo.voxelthing.Game;
+import io.bluestaggo.voxelthing.assets.Texture;
 import io.bluestaggo.voxelthing.gui.control.*;
 import io.bluestaggo.voxelthing.renderer.GLState;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Quad;
 import io.bluestaggo.voxelthing.settings.Setting;
+import org.lwjgl.opengl.GL33C;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-
 public class SettingsMenu extends GuiScreen {
-	private final GuiControl backButton;
+	private final Control backButton;
 	private final ScrollContainer settingList;
-	private final Map<GuiControl, Setting<?>> settingButtons = new HashMap<>();
+	private final Map<Control, Setting<?>> settingButtons = new HashMap<>();
 
 	public SettingsMenu(Game game) {
 		super(game);
@@ -42,7 +42,7 @@ public class SettingsMenu extends GuiScreen {
 			settingList.addPadding(5);
 
 			for (Setting<?> setting : category.getValue()) {
-				GuiContainer settingPanel = (GuiContainer) new GuiContainer(this)
+				Container settingPanel = (Container) new Container(this)
 						.size(0, 20)
 						.alignedAt(0.1f, 0.0f)
 						.alignedSize(0.8f, 0.0f);
@@ -55,7 +55,7 @@ public class SettingsMenu extends GuiScreen {
 						.alignedSize(0.0f, 1.0f)
 				);
 
-				GuiControl settingButton = setting.getControl(this);
+				Control settingButton = setting.getControl(this);
 				settingButtons.put(settingButton, setting);
 				settingPanel.addControl(settingButton);
 				settingList.addControl(settingPanel);
@@ -68,12 +68,20 @@ public class SettingsMenu extends GuiScreen {
 	public void draw() {
 		MainRenderer r = game.renderer;
 
+		Texture bgTex = r.textures.getTexture("/assets/gui/background.png");
+		r.draw2D.drawQuad(Quad.shared()
+				.size(r.screen.getWidth(), 30.0f)
+				.withUV(0.0f, 0.0f, r.screen.getWidth() / (float)bgTex.width, 30.0f / bgTex.height)
+				.withTexture(bgTex)
+		);
+
 		try (var state = new GLState()) {
-			state.enable(GL_BLEND);
+			state.enable(GL33C.GL_BLEND);
 			r.draw2D.drawQuad(Quad.shared()
 					.at(0.0f, 30.0f)
 					.size(r.screen.getWidth(), r.screen.getHeight() - 30.0f)
-					.withColor(0.0f, 0.0f, 0.0f, 0.5f));
+					.withColor(0.0f, 0.0f, 0.0f, 0.5f)
+			);
 
 			r.fonts.outlined.printCentered("SETTINGS", r.screen.getWidth() / 2.0f, 10.0f);
 		}
@@ -82,16 +90,43 @@ public class SettingsMenu extends GuiScreen {
 	}
 
 	@Override
-	public void onControlClicked(GuiControl control, int button) {
+	public void onControlClicked(Control control, int button) {
 		if (control == backButton) {
 			game.closeGui();
-		} else if (settingButtons.containsKey(control) && !(control instanceof GuiFocusable)) {
+		} else if (settingButtons.containsKey(control)) {
 			settingButtons.get(control).handleControl(control);
+		}
+	}
+
+	@Override
+	protected void onMouseDragged(int button, int mx, int my) {
+		super.onMouseDragged(button, mx, my);
+
+		FocusableControl focusable = getFocusedControl();
+		if (settingButtons.containsKey(focusable)) {
+			settingButtons.get(focusable).handleControl(focusable);
+		}
+	}
+
+	@Override
+	protected void onControlUnfocused(FocusableControl focusable) {
+		if (settingButtons.containsKey(focusable)) {
+			settingButtons.get(focusable).handleControl(focusable);
 		}
 	}
 
 	@Override
 	protected void onMouseScrolled(double scroll) {
 		settingList.scroll(scroll * -10.0);
+	}
+
+	@Override
+	public boolean pauseGame() {
+		return true;
+	}
+
+	@Override
+	public void onClosed() {
+		game.settings.save();
 	}
 }

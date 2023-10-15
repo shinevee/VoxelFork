@@ -2,8 +2,8 @@ package io.bluestaggo.voxelthing.gui.control;
 
 import io.bluestaggo.voxelthing.gui.screen.GuiScreen;
 
-public class GuiFocusable extends GuiControl {
-	public GuiFocusable(GuiScreen screen) {
+public class FocusableControl extends Control {
+	public FocusableControl(GuiScreen screen) {
 		super(screen);
 	}
 
@@ -18,5 +18,12 @@ public class GuiFocusable extends GuiControl {
 		if (intersects(mx, my)) {
 			screen.focusControl(this);
 		}
+	}
+
+	public void onMouseDragged(int button, int mx, int my) {
+	}
+
+	public boolean dragFocusOnly() {
+		return false;
 	}
 }

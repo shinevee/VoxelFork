@@ -10,5 +10,3 @@
 rootProject.name = "VoxelThing"
 include("client", "shared") // Main Voxel Thing projects
 include("pds") // Voxel Thing libraries
-include("fastutil")
-include("fastutil")

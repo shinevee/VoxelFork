@@ -1,8 +1,10 @@
 package io.bluestaggo.voxelthing.settings;
 
 import io.bluestaggo.pds.*;
-import io.bluestaggo.voxelthing.gui.control.GuiControl;
+import io.bluestaggo.voxelthing.gui.control.Control;
 import io.bluestaggo.voxelthing.gui.screen.GuiScreen;
+
+import java.util.Objects;
 
 public abstract class Setting<T> {
 	public final String category;
@@ -24,21 +26,29 @@ public abstract class Setting<T> {
 		this.saveName = camelCategory + ":" + camelName;
 	}
 
-	public T get() {
+	public T getValue() {
 		return value;
 	}
 
-	public void set(T value) {
+	public void setValue(T value) {
 		this.value = value;
 	}
 
 	public StructureItem serialize() {
 		if (value instanceof Boolean bool) {
 			return new ByteItem(bool);
-		} else if (value instanceof Integer integer) {
-			return new IntItem(integer);
-		} else if (value instanceof Float floating) {
-			return new FloatItem(floating);
+		} else if (value instanceof Byte i8) {
+			return new ByteItem(i8);
+		} else if (value instanceof Short i16) {
+			return new ShortItem(i16);
+		} else if (value instanceof Integer i32) {
+			return new IntItem(i32);
+		} else if (value instanceof Long i64) {
+			return new LongItem(i64);
+		} else if (value instanceof Float f32) {
+			return new FloatItem(f32);
+		} else if (value instanceof Double f64) {
+			return new DoubleItem(f64);
 		} else if (value instanceof String string) {
 			return new StringItem(string);
 		} else {
@@ -62,7 +72,20 @@ public abstract class Setting<T> {
 		}
 	}
 
-	public abstract GuiControl getControl(GuiScreen screen);
+	public abstract Control getControl(GuiScreen screen);
 
-	public abstract void handleControl(GuiControl control);
+	public abstract void handleControl(Control control);
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Setting<?> setting = (Setting<?>) o;
+		return Objects.equals(category, setting.category) && Objects.equals(name, setting.name) && Objects.equals(value, setting.value);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(category, name, value);
+	}
 }

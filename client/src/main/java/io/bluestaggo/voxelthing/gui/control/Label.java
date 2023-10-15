@@ -4,7 +4,7 @@ import io.bluestaggo.voxelthing.gui.screen.GuiScreen;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.screen.Font;
 
-public class Label extends GuiControl {
+public class Label extends Control {
 	public String text;
 	public Font font;
 	public float textAlignX = 0.5f;
@@ -24,7 +24,7 @@ public class Label extends GuiControl {
 		return this;
 	}
 
-	public GuiControl textAlignedAt(float textAlignX, float textAlignY) {
+	public Control textAlignedAt(float textAlignX, float textAlignY) {
 		this.textAlignX = textAlignX;
 		this.textAlignY = textAlignY;
 		return this;

@@ -124,9 +124,9 @@ public class MainRenderer {
 
 			state.disable(GL_CULL_FACE);
 
-			String skin = game.getSkin();
+			String skin = "/assets/entities/" +  Game.SKINS[game.settings.skin.getValue()] + ".png";
 			game.player.setTexture(skin);
-			if (game.showThirdPerson()) {
+			if (game.settings.thirdPerson.getValue()) {
 				entityRenderer.renderEntity(game.player);
 			}
 

@@ -52,17 +52,12 @@ public class Game {
 		VERSION = version;
 	}
 
-	private static final String[] SKINS = {
+	public static final String[] SKINS = {
 			"joel",
 			"staggo",
 			"floof",
 			"talon"
 	};
-	private int currentSkin = VERSION.contains("dev") ? 1 : 0;
-	private boolean thirdPerson;
-	private boolean debugMenu = true;
-	private boolean drawGui = true;
-	private boolean viewBobbing = true;
 
 	private static Game instance;
 
@@ -83,6 +78,7 @@ public class Game {
 	private final GuiScreen debugGui;
 	private final GuiScreen inGameGui;
 	private GuiScreen currentGui;
+	private boolean debugMenu = true;
 
 	private BlockRaycast blockRaycast;
 
@@ -140,6 +136,7 @@ public class Game {
 				update(window.getDeltaTime());
 				draw();
 				window.update();
+				limitFps();
 			} catch (Throwable e) {
 				e.printStackTrace();
 				var stackTrace = new StringWriter();
@@ -210,6 +207,8 @@ public class Game {
 			player = null;
 			world = null;
 		}
+
+		System.gc();
 	}
 
 	public boolean isInWorld() {
@@ -220,6 +219,7 @@ public class Game {
 		tickTime += delta;
 
 		GuiScreen gui = currentGui != null ? currentGui : isInWorld() ? inGameGui : null;
+
 		if (gui == null) {
 			gui = currentGui = new MainMenu(this);
 			window.ungrabCursor();
@@ -229,11 +229,17 @@ public class Game {
 			doControls();
 		}
 		gui.handleInput();
+		boolean paused = gui.pauseGame();
 
 		if (isInWorld()) {
-			player.onGameUpdate();
-			player.noClip = window.isKeyDown(GLFW_KEY_Q);
-			renderer.worldRenderer.loadChunks(10);
+			if (paused) {
+				partialTick = 1.0;
+				world.partialTick = 1.0;
+			} else {
+				player.onGameUpdate();
+				player.noClip = window.isKeyDown(GLFW_KEY_Q);
+				renderer.worldRenderer.loadChunks(10);
+			}
 		}
 
 		if (tickTime >= TICK_RATE) {
@@ -242,13 +248,16 @@ public class Game {
 				currentGui.tick();
 			}
 
-			if (isInWorld()) {
+			if (isInWorld() && !paused) {
+				assert inGameGui != null;
 				inGameGui.tick();
 				player.tick();
 			}
 		}
 
-		partialTick = tickTime / TICK_RATE;
+		if (!paused) {
+			partialTick = tickTime / TICK_RATE;
+		}
 
 		if (isInWorld()) {
 			world.partialTick = partialTick;
@@ -260,8 +269,8 @@ public class Game {
 			float pitch = (float) player.rotPitch;
 
 			py += player.height - 0.3;
-			if (settings.viewBobbing.get()) {
-				if (thirdPerson) {
+			if (settings.viewBobbing.getValue()) {
+				if (settings.thirdPerson.getValue()) {
 					py -= player.getPartialVelY() * 0.2;
 				}
 				pitch += player.getFallAmount() * 2.5;
@@ -275,9 +284,9 @@ public class Game {
 				world.doRaycast(blockRaycast);
 			}
 
-			if (thirdPerson) {
+			if (settings.thirdPerson.getValue()) {
 				renderer.camera.moveForward(-4.0f);
-			} else if (settings.viewBobbing.get()) {
+			} else if (settings.viewBobbing.getValue()) {
 				py += Math.abs(player.getRenderWalk()) * 0.1f;
 				renderer.camera.setPosition(px, py, pz);
 				renderer.camera.moveRight((float) player.getRenderWalk() * 0.05f);
@@ -286,24 +295,6 @@ public class Game {
 	}
 
 	private void doControls() {
-		if (window.isKeyJustPressed(GLFW_KEY_F)) {
-			int distHor = renderer.worldRenderer.renderDistanceHor;
-			int distVer = renderer.worldRenderer.renderDistanceVer;
-			if (window.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-				if (distHor < 16) {
-					distHor <<= 1;
-					distVer <<= 1;
-				}
-			} else if (distHor > 1) {
-				distHor >>= 1;
-				distVer >>= 1;
-			}
-
-			renderer.worldRenderer.renderDistanceHor = distHor;
-			renderer.worldRenderer.renderDistanceVer = distVer;
-			renderer.worldRenderer.loadRenderers();
-		}
-
 		if (window.isKeyJustPressed(GLFW_KEY_R)) {
 			player.posX = world.random.nextDouble(-1000.0, 1000.0);
 			player.posY = 64.0;
@@ -321,28 +312,16 @@ public class Game {
 			renderer.screen.scale += 0.5f;
 		}
 
-		if (window.isKeyJustPressed(GLFW_KEY_F1)) {
-			drawGui = !drawGui;
-		}
-
 		if (window.isKeyJustPressed(GLFW_KEY_F3)) {
 			debugMenu = !debugMenu;
 		}
 
-		if (window.isKeyJustPressed(GLFW_KEY_F4)) {
-			settings.viewBobbing.set(!settings.viewBobbing.get());
-		}
-
 		if (window.isKeyJustPressed(GLFW_KEY_F5)) {
-			thirdPerson = !thirdPerson;
-		}
-
-		if (window.isKeyJustPressed(GLFW_KEY_F6)) {
-			if (++currentSkin >= SKINS.length) currentSkin = 0;
+			settings.thirdPerson.setValue(!settings.thirdPerson.getValue());
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_ESCAPE)) {
-			exitWorld();
+			openGui(new PauseMenu(this));
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_E)) {
@@ -354,7 +333,7 @@ public class Game {
 		renderer.draw();
 
 		if (isInWorld()) {
-			if (drawGui) {
+			if (!settings.hideGui.getValue()) {
 				if (debugMenu) {
 					debugGui.draw();
 				}
@@ -378,7 +357,16 @@ public class Game {
 		}
 	}
 
+	private void limitFps() {
+		int opt = settings.limitFps.getValue();
+		if (opt > 1 || opt < 0) {
+			opt = currentGui == null ? 0 : 1;
+		}
+		glfwSwapInterval(opt);
+	}
+
 	public void openGui(GuiScreen gui) {
+		GuiScreen oldGui = gui == null && gui != currentGui ? currentGui : null;
 		if (gui == null) {
 			if (currentGui.parent != null) {
 				gui = currentGui.parent;
@@ -388,6 +376,10 @@ public class Game {
 		}
 
 		currentGui = gui;
+		if (oldGui != null) {
+			oldGui.onClosed();
+		}
+
 		if (gui == null) {
 			window.grabCursor();
 		} else {
@@ -407,24 +399,12 @@ public class Game {
 		return currentGui;
 	}
 
-	public String getSkin() {
-		return "/assets/entities/" + SKINS[currentSkin] + ".png";
-	}
-
-	public boolean showThirdPerson() {
-		return thirdPerson;
-	}
-
 	public double getPartialTick() {
 		return partialTick;
 	}
 
 	public BlockRaycast getBlockRaycast() {
 		return blockRaycast;
-	}
-
-	public boolean viewBobbingEnabled() {
-		return viewBobbing;
 	}
 
 	public static void main(String[] args) {

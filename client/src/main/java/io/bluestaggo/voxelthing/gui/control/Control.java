@@ -2,9 +2,9 @@ package io.bluestaggo.voxelthing.gui.control;
 
 import io.bluestaggo.voxelthing.gui.screen.GuiScreen;
 
-public class GuiControl {
+public class Control {
 	protected final GuiScreen screen;
-	protected GuiContainer container;
+	protected Container container;
 	public float x;
 	public float y;
 	public float width;
@@ -14,29 +14,29 @@ public class GuiControl {
 	public float alignWidth;
 	public float alignHeight;
 
-	public GuiControl(GuiScreen screen) {
+	public Control(GuiScreen screen) {
 		this.screen = screen;
 	}
 
-	public GuiControl at(float x, float y) {
+	public Control at(float x, float y) {
 		this.x = x;
 		this.y = y;
 		return this;
 	}
 
-	public GuiControl size(float width, float height) {
+	public Control size(float width, float height) {
 		this.width = width;
 		this.height = height;
 		return this;
 	}
 
-	public GuiControl alignedAt(float alignX, float alignY) {
+	public Control alignedAt(float alignX, float alignY) {
 		this.alignX = alignX;
 		this.alignY = alignY;
 		return this;
 	}
 
-	public GuiControl alignedSize(float alignWidth, float alignHeight) {
+	public Control alignedSize(float alignWidth, float alignHeight) {
 		this.alignWidth = alignWidth;
 		this.alignHeight = alignHeight;
 		return this;
@@ -64,7 +64,7 @@ public class GuiControl {
 		return height + parentHeight * alignHeight;
 	}
 
-	public void onClick(int button) {
+	public void onClick(int button, int mx, int my) {
 		screen.onControlClicked(this, button);
 	}
 
@@ -83,11 +83,11 @@ public class GuiControl {
 
 	public void checkMouseClicked(int button, int mx, int my) {
 		if (intersects(mx, my)) {
-			onClick(button);
+			onClick(button, mx, my);
 		}
 	}
 
-	public boolean isInContainer(GuiContainer container) {
+	public boolean isInContainer(Container container) {
 		return this.container == container;
 	}
 }

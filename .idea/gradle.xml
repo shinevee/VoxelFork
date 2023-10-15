@@ -13,7 +13,6 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/client" />
-            <option value="$PROJECT_DIR$/fastutil" />
             <option value="$PROJECT_DIR$/pds" />
             <option value="$PROJECT_DIR$/shared" />
           </set>

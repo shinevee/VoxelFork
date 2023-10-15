@@ -1,7 +1,7 @@
 package io.bluestaggo.voxelthing.gui.screen;
 
 import io.bluestaggo.voxelthing.Game;
-import io.bluestaggo.voxelthing.gui.control.GuiControl;
+import io.bluestaggo.voxelthing.gui.control.Control;
 import io.bluestaggo.voxelthing.gui.control.LabeledButton;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Quad;
@@ -14,15 +14,13 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Random;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_TAB;
-
 public class MainMenu extends GuiScreen {
 	private static final List<String> SPLASHES;
 	private static final Random random = new Random();
 	private final String splash;
 
-	private final GuiControl playButton;
-	private final GuiControl settingsButton;
+	private final Control playButton;
+	private final Control settingsButton;
 
 	static {
 		List<String> splashes = List.of("No splashes?");
@@ -60,6 +58,10 @@ public class MainMenu extends GuiScreen {
 	}
 
 	@Override
+	protected void onKeyPressed(int key) {
+	}
+
+	@Override
 	public void draw() {
 		MainRenderer r = game.renderer;
 
@@ -81,14 +83,7 @@ public class MainMenu extends GuiScreen {
 	}
 
 	@Override
-	protected void onKeyPressed(int key) {
-		if (key == GLFW_KEY_TAB) {
-			game.openGui(new MainMenu(game));
-		}
-	}
-
-	@Override
-	public void onControlClicked(GuiControl control, int button) {
+	public void onControlClicked(Control control, int button) {
 		if (control == playButton) {
 			game.openGui(new SaveSelect(game));
 		} else if (control == settingsButton) {

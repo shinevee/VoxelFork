@@ -6,6 +6,7 @@ import java.util.Objects;
 
 public class FloatList {
 	private static final int DEFAULT_CAPACITY = 16;
+	private static final int CAPACITY_MAX_THRESHOLD = 256;
 	private static final int SOFT_MAX_ARRAY_LENGTH = Integer.MAX_VALUE - 8;
 
 	private float[] data;
@@ -49,7 +50,11 @@ public class FloatList {
 	}
 
 	public void clear() {
-		data = new float[DEFAULT_CAPACITY];
+		if (data.length < CAPACITY_MAX_THRESHOLD) {
+			Arrays.fill(data, 0.0f);
+		} else {
+			data = new float[DEFAULT_CAPACITY];
+		}
 		size = 0;
 	}
 

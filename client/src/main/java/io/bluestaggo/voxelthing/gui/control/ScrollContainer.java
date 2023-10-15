@@ -5,7 +5,7 @@ import io.bluestaggo.voxelthing.renderer.GLState;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Quad;
 
-public class ScrollContainer extends GuiContainer {
+public class ScrollContainer extends Container {
 	private float contentHeight;
 	private float scrollAmount;
 
@@ -14,7 +14,7 @@ public class ScrollContainer extends GuiContainer {
 	}
 
 	@Override
-	public GuiControl addControl(GuiControl control) {
+	public Control addControl(Control control) {
 		super.addControl(control);
 		control.y = contentHeight;
 		control.alignY = 0.0f;
@@ -24,7 +24,7 @@ public class ScrollContainer extends GuiContainer {
 	}
 
 	public void addPadding(float height) {
-		addControl(new GuiControl(screen)
+		addControl(new Control(screen)
 				.size(0, height)
 		);
 	}
@@ -65,7 +65,7 @@ public class ScrollContainer extends GuiContainer {
 					(int) (sh * r.screen.getScale())
 			);
 
-			for (GuiControl control : controls) {
+			for (Control control : controls) {
 				control.y -= scrollAmount;
 				if (control.y + control.height >= 0 && control.y < getScaledHeight()) {
 					control.draw();

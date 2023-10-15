@@ -83,7 +83,13 @@ public class WorldRenderer {
 	}
 
 	public void draw() {
-//		calculateCulledRenderers();
+		if (renderDistanceHor != renderer.game.settings.renderDistanceHor.getValue()
+				|| renderDistanceVer != renderer.game.settings.renderDistanceVer.getValue()) {
+			renderDistanceHor = renderer.game.settings.renderDistanceHor.getValue();
+			renderDistanceVer = renderer.game.settings.renderDistanceVer.getValue();
+			loadRenderers();
+		}
+
 		sortedCulledChunkRenderers = sortedChunkRenderers;
 
 		int updates = 0;

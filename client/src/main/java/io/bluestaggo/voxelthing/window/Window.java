@@ -305,6 +305,12 @@ public class Window {
 				.toArray();
 	}
 
+	public int[] getMouseButtonsHeld() {
+		return IntStream.range(0, mouseStates.length)
+				.filter(this::isMouseDown)
+				.toArray();
+	}
+
 	public static double getTimeElapsed() {
 		return glfwGetTime();
 	}

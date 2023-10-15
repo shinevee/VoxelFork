@@ -1,7 +1,7 @@
 package io.bluestaggo.voxelthing.gui.screen;
 
 import io.bluestaggo.voxelthing.Game;
-import io.bluestaggo.voxelthing.gui.control.GuiControl;
+import io.bluestaggo.voxelthing.gui.control.Control;
 import io.bluestaggo.voxelthing.gui.control.LabeledButton;
 import io.bluestaggo.voxelthing.gui.control.TextBox;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
@@ -10,8 +10,8 @@ import io.bluestaggo.voxelthing.world.WorldInfo;
 import java.util.UUID;
 
 public class CreateWorld extends GuiScreen {
-	private final GuiControl createButton;
-	private final GuiControl cancelButton;
+	private final Control createButton;
+	private final Control cancelButton;
 	private final TextBox nameBox;
 	private final TextBox seedBox;
 
@@ -57,7 +57,7 @@ public class CreateWorld extends GuiScreen {
 	}
 
 	@Override
-	public void onControlClicked(GuiControl control, int button) {
+	public void onControlClicked(Control control, int button) {
 		if (control == createButton) {
 			var worldInfo = new WorldInfo();
 			worldInfo.name = nameBox.text;

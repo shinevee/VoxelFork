@@ -2,6 +2,7 @@ package io.bluestaggo.voxelthing.settings;
 
 import io.bluestaggo.pds.CompoundItem;
 import io.bluestaggo.pds.StructureItem;
+import io.bluestaggo.voxelthing.Game;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -10,32 +11,44 @@ import java.util.*;
 public class Settings {
 	private static final String[] CATEGORIES = {
 			"Graphics",
-			"Controls",
-			"Misc"
 	};
 
-	public final Map<String, Setting<?>> bySaveName = new HashMap<>();
-	public final Map<String, List<Setting<?>>> byCategory = new LinkedHashMap<>();
+	private Path savePath;
+
+	private final Map<String, Setting<?>> bySaveNameMut = new HashMap<>();
+	private final Map<String, List<Setting<?>>> byCategoryMut = new LinkedHashMap<>();
+	private final Set<Setting<?>> settingsSetMut = new HashSet<>();
+
+	public final Map<String, Setting<?>> bySaveName = Collections.unmodifiableMap(bySaveNameMut);
+	public final Map<String, List<Setting<?>>> byCategory = Collections.unmodifiableMap(byCategoryMut);
+	public final Set<Setting<?>> settingsSet = Collections.unmodifiableSet(settingsSetMut);
 
 	{
 		for (String category : CATEGORIES) {
-			byCategory.put(category, new ArrayList<>());
+			byCategoryMut.put(category, new ArrayList<>());
 		}
 	}
 
-	public Setting<Boolean> viewBobbing = addSetting(new ToggleSetting("Graphics", "View Bobbing", true));
-	public Setting<String> controllerName = addSetting(new TextBoxSetting("Controls", "Controller Name", "Controller"));
-	public Setting<Boolean> invertLook = addSetting(new ToggleSetting("Controls", "Invert Look", false));
-	public Setting<String> name = addSetting(new TextBoxSetting("Misc", "Name", "Staggo"));
+	public final Setting<Integer> limitFps = addSetting(new ChoiceSetting("Graphics", "Limit FPS", 2, "OFF", "ON", "Menu Only"));
+	public final Setting<Integer> renderDistanceHor = addSetting(new IntSliderSetting("Graphics", "Horizontal Render Distance", 16, 1, 16));
+	public final Setting<Integer> renderDistanceVer = addSetting(new IntSliderSetting("Graphics", "Vertical Render Distance", 8, 1, 16));
+	public final Setting<Boolean> viewBobbing = addSetting(new ToggleSetting("Graphics", "View Bobbing", true));
+	public final Setting<Boolean> thirdPerson = addSetting(new ToggleSetting("Graphics", "Third Person", false));
+	public final Setting<Boolean> hideGui = addSetting(new ToggleSetting("Graphics", "Hide GUI", false));
+	public final Setting<Integer> skin = addSetting(new ChoiceSetting("Graphics", "Skin", 0, Arrays.stream(Game.SKINS)
+			.map(s -> (Character.toUpperCase(s.charAt(0)) + s.substring(1)).replace('_', ' '))
+			.toArray(String[]::new)));
 
 	private <T extends Setting<?>> T addSetting(T setting) {
-		List<Setting<?>> settingList = byCategory.computeIfAbsent(setting.category, k -> new ArrayList<>());
+		List<Setting<?>> settingList = byCategoryMut.computeIfAbsent(setting.category, k -> new ArrayList<>());
+		settingsSetMut.add(setting);
 		settingList.add(setting);
-		bySaveName.put(setting.saveName, setting);
+		bySaveNameMut.put(setting.saveName, setting);
 		return setting;
 	}
 
 	public void readFrom(Path path) {
+		savePath = path;
 		StructureItem data;
 
 		try {
@@ -49,10 +62,34 @@ public class Settings {
 		}
 
 		for (Map.Entry<String, StructureItem> item : data.getMap().entrySet()) {
-			Setting<?> setting = bySaveName.get(item.getKey());
+			Setting<?> setting = bySaveNameMut.get(item.getKey());
 			if (setting != null) {
 				setting.deserialize(item.getValue());
 			}
+		}
+	}
+
+	public void saveTo(Path path) {
+		savePath = path;
+		save();
+	}
+
+	public void save() {
+		if (savePath == null) {
+			return;
+		}
+
+		var data = new CompoundItem();
+
+		for (Setting<?> setting : settingsSetMut) {
+			data.setItem(setting.saveName, setting.serialize());
+		}
+
+		try {
+			data.writeItemToPath(savePath);
+		} catch (IOException e) {
+			System.err.println("Failed to save settings!");
+			e.printStackTrace();
 		}
 	}
 }

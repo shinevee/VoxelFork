@@ -7,7 +7,7 @@ import io.bluestaggo.voxelthing.window.Window;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_BACKSPACE;
 
-public class TextBox extends GuiFocusable {
+public class TextBox extends FocusableControl {
 	public String text = "";
 
 	public TextBox(GuiScreen screen) {

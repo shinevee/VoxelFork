@@ -63,7 +63,7 @@ public class IngameGui extends GuiScreen {
 	public void draw() {
 		super.draw();
 
-		if (!game.showThirdPerson()) {
+		if (!game.settings.thirdPerson.getValue()) {
 			drawCrosshair();
 			drawHand();
 		}
@@ -96,7 +96,7 @@ public class IngameGui extends GuiScreen {
 		float bobY = (float) ((1.0 - hover * (block == null ? 1.0 : 0.9))
 				+ (MathUtil.sinPi(swing * 2.0) / 6.0)) * handSize;
 
-		if (game.viewBobbingEnabled()) {
+		if (game.settings.viewBobbing.getValue()) {
 			bobX += (float) (game.player.getRenderWalk() * -0.05) * handSize;
 			bobY += (float) ((Math.abs(game.player.getRenderWalk()) * 0.05)
 					+ Math.max(game.player.getFallAmount() * 0.1, -0.25)) * handSize;

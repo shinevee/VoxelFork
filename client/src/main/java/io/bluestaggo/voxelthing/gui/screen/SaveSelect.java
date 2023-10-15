@@ -1,7 +1,7 @@
 package io.bluestaggo.voxelthing.gui.screen;
 
 import io.bluestaggo.voxelthing.Game;
-import io.bluestaggo.voxelthing.gui.control.GuiControl;
+import io.bluestaggo.voxelthing.gui.control.Control;
 import io.bluestaggo.voxelthing.gui.control.LabeledButton;
 import io.bluestaggo.voxelthing.gui.control.ScrollContainer;
 import io.bluestaggo.voxelthing.gui.control.WorldButton;
@@ -9,6 +9,7 @@ import io.bluestaggo.voxelthing.renderer.GLState;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Quad;
 import io.bluestaggo.voxelthing.world.storage.FolderSaveHandler;
+import org.lwjgl.opengl.GL33C;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,11 +17,9 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-
 public class SaveSelect extends GuiScreen {
-	private final GuiControl backButton;
-	private final GuiControl newWorldButton;
+	private final Control backButton;
+	private final Control newWorldButton;
 	private final ScrollContainer worldContainer;
 
 	public SaveSelect(Game game) {
@@ -74,7 +73,7 @@ public class SaveSelect extends GuiScreen {
 		MainRenderer r = game.renderer;
 
 		try (var state = new GLState()) {
-			state.enable(GL_BLEND);
+			state.enable(GL33C.GL_BLEND);
 			r.draw2D.drawQuad(Quad.shared()
 					.at(0, 30)
 					.size(r.screen.getWidth(), r.screen.getHeight() - 60)
@@ -87,7 +86,7 @@ public class SaveSelect extends GuiScreen {
 	}
 
 	@Override
-	public void onControlClicked(GuiControl control, int button) {
+	public void onControlClicked(Control control, int button) {
 		if (control instanceof WorldButton world) {
 			game.startWorld(world.saveHandler);
 		} else if (control == backButton) {

@@ -3,6 +3,8 @@ package io.bluestaggo.voxelthing.gui.screen;
 import io.bluestaggo.voxelthing.Game;
 import io.bluestaggo.voxelthing.assets.FontManager;
 import io.bluestaggo.voxelthing.renderer.screen.Screen;
+import io.bluestaggo.voxelthing.world.BlockRaycast;
+import io.bluestaggo.voxelthing.world.block.Block;
 
 public class DebugGui extends GuiScreen {
 	public DebugGui(Game game) {
@@ -22,17 +24,21 @@ public class DebugGui extends GuiScreen {
 		long totalMB = Runtime.getRuntime().totalMemory() / 1000000L;
 		long maxMB = Runtime.getRuntime().maxMemory() / 1000000L;
 
+		String raycastText = Block.ID_AIR.toString();
+		if (game.getBlockRaycast() instanceof BlockRaycast raycast) {
+			raycastText = raycast.getDebugText(game.world);
+		}
+
 		String[] lines = {
 				"FPS", game.window.getFps() + " (" + (int)(game.window.getDeltaTime() * 1000.0D) + "ms)",
-				"Memory", (totalMB - freeMB) + " / " + maxMB + " MB",
-				"Render Distance", String.valueOf(game.renderer.worldRenderer.renderDistanceHor),
+				"Memory", ((totalMB - freeMB) * 100 / maxMB) + "% (" + (totalMB - freeMB) + " / " + maxMB + " MB)",
 				"GUI Scale", String.valueOf(screen.scale <= 0.0f ? "auto" : screen.scale),
 				"Position", game.isInWorld()
 						? formatDouble(game.player.posX)
 						+ ", " + formatDouble(game.player.posY)
 						+ ", " + formatDouble(game.player.posZ)
 						: "N/A",
-				"Looking At", game.getBlockRaycast().getDebugText(game.world),
+				"Looking At", raycastText,
 				"Scroll", formatDouble(game.window.getScrollX()) + ", " + formatDouble(game.window.getScrollY())
 		};
 
