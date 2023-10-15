@@ -135,19 +135,24 @@ public class Game {
 	}
 
 	public void run() {
-		try {
-			while (!window.shouldClose()) {
+		while (!window.shouldClose()) {
+			try {
 				update(window.getDeltaTime());
 				draw();
 				window.update();
+			} catch (Throwable e) {
+				e.printStackTrace();
+				var stackTrace = new StringWriter();
+				var stackTracePrinter = new PrintWriter(stackTrace);
+				stackTracePrinter.println("An exception has occured!");
+				e.printStackTrace(stackTracePrinter);
+				stackTracePrinter.println("Continue execution?");
+				boolean stop = JOptionPane.showConfirmDialog(null, stackTrace, "Voxel Thing: Exception", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE) != 1;
+
+				if (!stop) {
+					break;
+				}
 			}
-		} catch (Throwable e) {
-			var stackTrace = new StringWriter();
-			var stackTracePrinter = new PrintWriter(stackTrace);
-			stackTracePrinter.println("An exception has occured and the program needs to quit!");
-			e.printStackTrace(stackTracePrinter);
-			JOptionPane.showMessageDialog(null, stackTrace, "Voxel Thing: Exception", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
 		}
 
 		close();
@@ -223,14 +228,12 @@ public class Game {
 		if (gui == inGameGui) {
 			doControls();
 		}
-
-		if (gui != null) {
-			gui.handleInput();
-		}
+		gui.handleInput();
 
 		if (isInWorld()) {
 			player.onGameUpdate();
 			player.noClip = window.isKeyDown(GLFW_KEY_Q);
+			renderer.worldRenderer.loadChunks(10);
 		}
 
 		if (tickTime >= TICK_RATE) {

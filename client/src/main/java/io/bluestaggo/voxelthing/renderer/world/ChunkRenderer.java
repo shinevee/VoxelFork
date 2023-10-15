@@ -5,18 +5,19 @@ import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
 import io.bluestaggo.voxelthing.renderer.vertices.VertexLayout;
 import io.bluestaggo.voxelthing.window.Window;
-import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.ChunkCache;
-import io.bluestaggo.voxelthing.world.IBlockAccess;
 import io.bluestaggo.voxelthing.world.World;
+import io.bluestaggo.voxelthing.world.chunk.Chunk;
 import org.joml.FrustumIntersection;
 
 public class ChunkRenderer {
 	private final MainRenderer renderer;
 	private final World world;
+	private final ChunkCache cache;
 	private int x, y, z;
 	private boolean needsUpdate;
 	private boolean empty;
+	private boolean chunksLoaded;
 	private double firstAppearance;
 
 	private Bindings bindings;
@@ -24,6 +25,7 @@ public class ChunkRenderer {
 	public ChunkRenderer(MainRenderer renderer, World world, int x, int y, int z) {
 		this.renderer = renderer;
 		this.world = world;
+		this.cache = new ChunkCache(world);
 		this.setPosition(x, y, z);
 	}
 
@@ -33,6 +35,7 @@ public class ChunkRenderer {
 		this.z = z;
 		needsUpdate = true;
 		empty = true;
+		chunksLoaded = false;
 	}
 
 	public int getX() {
@@ -67,7 +70,7 @@ public class ChunkRenderer {
 				bindings = new Bindings(VertexLayout.WORLD);
 			}
 
-			IBlockAccess cache = new ChunkCache(world, x, y, z);
+			loadNeighborChunks();
 			for (int xx = 0; xx < Chunk.LENGTH; xx++) {
 				for (int yy = 0; yy < Chunk.LENGTH; yy++) {
 					for (int zz = 0; zz < Chunk.LENGTH; zz++) {
@@ -93,6 +96,10 @@ public class ChunkRenderer {
 		}
 	}
 
+	public void loadNeighborChunks() {
+		cache.moveTo(x, y, z);
+	}
+
 	public void queueUpdate() {
 		needsUpdate = true;
 	}
@@ -101,9 +108,17 @@ public class ChunkRenderer {
 		return needsUpdate;
 	}
 
+	public boolean areChunksLoaded() {
+		return chunksLoaded;
+	}
+
+	public Chunk getChunk() {
+		return world.getChunkAt(x, y, z);
+	}
+
 	public boolean inFrustum(FrustumIntersection frustum) {
-		return frustum.testAab(getX() * Chunk.LENGTH, getY() * Chunk.LENGTH, getZ() * Chunk.LENGTH,
-				(getX() + 1) * Chunk.LENGTH, (getY() + 1) * Chunk.LENGTH, (getZ() + 1) * Chunk.LENGTH);
+		return frustum.testAab(x * Chunk.LENGTH, y * Chunk.LENGTH, z * Chunk.LENGTH,
+				(x + 1) * Chunk.LENGTH, (y + 1) * Chunk.LENGTH, (z + 1) * Chunk.LENGTH);
 	}
 
 	public double getFadeAmount(double time) {

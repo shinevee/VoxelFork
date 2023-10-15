@@ -22,7 +22,7 @@ public class ToggleSetting extends Setting<Boolean> {
 	public void handleControl(GuiControl control) {
 		value = !value;
 		if (control instanceof LabeledButton labeledButton) {
-			labeledButton.text = value.toString();
+			labeledButton.text = value ? "ON" : "OFF";
 		}
 	}
 }

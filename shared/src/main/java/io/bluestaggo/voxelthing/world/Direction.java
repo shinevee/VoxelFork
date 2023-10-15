@@ -8,13 +8,28 @@ public enum Direction {
 	BOTTOM(0, -1, 0),
 	TOP(0, 1, 0);
 
+	static {
+		NORTH.opposite = SOUTH;
+		SOUTH.opposite = NORTH;
+		WEST.opposite = EAST;
+		EAST.opposite = WEST;
+		BOTTOM.opposite = TOP;
+		TOP.opposite = BOTTOM;
+	}
+
 	public static final Direction[] ALL = values();
 
 	public final int X, Y, Z;
+	public final int bitMask = 1 << ordinal();
+	private Direction opposite;
 
 	Direction(int x, int y, int z) {
 		X = x;
 		Y = y;
 		Z = z;
+	}
+
+	public Direction getOpposite() {
+		return opposite;
 	}
 }

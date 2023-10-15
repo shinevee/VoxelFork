@@ -6,6 +6,8 @@ import io.bluestaggo.voxelthing.world.block.Block;
 import java.util.List;
 
 public class EmptyBlockStorage extends BlockStorage {
+	private static final byte[] ZERO_BYTE_ARRAY = new byte[0];
+
 	public EmptyBlockStorage() {
 	}
 
@@ -28,7 +30,7 @@ public class EmptyBlockStorage extends BlockStorage {
 
 	@Override
 	public byte[] getBytes() {
-		return new byte[0];
+		return ZERO_BYTE_ARRAY;
 	}
 
 	@Override

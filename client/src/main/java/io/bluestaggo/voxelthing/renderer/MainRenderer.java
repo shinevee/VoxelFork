@@ -12,7 +12,7 @@ import io.bluestaggo.voxelthing.renderer.world.Camera;
 import io.bluestaggo.voxelthing.renderer.world.EntityRenderer;
 import io.bluestaggo.voxelthing.renderer.world.WorldRenderer;
 import io.bluestaggo.voxelthing.window.Window;
-import io.bluestaggo.voxelthing.world.Chunk;
+import io.bluestaggo.voxelthing.world.chunk.Chunk;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;

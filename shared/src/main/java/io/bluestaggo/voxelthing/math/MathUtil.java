@@ -100,4 +100,20 @@ public final class MathUtil {
 	public static double sinPi(double x) {
 		return Math.sin(x * Math.PI);
 	}
+
+	public static int pack8bit(int x, int y, int z) {
+		return (x & 0xFF) << 16 | (y & 0xFF) << 8 | z & 0xFF;
+	}
+
+	public static int unpack8bitX(int i) {
+		return (i >> 16) & 0xFF;
+	}
+
+	public static int unpack8bitY(int i) {
+		return (i >> 8) & 0xFF;
+	}
+
+	public static int unpack8bitZ(int i) {
+		return i & 0xFF;
+	}
 }

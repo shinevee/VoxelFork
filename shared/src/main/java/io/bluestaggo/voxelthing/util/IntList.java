@@ -47,6 +47,19 @@ public class IntList {
 		data[i] = e;
 	}
 
+	public int remove(int i) {
+		Objects.checkIndex(i, size);
+		int oldValue = data[i];
+
+		int newSize;
+		if ((newSize = size - 1) > i) {
+			System.arraycopy(data, i + 1, data, i, newSize - i);
+		}
+		data[size = newSize] = 0;
+
+		return oldValue;
+	}
+
 	public int get(int index) {
 		Objects.checkIndex(index, size);
 		return data[index];
@@ -63,6 +76,19 @@ public class IntList {
 
 	public void putToBuffer(IntBuffer buffer) {
 		buffer.put(data, 0, size);
+	}
+
+	public boolean contains(int e) {
+		return indexOf(e) >= 0;
+	}
+
+	public int indexOf(int e) {
+		for (int j = 0; j < size; j++) {
+            if (e == data[j]) {
+                return j;
+            }
+        }
+	    return -1;
 	}
 
 	private int[] grow() {

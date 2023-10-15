@@ -6,7 +6,7 @@ plugins {
     application
 }
 
-val lwjglVersion = "3.3.2"
+val lwjglVersion = "3.3.3"
 val jomlVersion = "1.10.5"
 
 val platforms = arrayOf(
@@ -18,7 +18,7 @@ val platforms = arrayOf(
     "windows",
     "windows-x86",
     "windows-arm64"
-);
+)
 
 val lwjglModules = arrayOf(
     "glfw",
@@ -105,7 +105,7 @@ task("genMetadata") {
 }
 
 fun getaVersion(): String {
-    var version = providers.gradleProperty("voxelthing.version").get();
-    version = version.replace("dev", "dev ${SimpleDateFormat("yyyyMMdd").format(Date())}");
-    return version;
+    var version = providers.gradleProperty("voxelthing.version").get()
+    version = version.replace("dev", "dev ${SimpleDateFormat("yyyyMMdd").format(Date())}")
+    return version
 }

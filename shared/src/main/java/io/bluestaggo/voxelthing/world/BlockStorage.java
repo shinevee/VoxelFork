@@ -2,6 +2,7 @@ package io.bluestaggo.voxelthing.world;
 
 import io.bluestaggo.voxelthing.util.IntList;
 import io.bluestaggo.voxelthing.world.block.Block;
+import io.bluestaggo.voxelthing.world.chunk.Chunk;
 import io.bluestaggo.voxelthing.world.storage.ByteBlockStorage;
 import io.bluestaggo.voxelthing.world.storage.EmptyBlockStorage;
 import io.bluestaggo.voxelthing.world.storage.NibbleBlockStorage;

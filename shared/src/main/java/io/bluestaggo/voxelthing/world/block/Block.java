@@ -123,6 +123,10 @@ public class Block {
 		return transparency.transparent;
 	}
 
+	public boolean isSolidOpaque() {
+		return !isTransparent();
+	}
+
 	public boolean isFaceDrawn(IBlockAccess blockAccess, int x, int y, int z, Direction face) {
 		Block block = blockAccess.getBlock(x, y, z);
 		if (block == null) {

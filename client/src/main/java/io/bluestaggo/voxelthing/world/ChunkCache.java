@@ -2,14 +2,19 @@ package io.bluestaggo.voxelthing.world;
 
 import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.world.block.Block;
+import io.bluestaggo.voxelthing.world.chunk.Chunk;
+import io.bluestaggo.voxelthing.world.chunk.EmptyChunk;
 
 public class ChunkCache implements IBlockAccess {
 	private final World world;
 	private final Chunk[] chunks = new Chunk[27];
-	private final int x, y, z;
+	private int x, y, z;
 
-	public ChunkCache(World world, int x, int y, int z) {
+	public ChunkCache(World world) {
 		this.world = world;
+	}
+
+	public void moveTo(int x, int y, int z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;

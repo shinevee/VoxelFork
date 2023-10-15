@@ -1,10 +1,10 @@
 package io.bluestaggo.voxelthing.renderer.world;
 
 import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
-import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.IBlockAccess;
 import io.bluestaggo.voxelthing.world.block.Block;
+import io.bluestaggo.voxelthing.world.chunk.Chunk;
 import org.joml.Vector2i;
 
 public class BlockRenderer {

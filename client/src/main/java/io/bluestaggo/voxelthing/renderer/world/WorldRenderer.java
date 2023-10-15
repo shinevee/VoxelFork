@@ -5,13 +5,15 @@ import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.util.Primitives;
 import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
 import io.bluestaggo.voxelthing.window.Window;
-import io.bluestaggo.voxelthing.world.Chunk;
+import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.World;
+import io.bluestaggo.voxelthing.world.chunk.Chunk;
 import org.joml.FrustumIntersection;
 import org.joml.Vector3f;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static org.lwjgl.opengl.GL33C.*;
 
@@ -22,9 +24,12 @@ public class WorldRenderer {
 
 	private World world;
 	private ChunkRenderer[] chunkRenderers;
-	private List<ChunkRenderer> sortedChunkRenderers;
+	private Set<ChunkRenderer> sortedChunkRenderers;
+	private Set<ChunkRenderer> sortedCulledChunkRenderers;
 	private int minX, minY, minZ;
 	private int maxX, maxY, maxZ;
+	private int lastCullX, lastCullY, lastCullZ;
+	private boolean forceCulling = true;
 
 	public int renderDistanceHor = 16;
 	public int renderDistanceVer = 8;
@@ -78,13 +83,15 @@ public class WorldRenderer {
 	}
 
 	public void draw() {
+//		calculateCulledRenderers();
+		sortedCulledChunkRenderers = sortedChunkRenderers;
+
 		int updates = 0;
 		int maxUpdates = 1;
-
-		FrustumIntersection frustum = this.renderer.camera.getFrustum();
 		double currentTime = Window.getTimeElapsed();
+		FrustumIntersection frustum = renderer.camera.getFrustum();
 
-		for (ChunkRenderer chunkRenderer : sortedChunkRenderers) {
+		for (ChunkRenderer chunkRenderer : sortedCulledChunkRenderers) {
 			if (!chunkRenderer.inFrustum(frustum)) continue;
 
 			if (updates < maxUpdates) {
@@ -100,6 +107,69 @@ public class WorldRenderer {
 		}
 
 		renderer.worldShader.fade.set(0.0f);
+	}
+
+	private ChunkRenderer getRendererAt(int x, int y, int z) {
+		return chunkRenderers[chunkRendererCoord(x, y, z)];
+	}
+
+	private void calculateCulledRenderers() {
+		Vector3f pos = renderer.camera.getPosition();
+		int ix = ((int) pos.x) >> Chunk.SIZE_POW2;
+		int iy = ((int) pos.y) >> Chunk.SIZE_POW2;
+		int iz = ((int) pos.z) >> Chunk.SIZE_POW2;
+
+		if (!forceCulling && ix == lastCullX && iy == lastCullY && iz == lastCullZ) {
+			return;
+		}
+		forceCulling = false;
+
+		Queue<CulledChunkStep> queue = new ArrayDeque<>();
+		CulledChunkStep step = new CulledChunkStep(ix, iy, iz, null, 0);
+		Set<ChunkRenderer> culledChunkRenderers = new HashSet<>();
+		queue.add(step);
+		culledChunkRenderers.add(getRendererAt(step.x, step.y, step.z));
+
+		while (queue.size() > 0) {
+			CulledChunkStep next = queue.remove();
+			ChunkRenderer chunkRenderer = getRendererAt(next.x, next.y, next.z);
+			Chunk chunk = chunkRenderer != null ? chunkRenderer.getChunk() : null;
+
+			if (chunk != null && chunk.needsCullingUpdate()) {
+				chunk.calculateCulling();
+			}
+
+			for (Direction dir : Direction.ALL) {
+				int nx = next.x + dir.X;
+				int ny = next.y + dir.Y;
+				int nz = next.z + dir.Z;
+
+				if ((next.steppedDirs & dir.getOpposite().bitMask) != 0) continue;
+				if (nx < ix - renderDistanceHor || nx > ix + renderDistanceHor
+						|| ny < iy - renderDistanceVer || ny > iy + renderDistanceVer
+						|| nz < iz - renderDistanceHor || nz > iz + renderDistanceHor) continue;
+				ChunkRenderer nextChunkRenderer = getRendererAt(nx, ny, nz);
+				if (nextChunkRenderer != null && culledChunkRenderers.contains(nextChunkRenderer)) continue;
+				if (next.fromDir != null && chunk != null && !chunk.canBeSeen(next.fromDir, dir)) continue;
+//				if (nextChunkRenderer != null && !nextChunkRenderer.inFrustum(frustum)) continue;
+
+				culledChunkRenderers.add(nextChunkRenderer);
+				queue.add(new CulledChunkStep(nx, ny, nz, dir.getOpposite(), next.steppedDirs | dir.bitMask));
+			}
+		}
+
+		sortedCulledChunkRenderers = sortedChunkRenderers.stream()
+				.filter(culledChunkRenderers::contains)
+				.collect(Collectors.toCollection(LinkedHashSet::new));
+	}
+
+	public void loadChunks(long max) {
+		var stream = sortedChunkRenderers.stream()
+				.filter(Predicate.not(ChunkRenderer::areChunksLoaded));
+		if (max > 0) {
+			stream = stream.limit(max);
+		}
+		stream.parallel().forEach(ChunkRenderer::loadNeighborChunks);
 	}
 
 	public void drawSky() {
@@ -151,7 +221,7 @@ public class WorldRenderer {
 
 		sortedChunkRenderers = Arrays.stream(chunkRenderers)
 				.sorted(this::compareChunks)
-				.toList();
+				.collect(Collectors.toCollection(LinkedHashSet::new));
 	}
 
 	private int compareChunks(ChunkRenderer a, ChunkRenderer b) {
@@ -204,6 +274,7 @@ public class WorldRenderer {
 
 		ChunkRenderer renderer = chunkRenderers[chunkRendererCoord(x, y, z)];
 		if (renderer.getX() == x && renderer.getY() == y && renderer.getZ() == z) {
+			forceCulling = true;
 			renderer.queueUpdate();
 		}
 	}
@@ -217,4 +288,6 @@ public class WorldRenderer {
 			}
 		}
 	}
+
+	private record CulledChunkStep(int x, int y, int z, Direction fromDir, int steppedDirs) {}
 }

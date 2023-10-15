@@ -5,6 +5,7 @@ import io.bluestaggo.voxelthing.Game;
 import io.bluestaggo.voxelthing.Identifier;
 import io.bluestaggo.voxelthing.renderer.world.WorldRenderer;
 import io.bluestaggo.voxelthing.world.block.Block;
+import io.bluestaggo.voxelthing.world.chunk.Chunk;
 import io.bluestaggo.voxelthing.world.storage.ISaveHandler;
 
 import java.util.ArrayList;

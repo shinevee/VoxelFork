@@ -1,4 +1,4 @@
-package io.bluestaggo.voxelthing.world;
+package io.bluestaggo.voxelthing.world.chunk;
 
 import io.bluestaggo.voxelthing.world.block.Block;
 

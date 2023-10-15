@@ -2,8 +2,8 @@ package io.bluestaggo.voxelthing.world.storage;
 
 import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.world.BlockStorage;
-import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.block.Block;
+import io.bluestaggo.voxelthing.world.chunk.Chunk;
 
 import java.util.List;
 

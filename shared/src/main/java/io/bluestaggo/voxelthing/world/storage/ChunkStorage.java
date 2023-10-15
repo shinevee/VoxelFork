@@ -1,8 +1,8 @@
 package io.bluestaggo.voxelthing.world.storage;
 
 import io.bluestaggo.pds.CompoundItem;
-import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.World;
+import io.bluestaggo.voxelthing.world.chunk.Chunk;
 
 public class ChunkStorage {
 	public static final int RADIUS_POW2 = 5;
@@ -23,7 +23,7 @@ public class ChunkStorage {
 		return (x << RADIUS_POW2 | z) << RADIUS_POW2 | y;
 	}
 
-	public Chunk getChunkAt(int x, int y, int z) {
+	public synchronized Chunk getChunkAt(int x, int y, int z) {
 		Chunk chunk = chunks[storageCoords(x, y, z)];
 		if (chunk == null || chunk.x != x || chunk.y != y || chunk.z != z) {
 			return null;
@@ -32,7 +32,7 @@ public class ChunkStorage {
 		return chunk;
 	}
 
-	public Chunk newChunkAt(int x, int y, int z) {
+	public synchronized Chunk newChunkAt(int x, int y, int z) {
 		Chunk chunk = getChunkAt(x, y, z);
 		if (chunk != null) {
 			return chunk;
@@ -48,7 +48,7 @@ public class ChunkStorage {
 		return chunk;
 	}
 
-	public Chunk deserializeChunkAt(int x, int y, int z, CompoundItem item) {
+	public synchronized Chunk deserializeChunkAt(int x, int y, int z, CompoundItem item) {
 		Chunk chunk = getChunkAt(x, y, z);
 		if (chunk != null) {
 			return chunk;

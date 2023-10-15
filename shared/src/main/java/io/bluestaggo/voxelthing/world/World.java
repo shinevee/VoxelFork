@@ -4,13 +4,13 @@ import io.bluestaggo.pds.CompoundItem;
 import io.bluestaggo.voxelthing.math.AABB;
 import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.world.block.Block;
+import io.bluestaggo.voxelthing.world.chunk.Chunk;
 import io.bluestaggo.voxelthing.world.generation.GenCache;
 import io.bluestaggo.voxelthing.world.generation.GenerationInfo;
 import io.bluestaggo.voxelthing.world.storage.ChunkStorage;
 import io.bluestaggo.voxelthing.world.storage.EmptySaveHandler;
 import io.bluestaggo.voxelthing.world.storage.ISaveHandler;
 import org.joml.Vector3d;
-import org.joml.Vector3i;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,27 +147,7 @@ public class World implements IBlockAccess {
 		onChunkAdded(cx, cy, cz);
 	}
 
-	public void loadSurroundingChunks(int cx, int cy, int cz, int radius) {
-		List<Vector3i> points = MathUtil.getSpherePoints(radius);
-
-		int loaded = 0;
-
-		for (Vector3i point : points) {
-			int x = point.x + cx;
-			int y = point.y + cy;
-			int z = point.z + cz;
-
-			if (!chunkExists(x, y, z)) {
-				loadChunkAt(x, y, z);
-
-				if (++loaded >= 25) {
-					return;
-				}
-			}
-		}
-	}
-
-	public Chunk getOrLoadChunkAt(int x, int y, int z) {
+	public synchronized Chunk getOrLoadChunkAt(int x, int y, int z) {
 		Chunk chunk = getChunkAt(x, y, z);
 		if (chunk == null) {
 			loadChunkAt(x, y, z);

@@ -2,7 +2,7 @@ package io.bluestaggo.voxelthing.world.generation;
 
 import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.math.OpenSimplex2Octaves;
-import io.bluestaggo.voxelthing.world.Chunk;
+import io.bluestaggo.voxelthing.world.chunk.Chunk;
 
 import java.util.Arrays;
 

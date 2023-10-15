@@ -94,6 +94,6 @@ public class ScrollContainer extends GuiContainer {
 			return;
 		}
 
-		super.checkMouseClicked(button, mx, my - (int) scrollAmount);
+		super.checkMouseClicked(button, mx, my + (int) scrollAmount);
 	}
 }
