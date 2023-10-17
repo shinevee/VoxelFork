@@ -7,8 +7,11 @@ import io.bluestaggo.voxelthing.Game;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
 
 public class Settings {
+	public static final Function<Float, String> PERCENTAGE_TEXT_TRANSFORMER = value -> (int)(value * 100.0f) + "%";
+
 	private static final String[] CATEGORIES = {
 			"Graphics",
 	};
@@ -38,6 +41,7 @@ public class Settings {
 	public final Setting<Integer> skin = addSetting(new ChoiceSetting("Graphics", "Skin", 0, Arrays.stream(Game.SKINS)
 			.map(s -> (Character.toUpperCase(s.charAt(0)) + s.substring(1)).replace('_', ' '))
 			.toArray(String[]::new)));
+	public final Setting<Integer> guiScale = addSetting(new IntSliderSetting("Graphics", "GUI Scale", 0, 0, 4).setModifiableOnDrag(false));
 
 	private <T extends Setting<?>> T addSetting(T setting) {
 		List<Setting<?>> settingList = byCategoryMut.computeIfAbsent(setting.category, k -> new ArrayList<>());

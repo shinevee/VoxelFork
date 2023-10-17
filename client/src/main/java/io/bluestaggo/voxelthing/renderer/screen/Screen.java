@@ -25,13 +25,14 @@ public class Screen {
 	public void updateDimensions() {
 		float newWidth = window.getWidth();
 		float newHeight = window.getHeight();
-		autoScale = scale;
 
-		if (autoScale <= 0.0f) {
-			autoScale = 1.0f;
-			while (newWidth / (autoScale + 1) >= VIRTUAL_WIDTH && newHeight / (autoScale + 1) >= VIRTUAL_HEIGHT) {
-				autoScale++;
-			}
+		autoScale = 1.0f;
+		while (newWidth / (autoScale + 1) >= VIRTUAL_WIDTH && newHeight / (autoScale + 1) >= VIRTUAL_HEIGHT) {
+			autoScale++;
+		}
+
+		if (scale > 0.0f) {
+			autoScale = Math.min(scale, autoScale);
 		}
 
 		newWidth /= autoScale;

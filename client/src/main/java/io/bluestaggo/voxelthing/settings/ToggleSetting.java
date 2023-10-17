@@ -12,7 +12,7 @@ public class ToggleSetting extends Setting<Boolean> {
 	@Override
 	public Control getControl(GuiScreen screen) {
 		return new LabeledButton(screen)
-				.withText(value ? "ON" : "OFF")
+				.withText(getValueAsString())
 				.size(100, 0)
 				.alignedAt(0.5f, 0.0f)
 				.alignedSize(0.0f, 1.0f);
@@ -22,7 +22,7 @@ public class ToggleSetting extends Setting<Boolean> {
 	public void handleControl(Control control) {
 		value = !value;
 		if (control instanceof LabeledButton labeledButton) {
-			labeledButton.text = value ? "ON" : "OFF";
+			labeledButton.text = getValueAsString();
 		}
 	}
 }

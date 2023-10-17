@@ -5,12 +5,16 @@ import io.bluestaggo.voxelthing.gui.control.Control;
 import io.bluestaggo.voxelthing.gui.screen.GuiScreen;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 public abstract class Setting<T> {
 	public final String category;
 	public final String name;
 	public final String saveName;
 	protected T value;
+
+	private Function<T, String> textTransformer;
+	private boolean modifiableOnDrag = true;
 
 	public Setting(String category, String name, T value) {
 		this.category = category;
@@ -26,12 +30,40 @@ public abstract class Setting<T> {
 		this.saveName = camelCategory + ":" + camelName;
 	}
 
+	public Setting<T> withTextTransformer(Function<T, String> textTransformer) {
+		this.textTransformer = textTransformer;
+		return this;
+	}
+
+	public Setting<T> setModifiableOnDrag(boolean modifiableOnDrag) {
+		this.modifiableOnDrag = modifiableOnDrag;
+		return this;
+	}
+
 	public T getValue() {
 		return value;
 	}
 
+	public String getValueAsString() {
+		if (textTransformer != null) {
+			return textTransformer.apply(value);
+		}
+
+		if (value instanceof Float f) {
+			return Float.toString((int) (f * 100.0f) / 100.0f);
+		} else if (value instanceof Boolean b) {
+			return b ? "ON" : "OFF";
+		}
+
+		return value.toString();
+	}
+
 	public void setValue(T value) {
 		this.value = value;
+	}
+
+	public boolean isModifiableOnDrag() {
+		return modifiableOnDrag;
 	}
 
 	public StructureItem serialize() {

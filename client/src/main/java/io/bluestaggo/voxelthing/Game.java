@@ -217,6 +217,7 @@ public class Game {
 
 	private void update(double delta) {
 		tickTime += delta;
+		renderer.screen.scale = settings.guiScale.getValue();
 
 		GuiScreen gui = currentGui != null ? currentGui : isInWorld() ? inGameGui : null;
 
@@ -304,12 +305,8 @@ public class Game {
 			player.velZ = 0.0;
 		}
 
-		if (window.isKeyJustPressed(GLFW_KEY_LEFT_BRACKET) && renderer.screen.scale > 0.0f) {
-			renderer.screen.scale -= 0.5f;
-		}
-
-		if (window.isKeyJustPressed(GLFW_KEY_RIGHT_BRACKET)) {
-			renderer.screen.scale += 0.5f;
+		if (window.isKeyJustPressed(GLFW_KEY_F1)) {
+			settings.hideGui.setValue(!settings.hideGui.getValue());
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_F3)) {

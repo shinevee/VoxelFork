@@ -104,7 +104,10 @@ public class SettingsMenu extends GuiScreen {
 
 		FocusableControl focusable = getFocusedControl();
 		if (settingButtons.containsKey(focusable)) {
-			settingButtons.get(focusable).handleControl(focusable);
+			Setting<?> setting = settingButtons.get(focusable);
+			if (setting.isModifiableOnDrag()) {
+				setting.handleControl(focusable);
+			}
 		}
 	}
 

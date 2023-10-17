@@ -58,6 +58,10 @@ public final class MathUtil {
 		return lerp(c0, c1, z);
 	}
 
+	public static int index2D(int x, int y, int length) {
+		return (x * length) + y;
+	}
+
 	public static int index3D(int x, int y, int z, int length) {
 		return ((x * length) + y) * length + z;
 	}

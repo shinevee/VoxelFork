@@ -3,7 +3,6 @@ package io.bluestaggo.voxelthing.gui.screen;
 import io.bluestaggo.voxelthing.Game;
 import io.bluestaggo.voxelthing.assets.FontManager;
 import io.bluestaggo.voxelthing.renderer.screen.Screen;
-import io.bluestaggo.voxelthing.world.BlockRaycast;
 import io.bluestaggo.voxelthing.world.block.Block;
 
 public class DebugGui extends GuiScreen {
@@ -25,8 +24,8 @@ public class DebugGui extends GuiScreen {
 		long maxMB = Runtime.getRuntime().maxMemory() / 1000000L;
 
 		String raycastText = Block.ID_AIR.toString();
-		if (game.getBlockRaycast() instanceof BlockRaycast raycast) {
-			raycastText = raycast.getDebugText(game.world);
+		if (game.getBlockRaycast() != null) {
+			raycastText = game.getBlockRaycast().getDebugText(game.world);
 		}
 
 		String[] lines = {

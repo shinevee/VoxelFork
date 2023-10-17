@@ -1,20 +1,18 @@
 package io.bluestaggo.voxelthing.world.chunk;
 
 import io.bluestaggo.pds.CompoundItem;
-import io.bluestaggo.pds.ListItem;
-import io.bluestaggo.voxelthing.Identifier;
 import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.util.IntList;
-import io.bluestaggo.voxelthing.world.BlockStorage;
 import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.IBlockAccess;
 import io.bluestaggo.voxelthing.world.World;
 import io.bluestaggo.voxelthing.world.block.Block;
-import io.bluestaggo.voxelthing.world.storage.EmptyBlockStorage;
+import io.bluestaggo.voxelthing.world.chunk.layer.BlockStorage;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.IntConsumer;
-import java.util.stream.Collectors;
 
 public class Chunk implements IBlockAccess {
 	public static final int SIZE_POW2 = 5;
@@ -33,7 +31,7 @@ public class Chunk implements IBlockAccess {
 	private short cullInfo = Short.MAX_VALUE;
 
 	public Chunk(World world, int x, int y, int z) {
-		this(world, x, y, z, new EmptyBlockStorage());
+		this(world, x, y, z, new BlockStorage());
 	}
 
 	public Chunk(World world, int x, int y, int z, BlockStorage blockStorage) {
@@ -62,14 +60,10 @@ public class Chunk implements IBlockAccess {
 		if (!containsLocal(x, y, z)) {
 			return this.world.getBlock(toGlobalX(x), toGlobalY(y), toGlobalZ(z));
 		}
-
 		return blockStorage.getBlock(x, y, z);
 	}
 
 	public void setBlock(int x, int y, int z, Block block) {
-		if (blockStorage.needsExpansion(block)) {
-			blockStorage = blockStorage.expand();
-		}
 		blockStorage.setBlock(x, y, z, block);
 		hasChanged = true;
 		needsCullingUpdate = true;
@@ -162,7 +156,7 @@ public class Chunk implements IBlockAccess {
 	private void processCullDirs(int dirs, Direction startDir) {
 		for (Direction dir : Direction.ALL) {
 			if (dir != startDir && (dirs & dir.bitMask) > 0) {
-				cullInfo |= Objects.requireNonNull(ChunkCullDirection.get(startDir, dir)).bitMask;
+				cullInfo |= (short) Objects.requireNonNull(ChunkCullDirection.get(startDir, dir)).bitMask;
 			}
 		}
 	}
@@ -239,30 +233,12 @@ public class Chunk implements IBlockAccess {
 
 	public CompoundItem serialize() {
 		var item = new CompoundItem();
-
-		var paletteItem = new ListItem(blockStorage.palette.stream()
-				.map(b -> (b == null ? Block.ID_AIR : b.id).serialize())
-				.collect(Collectors.toList()));
-		item.setItem("blockPalette", paletteItem);
-
-		item.setByte("blockArrayType", blockStorage.getType());
-		item.setByteArray("blocks", blockStorage.getBytes());
-
+		item.setItem("blocks", blockStorage.serialize());
 		return item;
 	}
 
 	public static Chunk deserialize(World world, int x, int y, int z, CompoundItem item) {
-		var paletteItem = item.getItem("blockPalette");
-		List<Block> palette = paletteItem.getList().stream()
-				.map(Identifier::deserialize)
-				.map(Block::fromId)
-				.collect(Collectors.toCollection(ArrayList::new));
-
-		byte[] blocks = item.getByteArray("blocks");
-		byte blockArrayType = item.getByte("blockArrayType");
-
-		BlockStorage storage = BlockStorage.decode(blockArrayType, palette, blocks);
-
+		BlockStorage storage = BlockStorage.deserialize(item.getItem("blocks"));
 		return new Chunk(world, x, y, z, storage);
 	}
 

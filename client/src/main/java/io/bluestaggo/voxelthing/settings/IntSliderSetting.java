@@ -17,7 +17,7 @@ public class IntSliderSetting extends Setting<Integer> {
 	@Override
 	public Control getControl(GuiScreen screen) {
 		return new Slider(screen)
-				.withText(value.toString())
+				.withText(getValueAsString())
 				.setValue((float) (value - min) / (max - min))
 				.size(100, 0)
 				.alignedAt(0.5f, 0.0f)
@@ -29,7 +29,7 @@ public class IntSliderSetting extends Setting<Integer> {
 		if (control instanceof Slider slider) {
 			slider.setValue(Math.round(slider.getValue() * (max - min)) / (float) (max - min));
 			value = (int) (slider.getValue() * (max - min) + min);
-			slider.text = value.toString();
+			slider.text = getValueAsString();
 		}
 	}
 }
