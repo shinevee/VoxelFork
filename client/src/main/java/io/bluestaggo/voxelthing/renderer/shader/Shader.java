@@ -19,39 +19,8 @@ public class Shader {
 	public Shader(String path) throws IOException {
 		String vertexPath = path + ".vsh";
 		String fragmentPath = path + ".fsh";
-		String vertexSource, fragmentSource;
-
-		// Load vertex shader code
-		try (InputStream vertexStream = getClass().getResourceAsStream(vertexPath)) {
-			if (vertexStream == null) {
-				throw new IOException("Failed to open vertex shader \"" + vertexPath + "\"!");
-			}
-
-			BufferedReader reader = new BufferedReader(new InputStreamReader(vertexStream));
-			StringBuilder stringBuilder = new StringBuilder();
-			String currentLine;
-			while ((currentLine = reader.readLine()) != null) {
-				stringBuilder.append(currentLine);
-				stringBuilder.append('\n');
-			}
-			vertexSource = stringBuilder.toString();
-		}
-
-		// Load fragment shader code
-		try (InputStream fragmentStream = getClass().getResourceAsStream(fragmentPath)) {
-			if (fragmentStream == null) {
-				throw new IOException("Failed to open fragment shader \"" + fragmentPath + "\"!");
-			}
-
-			BufferedReader reader = new BufferedReader(new InputStreamReader(fragmentStream));
-			StringBuilder stringBuilder = new StringBuilder();
-			String currentLine;
-			while ((currentLine = reader.readLine()) != null) {
-				stringBuilder.append(currentLine);
-				stringBuilder.append('\n');
-			}
-			fragmentSource = stringBuilder.toString();
-		}
+		String vertexSource = readShaderSource(vertexPath);
+		String fragmentSource = readShaderSource(fragmentPath);
 
 		// Load vertex shader
 		int vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -84,6 +53,32 @@ public class Shader {
 		// Delete shaders
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
+	}
+
+	private static String readShaderSource(String path) throws IOException {
+		try (InputStream shaderStream = Shader.class.getResourceAsStream(path)) {
+			if (shaderStream == null) {
+				throw new IOException("Failed to open shader \"" + path + "\"!");
+			}
+
+			BufferedReader reader = new BufferedReader(new InputStreamReader(shaderStream));
+			StringBuilder stringBuilder = new StringBuilder();
+			String currentLine;
+			while ((currentLine = reader.readLine()) != null) {
+				if (currentLine.startsWith("#include")) {
+					String includePath = currentLine.substring(currentLine.indexOf('"') + 1, currentLine.lastIndexOf('"'));
+					if (!includePath.startsWith("/")) {
+						includePath = "/" + includePath;
+					}
+
+					stringBuilder.append(readShaderSource(includePath));
+				} else {
+					stringBuilder.append(currentLine);
+				}
+				stringBuilder.append('\n');
+			}
+			return stringBuilder.toString();
+		}
 	}
 
 	public void unload() {

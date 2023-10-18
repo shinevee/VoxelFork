@@ -1,20 +1,20 @@
 package io.bluestaggo.voxelthing.renderer.util;
 
-import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
+import io.bluestaggo.voxelthing.renderer.vertices.FloatBindings;
 
 public abstract class Primitives {
 	private static Primitives world;
 	private static Primitives vector3f;
 
-	protected abstract Bindings newBindings();
+	protected abstract FloatBindings newBindings();
 
-	protected abstract void addPosition(Bindings bindings, float x, float y, float z);
+	protected abstract void addPosition(FloatBindings bindings, float x, float y, float z);
 
-	protected abstract void addColor(Bindings bindings, float r, float g, float b);
+	protected abstract void addColor(FloatBindings bindings, float r, float g, float b);
 
-	protected abstract void addUv(Bindings bindings, float u, float v);
+	protected abstract void addUv(FloatBindings bindings, float u, float v);
 
-	public Bindings generateSphere(Bindings bindings, float radius, int rings, int sectors) {
+	public FloatBindings generateSphere(FloatBindings bindings, float radius, int rings, int sectors) {
 		if (bindings == null) bindings = newBindings();
 
 		bindings.clear();
@@ -61,15 +61,15 @@ public abstract class Primitives {
 		return bindings;
 	}
 
-	public Bindings generatePlane(Bindings bindings) {
+	public FloatBindings generatePlane(FloatBindings bindings) {
 		return generatePlane(bindings, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
-	public Bindings generatePlane(Bindings bindings, float x, float z, float width, float length) {
+	public FloatBindings generatePlane(FloatBindings bindings, float x, float z, float width, float length) {
 		return generatePlane(bindings, x, z, width, length, 1.0f, 1.0f, 1.0f);
 	}
 
-	public Bindings generatePlane(Bindings bindings, float x, float z, float width, float length, float r, float g, float b) {
+	public FloatBindings generatePlane(FloatBindings bindings, float x, float z, float width, float length, float r, float g, float b) {
 		if (bindings == null) bindings = newBindings();
 
 		addPosition(bindings, width + x, 0.0f, length + z);

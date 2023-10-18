@@ -1,26 +1,26 @@
 package io.bluestaggo.voxelthing.renderer.util;
 
-import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
+import io.bluestaggo.voxelthing.renderer.vertices.FloatBindings;
 import io.bluestaggo.voxelthing.renderer.vertices.VertexLayout;
 
 public class WorldPrimitives extends Primitives {
 	@Override
-	protected Bindings newBindings() {
-		return new Bindings(VertexLayout.WORLD);
+	protected FloatBindings newBindings() {
+		return new FloatBindings(VertexLayout.WORLD);
 	}
 
 	@Override
-	protected void addPosition(Bindings bindings, float x, float y, float z) {
-		bindings.addVertices(x, y, z);
+	protected void addPosition(FloatBindings bindings, float x, float y, float z) {
+		bindings.put(x, y, z);
 	}
 
 	@Override
-	protected void addColor(Bindings bindings, float r, float g, float b) {
-		bindings.addVertices(r, g, b);
+	protected void addColor(FloatBindings bindings, float r, float g, float b) {
+		bindings.put(r, g, b);
 	}
 
 	@Override
-	protected void addUv(Bindings bindings, float u, float v) {
-		bindings.addVertices(u, v);
+	protected void addUv(FloatBindings bindings, float u, float v) {
+		bindings.put(u, v);
 	}
 }

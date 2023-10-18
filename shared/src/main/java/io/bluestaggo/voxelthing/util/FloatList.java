@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class FloatList {
-	private static final int DEFAULT_CAPACITY = 16;
+	private static final int DEFAULT_CAPACITY = 10;
 	private static final int CAPACITY_MAX_THRESHOLD = 256;
 	private static final int SOFT_MAX_ARRAY_LENGTH = Integer.MAX_VALUE - 8;
 

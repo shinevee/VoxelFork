@@ -1,23 +1,18 @@
 package io.bluestaggo.voxelthing.renderer.shader;
 
+import io.bluestaggo.voxelthing.renderer.shader.modules.FogInfo;
 import io.bluestaggo.voxelthing.renderer.shader.uniform.ShaderUniform;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
 import java.io.IOException;
 
-public class WorldShader extends Shader implements BaseFogShader {
+public class WorldShader extends Shader {
 	public final ShaderUniform<Matrix4f> mvp;
 
 	public final ShaderUniform<Integer> tex;
 	public final ShaderUniform<Boolean> hasTex;
-	public final ShaderUniform<Integer> skyTex;
-	public final ShaderUniform<Vector3f> camPos;
-	public final ShaderUniform<Float> distHor;
-	public final ShaderUniform<Float> distVer;
-	public final ShaderUniform<Float> skyWidth;
-	public final ShaderUniform<Float> skyHeight;
 	public final ShaderUniform<Float> fade;
+	public final FogInfo fogInfo;
 
 	public WorldShader() throws IOException {
 		super("/assets/shaders/world");
@@ -27,23 +22,9 @@ public class WorldShader extends Shader implements BaseFogShader {
 
 		(tex = getUniform1i("tex")).set(0);
 		hasTex = getUniform1b("hasTex");
-		(skyTex = getUniform1i("skyTex")).set(1);
-		skyWidth = getUniform1f("skyWidth");
-		skyHeight = getUniform1f("skyHeight");
-		camPos = getUniform3f("camPos");
-		distHor = getUniform1f("distHor");
-		distVer = getUniform1f("distVer");
 		fade = getUniform1f("fade");
+		fogInfo = new FogInfo(this);
 
 		stop();
-	}
-
-	@Override
-	public void setupFog(float skyWidth, float skyHeight, Vector3f camPos, float renderDistanceHor, float renderDistanceVer) {
-		this.skyWidth.set(skyWidth);
-		this.skyHeight.set(skyHeight);
-		this.camPos.set(camPos);
-		this.distHor.set(renderDistanceHor);
-		this.distVer.set(renderDistanceVer);
 	}
 }

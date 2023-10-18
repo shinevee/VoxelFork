@@ -2,7 +2,7 @@ package io.bluestaggo.voxelthing.renderer.world;
 
 import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
-import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
+import io.bluestaggo.voxelthing.renderer.vertices.MixedBindings;
 import io.bluestaggo.voxelthing.renderer.vertices.VertexLayout;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.ChunkCache;
@@ -19,8 +19,7 @@ public class ChunkRenderer {
 	private boolean empty;
 	private boolean chunksLoaded;
 	private double firstAppearance;
-
-	private Bindings bindings;
+	private MixedBindings bindings;
 
 	public ChunkRenderer(MainRenderer renderer, World world, int x, int y, int z) {
 		this.renderer = renderer;
@@ -67,7 +66,7 @@ public class ChunkRenderer {
 			}
 
 			if (bindings == null) {
-				bindings = new Bindings(VertexLayout.WORLD);
+				bindings = new MixedBindings(VertexLayout.WORLD);
 			}
 
 			loadNeighborChunks();
@@ -81,11 +80,12 @@ public class ChunkRenderer {
 
 			if (!empty) {
 				bindings.upload(true);
-
-				if (wasEmpty) {
-					firstAppearance = Window.getTimeElapsed();
-				}
 			}
+
+			if (!chunk.isEmpty() && wasEmpty) {
+				firstAppearance = Window.getTimeElapsed();
+			}
+
 			needsUpdate = false;
 		}
 	}

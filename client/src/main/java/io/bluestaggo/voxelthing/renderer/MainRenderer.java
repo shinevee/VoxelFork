@@ -7,6 +7,8 @@ import io.bluestaggo.voxelthing.renderer.draw.Draw2D;
 import io.bluestaggo.voxelthing.renderer.draw.Draw3D;
 import io.bluestaggo.voxelthing.renderer.screen.Screen;
 import io.bluestaggo.voxelthing.renderer.shader.*;
+import io.bluestaggo.voxelthing.renderer.shader.modules.FogInfo;
+import io.bluestaggo.voxelthing.renderer.vertices.RenderBuffers;
 import io.bluestaggo.voxelthing.renderer.world.BlockRenderer;
 import io.bluestaggo.voxelthing.renderer.world.Camera;
 import io.bluestaggo.voxelthing.renderer.world.EntityRenderer;
@@ -146,7 +148,7 @@ public class MainRenderer {
 	private void setupWorldShader(Matrix4f viewProj) {
 		worldShader.use();
 		worldShader.mvp.set(viewProj);
-		setupFogShader(worldShader);
+		setupFogInfo(worldShader.fogInfo);
 	}
 
 	private void setupSkyShader(Matrix4f view, Matrix4f proj) {
@@ -161,11 +163,12 @@ public class MainRenderer {
 		cloudShader.use();
 		cloudShader.viewProj.set(viewPoj);
 		cloudShader.ticks.set((float) Window.getTimeElapsed());
-		setupFogShader(cloudShader);
+		cloudShader.camPos.set(camera.getPosition());
+		setupFogInfo(cloudShader.fogInfo);
 	}
 
-	public void setupFogShader(BaseFogShader shader) {
-		shader.setupFog((float) game.window.getWidth(),
+	public void setupFogInfo(FogInfo fogInfo) {
+		fogInfo.setup((float) game.window.getWidth(),
 				(float) game.window.getHeight(),
 				camera.getPosition(),
 				worldRenderer.renderDistanceHor * Chunk.LENGTH,
@@ -189,5 +192,7 @@ public class MainRenderer {
 		skyShader.unload();
 		worldShader.unload();
 		skyFramebuffer.unload();
+
+		RenderBuffers.freeBuffers();
 	}
 }

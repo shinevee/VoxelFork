@@ -3,7 +3,7 @@ package io.bluestaggo.voxelthing.renderer.world;
 import io.bluestaggo.voxelthing.renderer.GLState;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.util.Primitives;
-import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
+import io.bluestaggo.voxelthing.renderer.vertices.FloatBindings;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.World;
@@ -19,8 +19,8 @@ import static org.lwjgl.opengl.GL33C.*;
 
 public class WorldRenderer {
 	private final MainRenderer renderer;
-	private final Bindings background;
-	private final Bindings clouds;
+	private final FloatBindings background;
+	private final FloatBindings clouds;
 
 	private World world;
 	private ChunkRenderer[] chunkRenderers;
