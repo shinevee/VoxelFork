@@ -23,6 +23,12 @@ public class ScrollContainer extends Container {
 		return control;
 	}
 
+	@Override
+	public void clearControls() {
+		super.clearControls();
+		contentHeight = 0.0f;
+	}
+
 	public void addPadding(float height) {
 		addControl(new Control(screen)
 				.size(0, height)

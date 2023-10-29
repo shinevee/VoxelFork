@@ -20,11 +20,11 @@ public class BlockRenderer {
 
 	@FunctionalInterface
 	private interface SideRenderer {
-		void render(MixedBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z);
+		void render(MixedBindings bindings, IBlockAccess blockAccess, Chunk chunk, Block block, int x, int y, int z);
 	}
 
-	private float getShade(int amount) {
-		return 1.0f - SHADE_FACTOR * amount;
+	private byte getShade(int amount) {
+		return (byte) ((1.0f - SHADE_FACTOR * amount) * 255.0f);
 	}
 
 	public boolean render(MixedBindings bindings, IBlockAccess blockAccess, Chunk chunk, int x, int y, int z) {
@@ -38,20 +38,24 @@ public class BlockRenderer {
 		int zz = z + Chunk.LENGTH * chunk.z;
 		for (Direction dir : Direction.ALL) {
 			if (block.isFaceDrawn(blockAccess, xx + dir.X, yy + dir.Y, zz + dir.Z, dir)) {
-				SIDE_RENDERERS[dir.ordinal()].render(bindings, blockAccess, block, xx, yy, zz);
+				SIDE_RENDERERS[dir.ordinal()].render(bindings, blockAccess, chunk, block, xx, yy, zz);
 			}
 		}
 
 		return true;
 	}
 
-	private void renderNorthFace(MixedBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
+	private void renderNorthFace(MixedBindings bindings, IBlockAccess blockAccess, Chunk chunk, Block block, int x, int y, int z) {
 		Vector2i texture = block.getTexture().get(Direction.NORTH, blockAccess, x, y, z);
 		float texX = texture.x * Block.TEXTURE_WIDTH;
 		float texY = texture.y * Block.TEXTURE_WIDTH;
 		float texXp = texX + Block.TEXTURE_WIDTH;
 		float texYp = texY + Block.TEXTURE_WIDTH;
-		float shade = getShade(1);
+		byte shade = getShade(1);
+
+		x -= chunk.x << Chunk.SIZE_POW2;
+		y -= chunk.y << Chunk.SIZE_POW2;
+		z -= chunk.z << Chunk.SIZE_POW2;
 
 		addVertices(bindings,   x + 1,  y + 1,  z,  shade,  shade,  shade,  texX,   texY    );
 		addVertices(bindings,   x + 1,  y,      z,  shade,  shade,  shade,  texX,   texYp   );
@@ -60,13 +64,17 @@ public class BlockRenderer {
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
-	private void renderSouthFace(MixedBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
+	private void renderSouthFace(MixedBindings bindings, IBlockAccess blockAccess, Chunk chunk, Block block, int x, int y, int z) {
 		Vector2i texture = block.getTexture().get(Direction.SOUTH, blockAccess, x, y, z);
 		float texX = texture.x * Block.TEXTURE_WIDTH;
 		float texY = texture.y * Block.TEXTURE_WIDTH;
 		float texXp = texX + Block.TEXTURE_WIDTH;
 		float texYp = texY + Block.TEXTURE_WIDTH;
-		float shade = getShade(3);
+		byte shade = getShade(3);
+
+		x -= chunk.x << Chunk.SIZE_POW2;
+		y -= chunk.y << Chunk.SIZE_POW2;
+		z -= chunk.z << Chunk.SIZE_POW2;
 
 		addVertices(bindings,   x,      y + 1,  z + 1,  shade,  shade,  shade,  texX,   texY    );
 		addVertices(bindings,   x,      y,      z + 1,  shade,  shade,  shade,  texX,   texYp   );
@@ -75,13 +83,17 @@ public class BlockRenderer {
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
-	private void renderWestFace(MixedBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
+	private void renderWestFace(MixedBindings bindings, IBlockAccess blockAccess, Chunk chunk, Block block, int x, int y, int z) {
 		Vector2i texture = block.getTexture().get(Direction.WEST, blockAccess, x, y, z);
 		float texX = texture.x * Block.TEXTURE_WIDTH;
 		float texY = texture.y * Block.TEXTURE_WIDTH;
 		float texXp = texX + Block.TEXTURE_WIDTH;
 		float texYp = texY + Block.TEXTURE_WIDTH;
-		float shade = getShade(2);
+		byte shade = getShade(2);
+
+		x -= chunk.x << Chunk.SIZE_POW2;
+		y -= chunk.y << Chunk.SIZE_POW2;
+		z -= chunk.z << Chunk.SIZE_POW2;
 
 		addVertices(bindings,   x,  y + 1,  z,      shade,  shade,  shade,  texX,   texY    );
 		addVertices(bindings,   x,  y,      z,      shade,  shade,  shade,  texX,   texYp   );
@@ -90,13 +102,17 @@ public class BlockRenderer {
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
-	private void renderEastFace(MixedBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
+	private void renderEastFace(MixedBindings bindings, IBlockAccess blockAccess, Chunk chunk, Block block, int x, int y, int z) {
 		Vector2i texture = block.getTexture().get(Direction.EAST, blockAccess, x, y, z);
 		float texX = texture.x * Block.TEXTURE_WIDTH;
 		float texY = texture.y * Block.TEXTURE_WIDTH;
 		float texXp = texX + Block.TEXTURE_WIDTH;
 		float texYp = texY + Block.TEXTURE_WIDTH;
-		float shade = getShade(2);
+		byte shade = getShade(2);
+
+		x -= chunk.x << Chunk.SIZE_POW2;
+		y -= chunk.y << Chunk.SIZE_POW2;
+		z -= chunk.z << Chunk.SIZE_POW2;
 
 		addVertices(bindings,   x + 1,  y + 1,  z + 1,  shade,  shade,  shade,  texX,   texY    );
 		addVertices(bindings,   x + 1,  y,      z + 1,  shade,  shade,  shade,  texX,   texYp   );
@@ -105,13 +121,17 @@ public class BlockRenderer {
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
-	private void renderBottomFace(MixedBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
+	private void renderBottomFace(MixedBindings bindings, IBlockAccess blockAccess, Chunk chunk, Block block, int x, int y, int z) {
 		Vector2i texture = block.getTexture().get(Direction.BOTTOM, blockAccess, x, y, z);
 		float texX = texture.x * Block.TEXTURE_WIDTH;
 		float texY = texture.y * Block.TEXTURE_WIDTH;
 		float texXp = texX + Block.TEXTURE_WIDTH;
 		float texYp = texY + Block.TEXTURE_WIDTH;
-		float shade = getShade(4);
+		byte shade = getShade(4);
+
+		x -= chunk.x << Chunk.SIZE_POW2;
+		y -= chunk.y << Chunk.SIZE_POW2;
+		z -= chunk.z << Chunk.SIZE_POW2;
 
 		addVertices(bindings,   x + 1,  y,  z,      shade,  shade,  shade,  texX,   texY    );
 		addVertices(bindings,   x + 1,  y,  z + 1,  shade,  shade,  shade,  texX,   texYp   );
@@ -120,13 +140,17 @@ public class BlockRenderer {
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
-	private void renderTopFace(MixedBindings bindings, IBlockAccess blockAccess, Block block, int x, int y, int z) {
+	private void renderTopFace(MixedBindings bindings, IBlockAccess blockAccess, Chunk chunk, Block block, int x, int y, int z) {
 		Vector2i texture = block.getTexture().get(Direction.TOP, blockAccess, x, y, z);
 		float texX = texture.x * Block.TEXTURE_WIDTH;
 		float texY = texture.y * Block.TEXTURE_WIDTH;
 		float texXp = texX + Block.TEXTURE_WIDTH;
 		float texYp = texY + Block.TEXTURE_WIDTH;
-		float shade = getShade(0);
+		byte shade = getShade(0);
+
+		x -= chunk.x << Chunk.SIZE_POW2;
+		y -= chunk.y << Chunk.SIZE_POW2;
+		z -= chunk.z << Chunk.SIZE_POW2;
 
 		addVertices(bindings,   x + 1,  y + 1,  z + 1,  shade,  shade,  shade,  texX,   texY    );
 		addVertices(bindings,   x + 1,  y + 1,  z,      shade,  shade,  shade,  texX,   texYp   );
@@ -135,7 +159,7 @@ public class BlockRenderer {
 		bindings.addIndices(0, 1, 2, 2, 3, 0);
 	}
 
-	private static void addVertices(MixedBindings bindings, float x, float y, float z, float r, float g, float b, float u, float v) {
+	private static void addVertices(MixedBindings bindings, float x, float y, float z, byte r, byte g, byte b, float u, float v) {
 		bindings.put(x).put(y).put(z).put(r).put(g).put(b).put(u).put(v);
 	}
 }

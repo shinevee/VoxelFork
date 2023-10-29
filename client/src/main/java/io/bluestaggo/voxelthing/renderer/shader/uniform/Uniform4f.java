@@ -11,6 +11,10 @@ public class Uniform4f extends UniformBase<Vector4f> {
 
 	@Override
 	public void set(Vector4f value) {
-		glUniform4f(location, value.x, value.y, value.z, value.w);
+		set(value.x, value.y, value.z, value.w);
+	}
+
+	public void set(float x, float y, float z, float w) {
+		glUniform4f(location, x, y, z, w);
 	}
 }

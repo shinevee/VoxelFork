@@ -9,6 +9,14 @@ public class Uniform1f extends UniformBase<Float> {
 
 	@Override
 	public void set(Float value) {
+		set(value.floatValue());
+	}
+
+	public void set(double value) {
+		set((float) value);
+	}
+
+	public void set(float value) {
 		glUniform1f(location, value);
 	}
 }

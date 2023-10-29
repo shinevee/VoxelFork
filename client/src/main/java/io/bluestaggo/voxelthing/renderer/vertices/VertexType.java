@@ -22,6 +22,7 @@ public class VertexType {
 	public static final VertexType VECTOR2F = new VertexType(GL_FLOAT, 2);
 	public static final VertexType VECTOR3F = new VertexType(GL_FLOAT, 3);
 	public static final VertexType COLOR3F = new VertexType(GL_FLOAT, 3, true);
+	public static final VertexType COLOR3B = new VertexType(GL_UNSIGNED_BYTE, 3, true);
 
 	public final int type;
 	public final int size;

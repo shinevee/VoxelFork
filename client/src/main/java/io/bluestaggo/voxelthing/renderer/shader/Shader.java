@@ -1,10 +1,6 @@
 package io.bluestaggo.voxelthing.renderer.shader;
 
 import io.bluestaggo.voxelthing.renderer.shader.uniform.*;
-import org.joml.Matrix4f;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -89,31 +85,31 @@ public class Shader {
 		glUseProgram(handle);
 	}
 
-	public ShaderUniform<Boolean> getUniform1b(String name) {
+	public Uniform1b getUniform1b(String name) {
 		return new Uniform1b(handle, name);
 	}
 
-	public ShaderUniform<Integer> getUniform1i(String name) {
+	public Uniform1i getUniform1i(String name) {
 		return new Uniform1i(handle, name);
 	}
 
-	public ShaderUniform<Float> getUniform1f(String name) {
+	public Uniform1f getUniform1f(String name) {
 		return new Uniform1f(handle, name);
 	}
 
-	public ShaderUniform<Vector2f> getUniform2f(String name) {
+	public Uniform2f getUniform2f(String name) {
 		return new Uniform2f(handle, name);
 	}
 
-	public ShaderUniform<Vector3f> getUniform3f(String name) {
+	public Uniform3f getUniform3f(String name) {
 		return new Uniform3f(handle, name);
 	}
 
-	public ShaderUniform<Vector4f> getUniform4f(String name) {
+	public Uniform4f getUniform4f(String name) {
 		return new Uniform4f(handle, name);
 	}
 
-	public ShaderUniform<Matrix4f> getUniformMatrix4fv(String name) {
+	public UniformMatrix4fv getUniformMatrix4fv(String name) {
 		return new UniformMatrix4fv(handle, name);
 	}
 

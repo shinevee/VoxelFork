@@ -9,6 +9,10 @@ public class Uniform1b extends UniformBase<Boolean> {
 
 	@Override
 	public void set(Boolean value) {
+		set(value.booleanValue());
+	}
+
+	public void set(boolean value) {
 		glUniform1i(location, value ? 1 : 0);
 	}
 }

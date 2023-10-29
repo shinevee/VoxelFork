@@ -1,6 +1,8 @@
 package io.bluestaggo.voxelthing.gui.control;
 
 import io.bluestaggo.voxelthing.gui.screen.GuiScreen;
+import io.bluestaggo.voxelthing.renderer.MainRenderer;
+import io.bluestaggo.voxelthing.renderer.draw.Quad;
 
 public class Control {
 	protected final GuiScreen screen;
@@ -65,10 +67,30 @@ public class Control {
 	}
 
 	public void onClick(int button, int mx, int my) {
-		screen.onControlClicked(this, button);
+		if (container != null) container.onControlClicked(this, button);
+		else screen.onControlClicked(this, button);
 	}
 
 	public void draw() {
+	}
+
+	protected void drawButtonBackground() {
+		MainRenderer r = screen.game.renderer;
+		float sx = getScaledX();
+		float sy = getScaledY();
+		float sw = getScaledWidth();
+		float sh = getScaledHeight();
+
+		r.draw2D.drawQuad(Quad.shared()
+				.at(sx, sy)
+				.size(sw, sh)
+				.withColor(0.25f, 0.25f, 0.25f)
+		);
+		r.draw2D.drawQuad(Quad.shared()
+				.at(sx + 1.0f, sy + 1.0f)
+				.size(sw - 2.0f, sh - 2.0f)
+				.withColor(0.5f, 0.5f, 0.5f)
+		);
 	}
 
 	public boolean intersects(int x, int y) {

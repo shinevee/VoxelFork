@@ -1,22 +1,19 @@
 package io.bluestaggo.voxelthing.renderer.shader;
 
-import io.bluestaggo.voxelthing.renderer.shader.uniform.ShaderUniform;
-import org.joml.Matrix4f;
-import org.joml.Vector2f;
-import org.joml.Vector4f;
+import io.bluestaggo.voxelthing.renderer.shader.uniform.*;
 
 import java.io.IOException;
 
 public class QuadShader extends Shader {
-	public final ShaderUniform<Matrix4f> viewProj;
-	public final ShaderUniform<Vector2f> offset;
-	public final ShaderUniform<Vector2f> size;
-	public final ShaderUniform<Vector4f> uvRange;
-	public final ShaderUniform<Float> screenScale;
+	public final UniformMatrix4fv viewProj;
+	public final Uniform2f offset;
+	public final Uniform2f size;
+	public final Uniform4f uvRange;
+	public final Uniform1f screenScale;
 
-	public final ShaderUniform<Integer> tex;
-	public final ShaderUniform<Boolean> hasTex;
-	public final ShaderUniform<Vector4f> color;
+	public final Uniform1i tex;
+	public final Uniform1b hasTex;
+	public final Uniform4f color;
 
 	public QuadShader() throws IOException {
 		super("/assets/shaders/quad");

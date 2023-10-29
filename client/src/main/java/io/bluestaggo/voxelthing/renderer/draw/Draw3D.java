@@ -11,7 +11,7 @@ import java.io.IOException;
 public class Draw3D {
 	private final MainRenderer renderer;
 
-	private final FloatBindings bindings = new FloatBindings(VertexLayout.WORLD);
+	private final FloatBindings bindings = new FloatBindings(VertexLayout.WORLD_FLOAT);
 	private final FloatBindings billboard = new FloatBindings(VertexType.VECTOR3F);
 	private final FloatBindings clouds = new FloatBindings(VertexType.VECTOR3F);
 

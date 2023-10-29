@@ -9,6 +9,10 @@ public class Uniform1i extends UniformBase<Integer> {
 
 	@Override
 	public void set(Integer value) {
+		set(value.intValue());
+	}
+
+	public void set(int value) {
 		glUniform1i(location, value);
 	}
 }

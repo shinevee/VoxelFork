@@ -4,7 +4,7 @@ import io.bluestaggo.voxelthing.Game;
 import io.bluestaggo.voxelthing.gui.control.Control;
 import io.bluestaggo.voxelthing.gui.control.LabeledButton;
 import io.bluestaggo.voxelthing.gui.control.ScrollContainer;
-import io.bluestaggo.voxelthing.gui.control.WorldButton;
+import io.bluestaggo.voxelthing.gui.control.WorldPanel;
 import io.bluestaggo.voxelthing.renderer.GLState;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Quad;
@@ -43,8 +43,12 @@ public class SaveSelect extends GuiScreen {
 				.alignedSize(1.0f, 1.0f)
 		);
 
-		Path worldsPath = game.saveDir.resolve("worlds");
-		try (Stream<Path> worlds = Files.list(worldsPath)) {
+		refresh();
+	}
+
+	public void refresh() {
+		worldContainer.clearControls();
+		try (Stream<Path> worlds = Files.list(game.worldDir)) {
 			worlds.filter(Files::isDirectory)
 					.map(p -> {
 						try {
@@ -54,7 +58,7 @@ public class SaveSelect extends GuiScreen {
 						}
 					})
 					.filter(Objects::nonNull)
-					.map(s -> new WorldButton(this, s)
+					.map(s -> new WorldPanel(this, s)
 							.at(-75, 0)
 							.size(150, 20)
 							.alignedAt(0.5f, 0.0f)
@@ -62,10 +66,6 @@ public class SaveSelect extends GuiScreen {
 					.forEach(worldContainer::addControl);
 		} catch (IOException e) {
 		}
-	}
-
-	@Override
-	public void tick() {
 	}
 
 	@Override
@@ -87,8 +87,16 @@ public class SaveSelect extends GuiScreen {
 
 	@Override
 	public void onControlClicked(Control control, int button) {
-		if (control instanceof WorldButton world) {
-			game.startWorld(world.saveHandler);
+		if (control instanceof WorldPanel world) {
+			switch (button) {
+				case 0:
+					game.startWorld(world.saveHandler);
+					break;
+
+				case 1:
+					game.openGui(new DeleteWorld(game, world.saveHandler, world.worldName));
+					break;
+			}
 		} else if (control == backButton) {
 			game.closeGui();
 		} else if (control == newWorldButton) {

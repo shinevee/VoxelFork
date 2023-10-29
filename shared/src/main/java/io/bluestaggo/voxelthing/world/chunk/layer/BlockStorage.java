@@ -19,6 +19,7 @@ public class BlockStorage {
 	private final List<Block> mutablePalette;
 	private final BlockLayer[] layers;
 	private final IntList blockCounts = new IntList();
+	private final List<IntList> blockCountsPerLayer = new ArrayList<>();
 
 	public BlockStorage() {
 		this(new ArrayList<>());
@@ -31,6 +32,7 @@ public class BlockStorage {
 	public BlockStorage(BlockLayer[] layers, List<Block> palette) {
 		this.layers = layers;
 		for (int i = 0; i < layers.length; i++) {
+			blockCountsPerLayer.add(new IntList());
 			if (layers[i] == null) {
 				layers[i] = new EmptyBlockLayer();
 			}
@@ -75,13 +77,37 @@ public class BlockStorage {
 
 		int oldId = layer.getBlockId(x, z);
 		if (index != oldId) {
+			IntList layerBlockCounts = blockCountsPerLayer.get(y);
 			layer.setBlockId(x, z, index);
 			blockCounts.set(index, blockCounts.get(index) + 1);
+			if (layerBlockCounts.size() <= index) {
+				layerBlockCounts.set(index, 0);
+			}
+			layerBlockCounts.set(index, layerBlockCounts.get(index) + 1);
 
 			if (oldId > 0) {
 				blockCounts.set(oldId, blockCounts.get(oldId) - 1);
+				layerBlockCounts.set(oldId, layerBlockCounts.get(oldId) - 1);
 				if (blockCounts.get(oldId) <= 0) {
 					mutablePalette.set(oldId, null);
+				}
+
+				boolean emptyLayer = true;
+				for (int i = 0; i < layerBlockCounts.size(); i++) {
+					int count = layerBlockCounts.get(i);
+					if (count > 0) {
+						emptyLayer = false;
+					}
+
+					if (count >= Chunk.AREA) {
+						layers[y] = new SingleBlockLayer(i);
+						break;
+					}
+				}
+
+				if (emptyLayer) {
+					layerBlockCounts.clear();
+					layers[y] = new EmptyBlockLayer();
 				}
 			}
 		}
@@ -92,15 +118,18 @@ public class BlockStorage {
 			blockCounts.set(i, 0);
 		}
 
+		int y = 0;
 		for (BlockLayer layer : layers) {
 			for (int x = 0; x < Chunk.LENGTH; x++) {
 				for (int z = 0; z < Chunk.LENGTH; z++) {
 					int id = layer.getBlockId(x, z);
 					if (id > 0) {
 						blockCounts.set(id, blockCounts.get(id) + 1);
+						blockCountsPerLayer.get(y).set(id, blockCounts.get(id) + 1);
 					}
 				}
 			}
+			y++;
 		}
 	}
 

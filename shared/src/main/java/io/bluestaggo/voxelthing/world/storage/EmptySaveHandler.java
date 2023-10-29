@@ -20,4 +20,8 @@ public class EmptySaveHandler implements ISaveHandler {
 	@Override
 	public void saveChunkData(int x, int y, int z, CompoundItem data) {
 	}
+
+	@Override
+	public void delete() {
+	}
 }

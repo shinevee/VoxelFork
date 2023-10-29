@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public abstract class StructureItem {
 	private static final List<Class<? extends StructureItem>> REGISTERED_TYPES = List.of(
@@ -147,17 +149,21 @@ public abstract class StructureItem {
 		write(stream);
 	}
 
-	public static StructureItem readItemFromPath(Path path) throws IOException {
+	public static StructureItem readItemFromPath(Path path, boolean compressed) throws IOException {
 		try (InputStream istream = Files.newInputStream(path)) {
-			var distream = new DataInputStream(istream);
-			return readItem(distream);
+			try (InputStream cistream = compressed ? new GZIPInputStream(istream) : istream) {
+				var distream = new DataInputStream(cistream);
+				return readItem(distream);
+			}
 		}
 	}
 
-	public void writeItemToPath(Path path) throws IOException {
+	public void writeItemToPath(Path path, boolean compressed) throws IOException {
 		try (OutputStream ostream = Files.newOutputStream(path)) {
-			var dostream = new DataOutputStream(ostream);
-			writeItem(dostream);
+			try (OutputStream costream = compressed ? new GZIPOutputStream(ostream) : ostream) {
+				var dostream = new DataOutputStream(costream);
+				writeItem(dostream);
+			}
 		}
 	}
 }

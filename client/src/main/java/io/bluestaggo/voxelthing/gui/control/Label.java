@@ -42,10 +42,14 @@ public class Label extends Control {
 			font = r.fonts.shadowed;
 		}
 
-		font.print(
-				text,
-				sx + (sw - font.getStringLength(text)) * textAlignX,
-				sy + (sh - font.lineHeight) * textAlignY
-		);
+		String[] lines = text.split("\n");
+		for (String line : lines) {
+			font.print(
+					line,
+					sx + (sw - font.getStringLength(line)) * textAlignX,
+					sy + (sh - font.lineHeight * lines.length) * textAlignY
+			);
+			sy += font.lineHeight;
+		}
 	}
 }

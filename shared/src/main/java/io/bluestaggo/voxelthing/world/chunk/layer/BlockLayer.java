@@ -7,7 +7,8 @@ public abstract class BlockLayer {
 			EmptyBlockLayer.class,
 			NibbleBlockLayer.class,
 			ByteBlockLayer.class,
-			ShortBlockLayer.class
+			ShortBlockLayer.class,
+			SingleBlockLayer.class
 	);
 
 	public abstract int getBlockId(int x, int z);
@@ -32,7 +33,7 @@ public abstract class BlockLayer {
 
 	public static BlockLayer decode(byte type, byte[] bytes) {
 		try {
-			return REGISTERED_TYPES.get(type).getDeclaredConstructor(byte[].class).newInstance(bytes);
+			return REGISTERED_TYPES.get(type).getDeclaredConstructor(byte[].class).newInstance((Object) bytes);
 		} catch (NoSuchMethodException
 				| InstantiationException
 				| IllegalAccessException

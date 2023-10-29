@@ -125,16 +125,16 @@ public class Entity {
 		return MathUtil.lerp(prevPosZ, posZ, world.partialTick);
 	}
 
-	public float getRenderX() {
-		return (float) getPartialX();
+	public double getRenderX() {
+		return getPartialX();
 	}
 
-	public float getRenderY() {
-		return (float) getPartialY();
+	public double getRenderY() {
+		return getPartialY();
 	}
 
-	public float getRenderZ() {
-		return (float) getPartialZ();
+	public double getRenderZ() {
+		return getPartialZ();
 	}
 
 	public int getBlockX() {
@@ -159,6 +159,10 @@ public class Entity {
 
 	public double getPartialVelZ() {
 		return MathUtil.lerp(prevVelZ, velZ, world.partialTick);
+	}
+
+	public double getEyeHeight() {
+		return posY + height - 0.3;
 	}
 
 	public float getRenderYaw() {

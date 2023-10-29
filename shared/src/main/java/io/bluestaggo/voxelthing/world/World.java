@@ -123,7 +123,7 @@ public class World implements IBlockAccess {
 
 				for (int y = 0; y < Chunk.LENGTH; y++) {
 					int yy = cy * Chunk.LENGTH + y;
-					boolean cave = yy < height && genInfo.getCave(x, yy, z);
+					boolean cave = yy < height && genInfo.getCave(x, yy, z) && false;
 					Block block = null;
 
 					if (!cave) {

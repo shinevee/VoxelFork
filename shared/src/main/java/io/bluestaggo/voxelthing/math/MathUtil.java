@@ -78,6 +78,14 @@ public final class MathUtil {
 		return mod;
 	}
 
+	public static double floorMod(double x, double y) {
+		double mod = x % y;
+		if (mod < 0) {
+			mod += y;
+		}
+		return mod;
+	}
+
 	public static float squareOut(float x) {
 		return 1.0f - (1.0f - x) * (1.0f - x);
 	}

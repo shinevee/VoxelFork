@@ -1,15 +1,16 @@
 package io.bluestaggo.voxelthing.renderer.shader;
 
-import io.bluestaggo.voxelthing.renderer.shader.uniform.ShaderUniform;
-import org.joml.Matrix4f;
+import io.bluestaggo.voxelthing.renderer.shader.uniform.Uniform1b;
+import io.bluestaggo.voxelthing.renderer.shader.uniform.Uniform1i;
+import io.bluestaggo.voxelthing.renderer.shader.uniform.UniformMatrix4fv;
 
 import java.io.IOException;
 
 public class ScreenShader extends Shader {
-	public final ShaderUniform<Matrix4f> mvp;
+	public final UniformMatrix4fv mvp;
 
-	public final ShaderUniform<Integer> tex;
-	public final ShaderUniform<Boolean> hasTex;
+	public final Uniform1i tex;
+	public final Uniform1b hasTex;
 
 	public ScreenShader() throws IOException {
 		super("/assets/shaders/screen");

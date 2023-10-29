@@ -24,7 +24,7 @@ public class Chunk implements IBlockAccess {
 	public final World world;
 	public final int x, y, z;
 
-	private BlockStorage blockStorage;
+	private final BlockStorage blockStorage;
 	private boolean hasChanged;
 	private boolean needsCullingUpdate;
 

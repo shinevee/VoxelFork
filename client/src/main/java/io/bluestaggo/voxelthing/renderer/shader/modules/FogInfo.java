@@ -1,16 +1,18 @@
 package io.bluestaggo.voxelthing.renderer.shader.modules;
 
 import io.bluestaggo.voxelthing.renderer.shader.Shader;
-import io.bluestaggo.voxelthing.renderer.shader.uniform.ShaderUniform;
+import io.bluestaggo.voxelthing.renderer.shader.uniform.Uniform1f;
+import io.bluestaggo.voxelthing.renderer.shader.uniform.Uniform1i;
+import io.bluestaggo.voxelthing.renderer.shader.uniform.Uniform3f;
 import org.joml.Vector3f;
 
 public class FogInfo {
-	public final ShaderUniform<Integer> skyTex;
-	public final ShaderUniform<Float> skyWidth;
-	public final ShaderUniform<Float> skyHeight;
-	public final ShaderUniform<Vector3f> camPos;
-	public final ShaderUniform<Float> distHor;
-	public final ShaderUniform<Float> distVer;
+	public final Uniform1i skyTex;
+	public final Uniform1f skyWidth;
+	public final Uniform1f skyHeight;
+	public final Uniform3f camPos;
+	public final Uniform1f distHor;
+	public final Uniform1f distVer;
 
 	public FogInfo(Shader shader) {
 		(skyTex = shader.getUniform1i("fogInfo.skyTex")).set(1);

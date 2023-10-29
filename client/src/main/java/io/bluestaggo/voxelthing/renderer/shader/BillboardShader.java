@@ -1,25 +1,21 @@
 package io.bluestaggo.voxelthing.renderer.shader;
 
 import io.bluestaggo.voxelthing.renderer.shader.modules.FogInfo;
-import io.bluestaggo.voxelthing.renderer.shader.uniform.ShaderUniform;
-import org.joml.Matrix4f;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
+import io.bluestaggo.voxelthing.renderer.shader.uniform.*;
 
 import java.io.IOException;
 
 public class BillboardShader extends Shader {
-	public final ShaderUniform<Matrix4f> modelView;
-	public final ShaderUniform<Matrix4f> proj;
-	public final ShaderUniform<Vector3f> position;
-	public final ShaderUniform<Vector2f> align;
-	public final ShaderUniform<Vector2f> size;
-	public final ShaderUniform<Vector4f> uvRange;
+	public final UniformMatrix4fv modelView;
+	public final UniformMatrix4fv proj;
+	public final Uniform3f position;
+	public final Uniform2f align;
+	public final Uniform2f size;
+	public final Uniform4f uvRange;
 
-	public final ShaderUniform<Integer> tex;
-	public final ShaderUniform<Boolean> hasTex;
-	public final ShaderUniform<Vector4f> color;
+	public final Uniform1i tex;
+	public final Uniform1b hasTex;
+	public final Uniform4f color;
 	public final FogInfo fogInfo;
 
 	public BillboardShader() throws IOException {

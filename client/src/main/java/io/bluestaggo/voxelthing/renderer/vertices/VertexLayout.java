@@ -11,6 +11,11 @@ import static org.lwjgl.opengl.GL33C.*;
 public class VertexLayout {
 	public static final VertexLayout WORLD = new VertexLayout(
 			VertexType.VECTOR3F,
+			VertexType.COLOR3B,
+			VertexType.VECTOR2F
+	);
+	public static final VertexLayout WORLD_FLOAT = new VertexLayout(
+			VertexType.VECTOR3F,
 			VertexType.COLOR3F,
 			VertexType.VECTOR2F
 	);

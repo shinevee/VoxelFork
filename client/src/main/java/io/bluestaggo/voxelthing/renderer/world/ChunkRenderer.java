@@ -8,12 +8,13 @@ import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.ChunkCache;
 import io.bluestaggo.voxelthing.world.World;
 import io.bluestaggo.voxelthing.world.chunk.Chunk;
-import org.joml.FrustumIntersection;
+import org.joml.Vector3d;
 
 public class ChunkRenderer {
 	private final MainRenderer renderer;
 	private final World world;
 	private final ChunkCache cache;
+	private BlockRenderer blockRenderer;
 	private int x, y, z;
 	private boolean needsUpdate;
 	private boolean empty;
@@ -25,7 +26,7 @@ public class ChunkRenderer {
 		this.renderer = renderer;
 		this.world = world;
 		this.cache = new ChunkCache(world);
-		this.setPosition(x, y, z);
+		setPosition(x, y, z);
 	}
 
 	public void setPosition(int x, int y, int z) {
@@ -116,9 +117,15 @@ public class ChunkRenderer {
 		return world.getChunkAt(x, y, z);
 	}
 
-	public boolean inFrustum(FrustumIntersection frustum) {
-		return frustum.testAab(x * Chunk.LENGTH, y * Chunk.LENGTH, z * Chunk.LENGTH,
-				(x + 1) * Chunk.LENGTH, (y + 1) * Chunk.LENGTH, (z + 1) * Chunk.LENGTH);
+	public boolean inCamera(Camera camera) {
+		Vector3d offset = camera.getOffset();
+		float minX = (float)(x * Chunk.LENGTH - offset.x);
+		float minY = (float)(y * Chunk.LENGTH - offset.y);
+		float minZ = (float)(z * Chunk.LENGTH - offset.z);
+		float maxX = minX + Chunk.LENGTH;
+		float maxY = minY + Chunk.LENGTH;
+		float maxZ = minZ + Chunk.LENGTH;
+		return camera.getFrustum().testAab(minX, minY, minZ, maxX, maxY, maxZ);
 	}
 
 	public double getFadeAmount(double time) {

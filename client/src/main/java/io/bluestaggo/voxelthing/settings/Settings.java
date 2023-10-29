@@ -56,7 +56,7 @@ public class Settings {
 		StructureItem data;
 
 		try {
-			data = StructureItem.readItemFromPath(path);
+			data = StructureItem.readItemFromPath(path, false);
 		} catch (IOException e) {
 			return;
 		}
@@ -90,7 +90,7 @@ public class Settings {
 		}
 
 		try {
-			data.writeItemToPath(savePath);
+			data.writeItemToPath(savePath, false);
 		} catch (IOException e) {
 			System.err.println("Failed to save settings!");
 			e.printStackTrace();

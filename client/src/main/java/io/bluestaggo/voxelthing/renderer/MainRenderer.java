@@ -3,6 +3,7 @@ package io.bluestaggo.voxelthing.renderer;
 import io.bluestaggo.voxelthing.Game;
 import io.bluestaggo.voxelthing.assets.FontManager;
 import io.bluestaggo.voxelthing.assets.TextureManager;
+import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.renderer.draw.Draw2D;
 import io.bluestaggo.voxelthing.renderer.draw.Draw3D;
 import io.bluestaggo.voxelthing.renderer.screen.Screen;
@@ -16,7 +17,7 @@ import io.bluestaggo.voxelthing.renderer.world.WorldRenderer;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.chunk.Chunk;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
+import org.joml.Vector3d;
 import org.joml.Vector4f;
 
 import java.io.IOException;
@@ -47,14 +48,14 @@ public class MainRenderer {
 	private final Vector4f skyColor = new Vector4f(0.2f, 0.6f, 1.0f, 1.0f);
 	private final Framebuffer skyFramebuffer;
 
-	private final Vector3f prevUpdatePos = new Vector3f();
+	private final Vector3d prevUpdatePos = new Vector3d();
 
 	public MainRenderer(Game game) {
 		this.game = game;
 
 		try {
 			camera = new Camera(game.window);
-			camera.getPosition(prevUpdatePos);
+			prevUpdatePos.set(camera.getOffset());
 			screen = new Screen(game.window);
 
 			textures = new TextureManager();
@@ -82,9 +83,9 @@ public class MainRenderer {
 		screen.updateDimensions();
 		skyFramebuffer.resize(game.window.getWidth(), game.window.getHeight());
 
-		if (prevUpdatePos.distance(camera.getPosition()) > 8.0f) {
+		if (prevUpdatePos.distance(camera.getOffset()) > 8.0) {
 			worldRenderer.moveRenderers();
-			camera.getPosition(prevUpdatePos);
+			prevUpdatePos.set(camera.getOffset());
 		}
 
 		camera.setFar((float) Math.sqrt(worldRenderer.renderDistanceHor * worldRenderer.renderDistanceHor
@@ -160,10 +161,16 @@ public class MainRenderer {
 	}
 
 	private void setupCloudShader(Matrix4f viewPoj) {
+		Vector3d offsetPosition = camera.getOffset();
+		double offX = offsetPosition.x + Window.getTimeElapsed();
+		double offY = offsetPosition.y;
+		double offZ = offsetPosition.z;
+		offX = MathUtil.floorMod(offX, 4096.0);
+		offZ = MathUtil.floorMod(offZ, 4096.0);
+
 		cloudShader.use();
 		cloudShader.viewProj.set(viewPoj);
-		cloudShader.ticks.set((float) Window.getTimeElapsed());
-		cloudShader.camPos.set(camera.getPosition());
+		cloudShader.offset.set((float)offX, (float)offY, (float)offZ);
 		setupFogInfo(cloudShader.fogInfo);
 	}
 

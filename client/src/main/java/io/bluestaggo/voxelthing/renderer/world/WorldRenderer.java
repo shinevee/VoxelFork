@@ -4,11 +4,13 @@ import io.bluestaggo.voxelthing.renderer.GLState;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.util.Primitives;
 import io.bluestaggo.voxelthing.renderer.vertices.FloatBindings;
+import io.bluestaggo.voxelthing.renderer.vertices.MixedBindings;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.World;
 import io.bluestaggo.voxelthing.world.chunk.Chunk;
-import org.joml.FrustumIntersection;
+import org.joml.Matrix4f;
+import org.joml.Vector3d;
 import org.joml.Vector3f;
 
 import java.util.*;
@@ -19,7 +21,7 @@ import static org.lwjgl.opengl.GL33C.*;
 
 public class WorldRenderer {
 	private final MainRenderer renderer;
-	private final FloatBindings background;
+	private final MixedBindings background;
 	private final FloatBindings clouds;
 
 	private World world;
@@ -35,6 +37,10 @@ public class WorldRenderer {
 	public int renderDistanceVer = 8;
 	private int renderRangeHor;
 	private int renderRangeVer;
+
+	private final Matrix4f viewProj = new Matrix4f();
+	private final Matrix4f mvp = new Matrix4f();
+	private final Vector3f camPos = new Vector3f();
 
 	public WorldRenderer(MainRenderer renderer) {
 		this.renderer = renderer;
@@ -92,13 +98,15 @@ public class WorldRenderer {
 
 		sortedCulledChunkRenderers = sortedChunkRenderers;
 
+		renderer.camera.getViewProj(viewProj);
+		Vector3d offset = renderer.camera.getOffset();
+
 		int updates = 0;
 		int maxUpdates = 1;
 		double currentTime = Window.getTimeElapsed();
-		FrustumIntersection frustum = renderer.camera.getFrustum();
 
 		for (ChunkRenderer chunkRenderer : sortedCulledChunkRenderers) {
-			if (!chunkRenderer.inFrustum(frustum)) continue;
+			if (chunkRenderer.isEmpty() && !chunkRenderer.needsUpdate() || !chunkRenderer.inCamera(renderer.camera)) continue;
 
 			if (updates < maxUpdates) {
 				boolean neededUpdate = chunkRenderer.needsUpdate();
@@ -108,6 +116,15 @@ public class WorldRenderer {
 				}
 			}
 
+			float offX = (float) (chunkRenderer.getX() * Chunk.LENGTH - offset.x);
+			float offY = (float) (chunkRenderer.getY() * Chunk.LENGTH - offset.y);
+			float offZ = (float) (chunkRenderer.getZ() * Chunk.LENGTH - offset.z);
+
+			viewProj.translate(offX, offY, offZ, mvp);
+			renderer.camera.getPosition().sub(offX, offY, offZ, camPos);
+
+			renderer.worldShader.mvp.set(mvp);
+			renderer.worldShader.fogInfo.camPos.set(camPos);
 			renderer.worldShader.fade.set((float)chunkRenderer.getFadeAmount(currentTime));
 			chunkRenderer.draw();
 		}
@@ -136,7 +153,7 @@ public class WorldRenderer {
 		queue.add(step);
 		culledChunkRenderers.add(getRendererAt(step.x, step.y, step.z));
 
-		while (queue.size() > 0) {
+		while (!queue.isEmpty()) {
 			CulledChunkStep next = queue.remove();
 			ChunkRenderer chunkRenderer = getRendererAt(next.x, next.y, next.z);
 			Chunk chunk = chunkRenderer != null ? chunkRenderer.getChunk() : null;
@@ -198,7 +215,7 @@ public class WorldRenderer {
 	}
 
 	public void moveRenderers() {
-		Vector3f cameraPos = renderer.camera.getPosition();
+		Vector3d cameraPos = renderer.camera.getOffset();
 		int x = (int)Math.floor(cameraPos.x / Chunk.LENGTH);
 		int y = (int)Math.floor(cameraPos.y / Chunk.LENGTH);
 		int z = (int)Math.floor(cameraPos.z / Chunk.LENGTH);
@@ -231,7 +248,7 @@ public class WorldRenderer {
 	}
 
 	private int compareChunks(ChunkRenderer a, ChunkRenderer b) {
-		Vector3f cameraPos = renderer.camera.getPosition();
+		Vector3d cameraPos = renderer.camera.getOffset();
 
 		int ax = (a.getX() - (int)(cameraPos.x / Chunk.LENGTH));
 		int ay = (a.getY() - (int)(cameraPos.y / Chunk.LENGTH));

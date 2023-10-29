@@ -1,17 +1,16 @@
 package io.bluestaggo.voxelthing.renderer.shader;
 
-import io.bluestaggo.voxelthing.renderer.shader.uniform.ShaderUniform;
-import org.joml.Matrix4f;
-import org.joml.Vector4f;
+import io.bluestaggo.voxelthing.renderer.shader.uniform.Uniform4f;
+import io.bluestaggo.voxelthing.renderer.shader.uniform.UniformMatrix4fv;
 
 import java.io.IOException;
 
 public class SkyShader extends Shader {
-	public final ShaderUniform<Matrix4f> view;
-	public final ShaderUniform<Matrix4f> proj;
+	public final UniformMatrix4fv view;
+	public final UniformMatrix4fv proj;
 
-	public final ShaderUniform<Vector4f> fogCol;
-	public final ShaderUniform<Vector4f> skyCol;
+	public final Uniform4f fogCol;
+	public final Uniform4f skyCol;
 
 	public SkyShader() throws IOException {
 		super("/assets/shaders/sky");

@@ -263,9 +263,9 @@ public class Game {
 		if (isInWorld()) {
 			world.partialTick = partialTick;
 
-			float px = (float) player.getPartialX();
-			float py = (float) player.getPartialY();
-			float pz = (float) player.getPartialZ();
+			double px = player.getPartialX();
+			double py = player.getPartialY();
+			double pz = player.getPartialZ();
 			float yaw = (float) player.rotYaw;
 			float pitch = (float) player.rotPitch;
 
@@ -277,7 +277,8 @@ public class Game {
 				pitch += player.getFallAmount() * 2.5;
 			}
 
-			renderer.camera.setPosition(px, py, pz);
+			renderer.camera.setPosition(0.0f, 0.0f, 0.0f);
+			renderer.camera.setOffset(px, py, pz);
 			renderer.camera.setRotation(yaw, pitch);
 
 			if (world != null) {
@@ -288,8 +289,7 @@ public class Game {
 			if (settings.thirdPerson.getValue()) {
 				renderer.camera.moveForward(-4.0f);
 			} else if (settings.viewBobbing.getValue()) {
-				py += Math.abs(player.getRenderWalk()) * 0.1f;
-				renderer.camera.setPosition(px, py, pz);
+				renderer.camera.addPosition(0.0f, (float)Math.abs(player.getRenderWalk()) * 0.1f, 0.0f);
 				renderer.camera.moveRight((float) player.getRenderWalk() * 0.05f);
 			}
 		}
@@ -300,6 +300,8 @@ public class Game {
 			player.posX = world.random.nextDouble(-1000.0, 1000.0);
 			player.posY = 64.0;
 			player.posZ = world.random.nextDouble(-1000.0, 1000.0);
+			player.posX = Integer.MAX_VALUE;
+			player.posZ = Integer.MAX_VALUE;
 			player.velX = 0.0;
 			player.velY = 0.0;
 			player.velZ = 0.0;

@@ -1,10 +1,7 @@
 
 # TODO List
 
-Current goal: create a game akin to Minecraft Classic with building and destruction in an infinitely generated world.
-
-Key:
-- 🤔 Thinking faces denote features that may not be implemented, but they may be worked on.
+Current goal: create a game similar to Minecraft Classic with building and destruction in an infinitely generated world.
 
 ## Rendering
 - [x] Frustum culling
@@ -12,16 +9,20 @@ Key:
 - [x] 2D immediate mode renderer (for guis)
 - [x] 3D immediate mode renderer (for entities)
 - [x] Clouds
+- [ ] Translucent blocks (e.g. water)
 
 ## Gameplay
 - [x] Player entity with physics
 - [x] Block building and destruction
 - [x] Block inventory
-- [ ] Partial blocks (e.g. slabs)
 - [x] World saving and loading
 - [x] Block ID flattening
+- [ ] Partial blocks with block models (e.g. slabs)
+- [ ] Block states
+- [ ] Lighting
+- [ ] Improved world generation
 
 ## Bugs
 - [ ] Fix raycasts
 - [x] Fix player animation jitter
-- [ ] Fix distance jitter
+- [x] Fix distance jitter

@@ -141,7 +141,7 @@ public class Player extends Entity {
 	}
 
 	@Override
-	public float getRenderY() {
+	public double getRenderY() {
 		return super.getRenderY() + (float) Math.abs(getRenderWalk() / 3.0);
 	}
 

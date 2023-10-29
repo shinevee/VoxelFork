@@ -11,6 +11,10 @@ public class Uniform2f extends UniformBase<Vector2f> {
 
 	@Override
 	public void set(Vector2f value) {
-		glUniform2f(location, value.x, value.y);
+		set(value.x, value.y);
+	}
+
+	public void set(float x, float y) {
+		glUniform2f(location, x, y);
 	}
 }

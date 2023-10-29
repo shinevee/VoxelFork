@@ -11,6 +11,8 @@ public class Camera {
 	private final Window window;
 
 	private final Vector3f position = new Vector3f();
+	private final Vector3d offset = new Vector3d();
+	private final Vector3d offsetPosition = new Vector3d();
 	private final FrustumIntersection frustum = new FrustumIntersection();
 	private final Vector3f front;
 	private final Vector3f up = new Vector3f();
@@ -45,10 +47,26 @@ public class Camera {
 	}
 
 	public void setPosition(float x, float y, float z) {
-		this.position.x = x;
-		this.position.y = y;
-		this.position.z = z;
+		position.x = x;
+		position.y = y;
+		position.z = z;
+		offset.add(position, offsetPosition);
 		updateVectors();
+	}
+
+	public void addPosition(float x, float y, float z) {
+		position.x += x;
+		position.y += y;
+		position.z += z;
+		offset.add(position, offsetPosition);
+		updateVectors();
+	}
+
+	public void setOffset(double x, double y, double z) {
+		offset.x = x;
+		offset.y = y;
+		offset.z = z;
+		offset.add(position, offsetPosition);
 	}
 
 	public void setRotation(float yaw, float pitch) {
@@ -62,7 +80,7 @@ public class Camera {
 
 	public BlockRaycast getRaycast(double length) {
 		return new BlockRaycast(
-				new Vector3d(position),
+				offset,
 				new Vector3d(front),
 				length
 		);
@@ -100,6 +118,14 @@ public class Camera {
 
 	public Vector3f getPosition(Vector3f vector) {
 		return vector.set(position);
+	}
+
+	public Vector3d getOffset() {
+		return offset;
+	}
+
+	public Vector3d getOffsetPosition() {
+		return offsetPosition;
 	}
 
 	public float getNear() {

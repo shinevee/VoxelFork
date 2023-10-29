@@ -1,20 +1,20 @@
 package io.bluestaggo.voxelthing.renderer.util;
 
-import io.bluestaggo.voxelthing.renderer.vertices.FloatBindings;
+import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
 
-public abstract class Primitives {
-	private static Primitives world;
-	private static Primitives vector3f;
+public abstract class Primitives<T extends Bindings> {
+	private static WorldPrimitives world;
+	private static Vector3fPrimitives vector3f;
 
-	protected abstract FloatBindings newBindings();
+	protected abstract T newBindings();
 
-	protected abstract void addPosition(FloatBindings bindings, float x, float y, float z);
+	protected abstract void addPosition(T bindings, float x, float y, float z);
 
-	protected abstract void addColor(FloatBindings bindings, float r, float g, float b);
+	protected abstract void addColor(T bindings, float r, float g, float b);
 
-	protected abstract void addUv(FloatBindings bindings, float u, float v);
+	protected abstract void addUv(T bindings, float u, float v);
 
-	public FloatBindings generateSphere(FloatBindings bindings, float radius, int rings, int sectors) {
+	public T generateSphere(T bindings, float radius, int rings, int sectors) {
 		if (bindings == null) bindings = newBindings();
 
 		bindings.clear();
@@ -61,15 +61,15 @@ public abstract class Primitives {
 		return bindings;
 	}
 
-	public FloatBindings generatePlane(FloatBindings bindings) {
+	public T generatePlane(T bindings) {
 		return generatePlane(bindings, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
-	public FloatBindings generatePlane(FloatBindings bindings, float x, float z, float width, float length) {
+	public T generatePlane(T bindings, float x, float z, float width, float length) {
 		return generatePlane(bindings, x, z, width, length, 1.0f, 1.0f, 1.0f);
 	}
 
-	public FloatBindings generatePlane(FloatBindings bindings, float x, float z, float width, float length, float r, float g, float b) {
+	public T generatePlane(T bindings, float x, float z, float width, float length, float r, float g, float b) {
 		if (bindings == null) bindings = newBindings();
 
 		addPosition(bindings, width + x, 0.0f, length + z);
@@ -93,14 +93,14 @@ public abstract class Primitives {
 		return bindings;
 	}
 
-	public static Primitives inWorld() {
+	public static WorldPrimitives inWorld() {
 		if (world == null) {
 			world = new WorldPrimitives();
 		}
 		return world;
 	}
 
-	public static Primitives ofVector3f() {
+	public static Vector3fPrimitives ofVector3f() {
 		if (vector3f == null) {
 			vector3f = new Vector3fPrimitives();
 		}

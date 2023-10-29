@@ -3,7 +3,7 @@ package io.bluestaggo.voxelthing.renderer.util;
 import io.bluestaggo.voxelthing.renderer.vertices.FloatBindings;
 import io.bluestaggo.voxelthing.renderer.vertices.VertexType;
 
-public class Vector3fPrimitives extends Primitives {
+public class Vector3fPrimitives extends Primitives<FloatBindings> {
 	@Override
 	protected FloatBindings newBindings() {
 		return new FloatBindings(VertexType.VECTOR3F);

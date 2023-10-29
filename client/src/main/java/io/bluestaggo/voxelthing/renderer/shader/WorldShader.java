@@ -1,17 +1,19 @@
 package io.bluestaggo.voxelthing.renderer.shader;
 
 import io.bluestaggo.voxelthing.renderer.shader.modules.FogInfo;
-import io.bluestaggo.voxelthing.renderer.shader.uniform.ShaderUniform;
-import org.joml.Matrix4f;
+import io.bluestaggo.voxelthing.renderer.shader.uniform.Uniform1b;
+import io.bluestaggo.voxelthing.renderer.shader.uniform.Uniform1f;
+import io.bluestaggo.voxelthing.renderer.shader.uniform.Uniform1i;
+import io.bluestaggo.voxelthing.renderer.shader.uniform.UniformMatrix4fv;
 
 import java.io.IOException;
 
 public class WorldShader extends Shader {
-	public final ShaderUniform<Matrix4f> mvp;
+	public final UniformMatrix4fv mvp;
 
-	public final ShaderUniform<Integer> tex;
-	public final ShaderUniform<Boolean> hasTex;
-	public final ShaderUniform<Float> fade;
+	public final Uniform1i tex;
+	public final Uniform1b hasTex;
+	public final Uniform1f fade;
 	public final FogInfo fogInfo;
 
 	public WorldShader() throws IOException {

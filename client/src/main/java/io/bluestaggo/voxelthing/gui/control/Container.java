@@ -18,6 +18,10 @@ public class Container extends Control {
 		return control;
 	}
 
+	public void clearControls() {
+		controls.clear();
+	}
+
 	@Override
 	public void draw() {
 		for (Control control : controls) {
@@ -30,5 +34,10 @@ public class Container extends Control {
 		for (Control control : controls) {
 			control.checkMouseClicked(button, mx, my);
 		}
+	}
+
+	public void onControlClicked(Control control, int button) {
+		if (container != null) container.onControlClicked(control, button);
+		else screen.onControlClicked(control, button);
 	}
 }

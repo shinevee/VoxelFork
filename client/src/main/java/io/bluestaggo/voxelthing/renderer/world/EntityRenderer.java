@@ -4,6 +4,7 @@ import io.bluestaggo.voxelthing.assets.Texture;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Billboard;
 import io.bluestaggo.voxelthing.world.entity.Entity;
+import org.joml.Vector3d;
 
 public class EntityRenderer {
 	private final MainRenderer renderer;
@@ -14,6 +15,7 @@ public class EntityRenderer {
 
 	public void renderEntity(Entity entity) {
 		Texture texture = renderer.textures.getTexture(entity.getTexture());
+		Vector3d camOffset = renderer.camera.getOffset();
 
 		int rotation = entity.getRenderRotation(renderer.camera.getYaw());
 		float minX = texture.uCoord(entity.getRenderFrame() * 32);
@@ -22,7 +24,11 @@ public class EntityRenderer {
 		float maxY = minY + texture.vCoord(32);
 
 		renderer.draw3D.drawBillboard(Billboard.shared()
-				.at(entity.getRenderX(), entity.getRenderY(), entity.getRenderZ())
+				.at(
+						(float) (entity.getRenderX() - camOffset.x),
+						(float) (entity.getRenderY() - camOffset.y),
+						(float) (entity.getRenderZ() - camOffset.z)
+				)
 				.scale(entity.getRenderWidth(), entity.getRenderHeight())
 				.align(0.5f, 0.0f)
 				.withTexture(texture)
