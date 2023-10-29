@@ -14,12 +14,10 @@ Nothing much here yet, huh? What will this be? Well, it is heading towards being
 - E: Inventory
 - Q: No-clip
 - R: Teleport to a random position
-- Shift + F: Double fog distance
 - F1: Toggle GUI
 - F3: Debug menu
-- Escape: Exit and save world
-- ]: Increase GUI scale
-- [: Decrease GUI scale
+- F5: Toggle third person
+- Escape: Open pause menu
 
 ## Play
 There are two ways to play Voxel Thing:

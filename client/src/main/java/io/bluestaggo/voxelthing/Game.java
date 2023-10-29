@@ -300,8 +300,6 @@ public class Game {
 			player.posX = world.random.nextDouble(-1000.0, 1000.0);
 			player.posY = 64.0;
 			player.posZ = world.random.nextDouble(-1000.0, 1000.0);
-			player.posX = Integer.MAX_VALUE;
-			player.posZ = Integer.MAX_VALUE;
 			player.velX = 0.0;
 			player.velY = 0.0;
 			player.velZ = 0.0;
