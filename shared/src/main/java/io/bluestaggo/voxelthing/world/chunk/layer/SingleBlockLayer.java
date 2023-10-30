@@ -16,6 +16,10 @@ public class SingleBlockLayer extends BlockLayer {
 		this.id = id;
 	}
 
+	public SingleBlockLayer(byte[] bytes) {
+		this(ByteBuffer.wrap(bytes).asIntBuffer().get());
+	}
+
 	@Override
 	public int getBlockId(int x, int z) {
 		return id;

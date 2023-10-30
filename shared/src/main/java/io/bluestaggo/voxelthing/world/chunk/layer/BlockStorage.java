@@ -120,12 +120,17 @@ public class BlockStorage {
 
 		int y = 0;
 		for (BlockLayer layer : layers) {
+			IntList layerBlockCounts = blockCountsPerLayer.get(y);
 			for (int x = 0; x < Chunk.LENGTH; x++) {
 				for (int z = 0; z < Chunk.LENGTH; z++) {
 					int id = layer.getBlockId(x, z);
 					if (id > 0) {
+						if (layerBlockCounts.size() <= id) {
+							layerBlockCounts.set(id, 0);
+						}
+
 						blockCounts.set(id, blockCounts.get(id) + 1);
-						blockCountsPerLayer.get(y).set(id, blockCounts.get(id) + 1);
+						layerBlockCounts.set(id, layerBlockCounts.get(id) + 1);
 					}
 				}
 			}
