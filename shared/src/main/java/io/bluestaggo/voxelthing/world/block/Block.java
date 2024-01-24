@@ -59,6 +59,11 @@ public class Block {
 	public static final Block[] WOOL = IntStream.range(0, WOOL_NAMES.length)
 			.mapToObj(i -> new Block("wool_" + WOOL_NAMES[i]).withTex(i % 4, i / 4 + 3))
 			.toArray(Block[]::new);
+	public static final Block MARINE_BRICKS = new Block("marine_bricks").withTex(4, 4);
+	public static final Block[] STAINED_GLASS = IntStream.range(0, WOOL_NAMES.length)
+			.mapToObj(i -> new Block("stained_glass_" + WOOL_NAMES[i]).withTex(i % 4, i / 4 + 7).transparency(BlockTransparency.FULL).translucent(true))
+			.toArray(Block[]::new);
+	public static final Block CHERRY_LEAVES = new Block("cherry_leaves").withTex(4, 5).transparency(BlockTransparency.THICK);
 
 	public final Identifier id;
 	protected BlockTexture texture;
