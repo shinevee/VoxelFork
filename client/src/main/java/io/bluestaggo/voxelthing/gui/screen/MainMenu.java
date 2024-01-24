@@ -23,7 +23,7 @@ public class MainMenu extends GuiScreen {
 	private final Control settingsButton;
 
 	static {
-		List<String> splashes = List.of("No splashes?");
+		List<String> splashes = List.of("sometimes the road is like that for a reason..");
 
 		try (InputStream istream = MainMenu.class.getResourceAsStream("/splashes.txt")) {
 			if (istream != null) {
@@ -71,11 +71,11 @@ public class MainMenu extends GuiScreen {
 				.withTexture(r.textures.getTexture("/assets/gui/titlebg.png")));
 
 		float hover = (float) Math.sin(Window.getTimeElapsed() * Math.PI);
-		r.fonts.outlined.printCentered("VOXEL THING",
+		r.fonts.outlined.printCentered("VOXEL FORK",
 				r.screen.getWidth() / 2.0f,
 				20.0f + hover * 2.0f,
 				0.0f, 1.0f, 1.0f, 4.0f);
-		r.fonts.shadowed.printCentered("§cffff55" + splash,
+		r.fonts.shadowed.printCentered("§cdbca02" + splash,
 				r.screen.getWidth() / 2.0f,
 				60.0f + hover * 4.0f);
 

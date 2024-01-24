@@ -17,7 +17,7 @@ public class DebugGui extends GuiScreen {
 		FontManager fonts = game.renderer.fonts;
 		Screen screen = game.renderer.screen;
 
-		fonts.outlined.print("§c00ffffVOXEL THING    §c00ff00" + Game.VERSION, 5, 5, 1.0f, 1.0f, 1.0f);
+		fonts.outlined.print("§c7aff0aVOXEL FORK    §c00ff00" + Game.VERSION, 5, 5, 1.0f, 1.0f, 1.0f);
 
 		long freeMB = Runtime.getRuntime().freeMemory() / 1000000L;
 		long totalMB = Runtime.getRuntime().totalMemory() / 1000000L;
@@ -36,7 +36,7 @@ public class DebugGui extends GuiScreen {
 						? formatDouble(game.player.posX)
 						+ ", " + formatDouble(game.player.posY)
 						+ ", " + formatDouble(game.player.posZ)
-						: "N/A",
+						: "null",
 				"Looking At", raycastText,
 				"Scroll", formatDouble(game.window.getScrollX()) + ", " + formatDouble(game.window.getScrollY())
 		};
