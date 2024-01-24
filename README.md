@@ -20,7 +20,7 @@
 ## Play
 Download [the latest release](https://github.com/shinevee/VoxelFork/releases/latest) & run the jar*
 
-*Java 21 or later is required to run Voxel Fork from release. 17 should be enough to compile
+*Java 17 or later is required to run Voxel Fork.
 
 ## Voxel Thing Credits
 ![STAGGO: Lead developer](doc/credits/staggo.png)
