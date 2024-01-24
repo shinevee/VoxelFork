@@ -62,7 +62,7 @@ public class Window {
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-		handle = glfwCreateWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, "Voxel Thing", 0, 0);
+		handle = glfwCreateWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, "Voxel Fork", 0, 0);
 		if (handle == 0) {
 			throw new IllegalStateException("Failed to open window!");
 		}
