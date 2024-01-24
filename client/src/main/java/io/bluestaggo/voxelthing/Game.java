@@ -116,15 +116,15 @@ public class Game {
 	private static Path getSaveDir() {
 		String home = System.getProperty("user.home", ".");
 		Path dir = switch (OperatingSystem.get()) {
-			case WINDOWS -> Path.of(Optional.ofNullable(System.getenv("APPDATA")).orElse(home), "VoxelThing");
-			case MACOS -> Path.of(home, "Library", "Application Support", "Voxel Thing");
-			default -> Path.of(home, ".voxelthing");
+			case WINDOWS -> Path.of(Optional.ofNullable(System.getenv("APPDATA")).orElse(home), "VoxelFork");
+			case MACOS -> Path.of(home, "Library", "Application Support", "Voxel Fork");
+			default -> Path.of(home, ".voxelfork");
 		};
 
 		try {
 			Files.createDirectories(dir);
 		} catch (IOException e) {
-			throw new RuntimeException("Failed to create Voxel Thing data directory!", e);
+			throw new RuntimeException("Failed to create Voxel Fork data directory!", e);
 		}
 
 		return dir;
@@ -144,7 +144,7 @@ public class Game {
 				stackTracePrinter.println("An exception has occured!");
 				e.printStackTrace(stackTracePrinter);
 				stackTracePrinter.println("Continue execution?");
-				boolean stop = JOptionPane.showConfirmDialog(null, stackTrace, "Voxel Thing: Exception", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE) != 1;
+				boolean stop = JOptionPane.showConfirmDialog(null, stackTrace, "Voxel Fork: Exception", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE) != 1;
 
 				if (!stop) {
 					break;
