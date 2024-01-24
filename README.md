@@ -1,4 +1,4 @@
-![VOXEL THING](doc/logo.png)
+![VOXEL FORK](doc/logo.png)
 
 ## Controls
 - WASD: Fly around
@@ -25,5 +25,4 @@ Download [the latest release](https://github.com/shinevee/VoxelFork/releases/lat
 ## Voxel Thing Credits
 ![STAGGO: Lead developer](doc/credits/staggo.png)
 ![FLOOF: Densigner](doc/credits/floof.png)
-
-[//]: # (![TALON: Just a cool guy ig]&#40;doc/credits/talon.png&#41;)
+![TALON: did the clouds](doc/credits/talon.png)
