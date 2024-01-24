@@ -123,7 +123,7 @@ public class World implements IBlockAccess {
 
 				for (int y = 0; y < Chunk.LENGTH; y++) {
 					int yy = cy * Chunk.LENGTH + y;
-					boolean cave = yy < height && genInfo.getCave(x, yy, z) && false;
+					boolean cave = yy < height && genInfo.getCave(x, yy, z);
 					Block block = null;
 
 					if (!cave) {
@@ -133,6 +133,8 @@ public class World implements IBlockAccess {
 							block = Block.DIRT;
 						} else if (yy < height) {
 							block = Block.GRASS;
+						} else if (yy < 0) {
+							block = Block.WATER;
 						}
 					}
 

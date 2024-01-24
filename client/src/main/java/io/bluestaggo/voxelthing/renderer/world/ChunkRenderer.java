@@ -14,13 +14,14 @@ public class ChunkRenderer {
 	private final MainRenderer renderer;
 	private final World world;
 	private final ChunkCache cache;
-	private BlockRenderer blockRenderer;
 	private int x, y, z;
 	private boolean needsUpdate;
 	private boolean empty;
+	private boolean emptyTranslucent;
 	private boolean chunksLoaded;
 	private double firstAppearance;
 	private MixedBindings bindings;
+	private MixedBindings translucentBindings;
 
 	public ChunkRenderer(MainRenderer renderer, World world, int x, int y, int z) {
 		this.renderer = renderer;
@@ -35,6 +36,7 @@ public class ChunkRenderer {
 		this.z = z;
 		needsUpdate = true;
 		empty = true;
+		emptyTranslucent = true;
 		chunksLoaded = false;
 	}
 
@@ -51,14 +53,24 @@ public class ChunkRenderer {
 	}
 
 	public boolean isEmpty() {
+		return empty && emptyTranslucent;
+	}
+
+	public boolean isEmptyOpaque() {
+		return empty;
+	}
+
+	public boolean isEmptyTranslucent() {
 		return empty;
 	}
 
 	public void render() {
 		boolean wasEmpty = empty;
+		boolean wasEmptyTranslucent = emptyTranslucent;
 
 		if (needsUpdate) {
 			empty = true;
+			emptyTranslucent = true;
 			Chunk chunk = world.getOrLoadChunkAt(x, y, z);
 
 			if (chunk == null || chunk.isEmpty()) {
@@ -70,20 +82,37 @@ public class ChunkRenderer {
 				bindings = new MixedBindings(VertexLayout.WORLD);
 			}
 
+			if (translucentBindings == null) {
+				translucentBindings = new MixedBindings(VertexLayout.WORLD);
+			}
+
 			loadNeighborChunks();
 			for (int xx = 0; xx < Chunk.LENGTH; xx++) {
 				for (int yy = 0; yy < Chunk.LENGTH; yy++) {
 					for (int zz = 0; zz < Chunk.LENGTH; zz++) {
-						 empty &= !renderer.blockRenderer.render(bindings, cache, chunk, xx, yy, zz);
+						 renderer.blockRenderer.render(bindings, translucentBindings, cache, chunk, xx, yy, zz);
 					}
 				}
 			}
 
+			empty = bindings.isEmpty();
+			emptyTranslucent = translucentBindings.isEmpty();
+
 			if (!empty) {
 				bindings.upload(true);
+			} else {
+				bindings.unload();
+				bindings = null;
 			}
 
-			if (!chunk.isEmpty() && wasEmpty) {
+			if (!emptyTranslucent) {
+				translucentBindings.upload(true);
+			} else {
+				translucentBindings.unload();
+				translucentBindings = null;
+			}
+
+			if (!chunk.isEmpty() && (wasEmpty && wasEmptyTranslucent)) {
 				firstAppearance = Window.getTimeElapsed();
 			}
 
@@ -94,6 +123,12 @@ public class ChunkRenderer {
 	public void draw() {
 		if (!empty && bindings != null) {
 			bindings.draw();
+		}
+	}
+
+	public void drawTranslucent() {
+		if (!emptyTranslucent && translucentBindings != null) {
+			translucentBindings.draw();
 		}
 	}
 

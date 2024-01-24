@@ -27,7 +27,7 @@ public class BlockRenderer {
 		return (byte) ((1.0f - SHADE_FACTOR * amount) * 255.0f);
 	}
 
-	public boolean render(MixedBindings bindings, IBlockAccess blockAccess, Chunk chunk, int x, int y, int z) {
+	public boolean render(MixedBindings bindings, MixedBindings translucentBindings, IBlockAccess blockAccess, Chunk chunk, int x, int y, int z) {
 		Block block = chunk.getBlock(x, y, z);
 		if (block == null) {
 			return false;
@@ -38,7 +38,7 @@ public class BlockRenderer {
 		int zz = z + Chunk.LENGTH * chunk.z;
 		for (Direction dir : Direction.ALL) {
 			if (block.isFaceDrawn(blockAccess, xx + dir.X, yy + dir.Y, zz + dir.Z, dir)) {
-				SIDE_RENDERERS[dir.ordinal()].render(bindings, blockAccess, chunk, block, xx, yy, zz);
+				SIDE_RENDERERS[dir.ordinal()].render(block.isTranslucent() ? translucentBindings : bindings, blockAccess, chunk, block, xx, yy, zz);
 			}
 		}
 

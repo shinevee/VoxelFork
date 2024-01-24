@@ -115,6 +115,10 @@ public class WorldRenderer {
 					updates++;
 				}
 			}
+		}
+
+		for (ChunkRenderer chunkRenderer : sortedCulledChunkRenderers) {
+			if (chunkRenderer.isEmptyOpaque()) continue;
 
 			float offX = (float) (chunkRenderer.getX() * Chunk.LENGTH - offset.x);
 			float offY = (float) (chunkRenderer.getY() * Chunk.LENGTH - offset.y);
@@ -127,6 +131,25 @@ public class WorldRenderer {
 			renderer.worldShader.fogInfo.camPos.set(camPos);
 			renderer.worldShader.fade.set((float)chunkRenderer.getFadeAmount(currentTime));
 			chunkRenderer.draw();
+		}
+
+		try (var state = new GLState()) {
+			state.enable(GL_BLEND);
+			for (ChunkRenderer chunkRenderer : sortedCulledChunkRenderers) {
+				if (chunkRenderer.isEmptyTranslucent()) continue;
+
+				float offX = (float) (chunkRenderer.getX() * Chunk.LENGTH - offset.x);
+				float offY = (float) (chunkRenderer.getY() * Chunk.LENGTH - offset.y);
+				float offZ = (float) (chunkRenderer.getZ() * Chunk.LENGTH - offset.z);
+
+				viewProj.translate(offX, offY, offZ, mvp);
+				renderer.camera.getPosition().sub(offX, offY, offZ, camPos);
+
+				renderer.worldShader.mvp.set(mvp);
+				renderer.worldShader.fogInfo.camPos.set(camPos);
+				renderer.worldShader.fade.set((float)chunkRenderer.getFadeAmount(currentTime));
+				chunkRenderer.drawTranslucent();
+			}
 		}
 
 		renderer.worldShader.fade.set(0.0f);

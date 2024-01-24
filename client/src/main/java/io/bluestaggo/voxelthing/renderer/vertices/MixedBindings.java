@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 
 public class MixedBindings extends Bindings {
 	private ByteBuffer nextData = MemoryUtil.memAlloc(10);
+	private boolean empty;
 
 	public MixedBindings(VertexLayout layout) {
 		super(layout);
@@ -19,6 +20,7 @@ public class MixedBindings extends Bindings {
 		resizeByteBuffer(1);
 		nextData.put(vertex);
 		coordCount++;
+		empty = false;
 		return this;
 	}
 
@@ -26,6 +28,7 @@ public class MixedBindings extends Bindings {
 		resizeByteBuffer(2);
 		nextData.putShort(vertex);
 		coordCount++;
+		empty = false;
 		return this;
 	}
 
@@ -33,6 +36,7 @@ public class MixedBindings extends Bindings {
 		resizeByteBuffer(4);
 		nextData.putInt(vertex);
 		coordCount++;
+		empty = false;
 		return this;
 	}
 
@@ -40,6 +44,7 @@ public class MixedBindings extends Bindings {
 		resizeByteBuffer(4);
 		nextData.putFloat(vertex);
 		coordCount++;
+		empty = false;
 		return this;
 	}
 
@@ -65,6 +70,7 @@ public class MixedBindings extends Bindings {
 		} else {
 			nextData.clear();
 		}
+		empty = true;
 	}
 
 	@Override
@@ -72,5 +78,9 @@ public class MixedBindings extends Bindings {
 		super.unload();
 		MemoryUtil.memFree(nextData);
 		nextData = null;
+	}
+
+	public boolean isEmpty() {
+		return empty;
 	}
 }
