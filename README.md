@@ -18,7 +18,7 @@
 - Escape: Open pause menu
 
 ## Play
-Downloa [the latest release](https://github.com/shinevee/VoxelFork/releases/latest) & run the jar*!
+Download [the latest release](https://github.com/shinevee/VoxelFork/releases/latest) & run the jar*
 
 *Java 17 or later is required to run Voxel Fork.
 
