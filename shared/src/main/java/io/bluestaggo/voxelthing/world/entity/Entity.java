@@ -15,7 +15,7 @@ public class Entity {
 	private final AABB collisionBox = new AABB();
 	private final AABB offsetBox = new AABB();
 	public double width = 0.4;
-	public double height = 1.8;
+	public double height = 0.8;
 
 	private double prevPosX;
 	private double prevPosY;
