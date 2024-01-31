@@ -26,3 +26,7 @@ Download [the latest release](https://github.com/shinevee/VoxelFork/releases/lat
 ![STAGGO: Lead developer](doc/credits/staggo.png)
 ![FLOOF: Densigner](doc/credits/floof.png)
 ![TALON: did the clouds](doc/credits/talon.png)
+
+## Voxel Fork Credits
+![Shinevee: yeah](doc/fork-credits/shinevee.png)
+![FLOOF: chibis now 2px shorter](doc/fork-credits/floof.png)
