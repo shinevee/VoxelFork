@@ -64,6 +64,10 @@ public class Block {
 			.mapToObj(i -> new Block("stained_glass_" + WOOL_NAMES[i]).withTex(i % 4, i / 4 + 7).transparency(BlockTransparency.FULL).translucent(true))
 			.toArray(Block[]::new);
 	public static final Block CHERRY_LEAVES = new Block("cherry_leaves").withTex(4, 5).transparency(BlockTransparency.THICK);
+	public static final Block VIOLET_STONE = new Block("violet_stone").withTex(4, 6);
+	public static final Block VIOLET_COBBLESTONE = new Block("violet_cobblestone").withTex(4, 7);
+	public static final Block VIOLET_POLISHED_STONE = new Block("violet_polished_stone").withTex(4, 8);
+	public static final Block VIOLET_STONE_BRICKS = new Block("violet_stone_bricks").withTex(4, 9);
 
 	public final Identifier id;
 	protected BlockTexture texture;
