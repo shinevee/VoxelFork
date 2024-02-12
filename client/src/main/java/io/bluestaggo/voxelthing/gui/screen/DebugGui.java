@@ -17,7 +17,7 @@ public class DebugGui extends GuiScreen {
 		FontManager fonts = game.renderer.fonts;
 		Screen screen = game.renderer.screen;
 
-		fonts.outlined.print("§c7aff0aVOXEL FORK    §c00ff00" + Game.VERSION, 5, 5, 1.0f, 1.0f, 1.0f);
+		fonts.outlined.print("§c7aff0aVOXEL FORK    §c3DD3D3" + Game.VERSION, 5, 5, 1.0f, 1.0f, 1.0f);
 
 		long freeMB = Runtime.getRuntime().freeMemory() / 1000000L;
 		long totalMB = Runtime.getRuntime().totalMemory() / 1000000L;

@@ -50,7 +50,7 @@ public class MainMenu extends GuiScreen {
 				.alignedAt(0.5f, 0.5f)
 		);
 		settingsButton = addControl(new LabeledButton(this)
-				.withText("Settings")
+				.withText("Options")
 				.at(-50.0f, 30.0f)
 				.size(100.0f, 20.0f)
 				.alignedAt(0.5f, 0.5f)
