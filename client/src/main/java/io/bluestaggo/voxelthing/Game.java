@@ -69,13 +69,13 @@ public class Game {
 	public Player player;
 	public IPlayerController playerController;
 
-	public Block[] palette = new Block[9];
+	public Block[] palette = new Block[10];
 	public int heldItem;
 
 	private final GuiScreen debugGui;
 	private final GuiScreen inGameGui;
 	private GuiScreen currentGui;
-	private boolean debugMenu = true;
+	private boolean debugMenu = false;
 
 	private BlockRaycast blockRaycast;
 
