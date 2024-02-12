@@ -13,8 +13,8 @@ import org.lwjgl.opengl.GL33C;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class BlockInventory extends GuiScreen {
-	private static final int ROWS = 11;
-	private static final int COLUMNS = 5;
+	private static final int ROWS = 15;
+	private static final int COLUMNS = 7;
 
 	public BlockInventory(Game game) {
 		super(game);
