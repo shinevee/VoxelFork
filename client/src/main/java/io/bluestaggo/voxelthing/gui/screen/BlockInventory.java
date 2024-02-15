@@ -36,7 +36,7 @@ public class BlockInventory extends GuiScreen {
 			);
 
 			String title = "SELECT BLOCK";
-			r.fonts.outlined.print(title, (r.screen.getWidth() - r.fonts.outlined.getStringLength(title)) / 2.0f, 20);
+			r.fonts.outlined.print(title, (r.screen.getWidth() - r.fonts.outlined.getStringLength(title)) / 2.0f, 5);
 		}
 
 		Texture hotbarTexture = r.textures.getTexture("/assets/gui/hotbar.png");
