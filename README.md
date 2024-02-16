@@ -6,7 +6,7 @@
 - Space: Jump
 - Double Space: Fly
 - Shift: Fly down
-- 1-9: Select block
+- 1-9 + 0: Select slot
 - Left click: Place block
 - Right click: Break block
 - E: Inventory
