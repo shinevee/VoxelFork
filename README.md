@@ -9,7 +9,7 @@
 - 1-9 + 0: Select slot
 - Left click: Place block
 - Right click: Break block
-- E: Inventory
+- E: Block Selection
 - Q: No-clip
 - R: Teleport to a random position
 - F1: Toggle GUI
