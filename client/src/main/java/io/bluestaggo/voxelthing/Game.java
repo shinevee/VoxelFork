@@ -55,7 +55,8 @@ public class Game {
 	public static final String[] SKINS = {
 			"joel",
 			"staggo",
-			"floof"
+			"floof",
+			"talon"
 	};
 
 	private static Game instance;
