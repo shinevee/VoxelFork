@@ -11,7 +11,6 @@
 - Right click: Break block
 - E: Block Selection
 - Q: No-clip
-- R: Teleport to a random position
 - F1: Toggle GUI
 - F3: Debug menu
 - F5: Toggle third person
