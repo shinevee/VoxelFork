@@ -68,6 +68,13 @@ public class Block {
 	public static final Block VIOLET_COBBLESTONE = new Block("violet_cobblestone").withTex(4, 7);
 	public static final Block VIOLET_POLISHED_STONE = new Block("violet_polished_stone").withTex(4, 8);
 	public static final Block VIOLET_STONE_BRICKS = new Block("violet_stone_bricks").withTex(4, 9);
+	public static final Block CRACKED_POLISHED_STONE = new Block("cracked_polished_stone").withTex(4, 10);
+	public static final Block CRACKED_VIOLET_POLISHED_STONE = new Block("cracked_violet_polished_stone").withTex(5, 4);
+	public static final Block CRACKED_STONE_BRICKS = new Block("cracked_stone_bricks").withTex(5, 2);
+	public static final Block CRACKED_VIOLET_STONE_BRICKS = new Block("cracked_violet_stone_bricks").withTex(5, 3);
+	public static final Block CRACKED_BRICKS = new Block("cracked_bricks").withTex(5, 0);
+	public static final Block CRACKED_MARINE_BRICKS = new Block("cracked_marine_bricks").withTex(5, 1);
+	//	public static final Block placeholder = new Block("null").withTex(0, 0);
 
 	public final Identifier id;
 	protected BlockTexture texture;
