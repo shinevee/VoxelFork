@@ -56,7 +56,8 @@ public class Game {
 			"joel",
 			"staggo",
 			"floof",
-			"talon"
+			"talon"/*,
+			"new"*/
 	};
 
 	private static Game instance;
@@ -296,14 +297,14 @@ public class Game {
 	}
 
 	private void doControls() {
-		if (window.isKeyJustPressed(GLFW_KEY_R)) {
+		/*if (window.isKeyJustPressed(GLFW_KEY_R)) {
 			player.posX = world.random.nextDouble(-1000.0, 1000.0);
 			player.posY = 64.0;
 			player.posZ = world.random.nextDouble(-1000.0, 1000.0);
 			player.velX = 0.0;
 			player.velY = 0.0;
 			player.velZ = 0.0;
-		}
+		}*/
 
 		if (window.isKeyJustPressed(GLFW_KEY_F1)) {
 			settings.hideGui.setValue(!settings.hideGui.getValue());
